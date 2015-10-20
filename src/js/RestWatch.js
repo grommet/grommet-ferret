@@ -1,7 +1,5 @@
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 
-console.log('!!! RestWatch LOAD');
-
 var Rest = require('grommet/utils/Rest');
 
 var RECONNECT_TIMEOUT = 5000; // 5s

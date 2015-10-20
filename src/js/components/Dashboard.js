@@ -2,7 +2,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { navActivate, dashboardLayout, dashboardLoad, dashboardUnload } from '../actions';
+import { navActivate, dashboardLayout, dashboardLoad, dashboardUnload, indexNav } from '../actions';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Header from 'grommet/components/Header';
@@ -61,8 +61,7 @@ class Dashboard extends Component {
   }
 
   _onClickSegment(tile, query) {
-    // TODO
-    //this.context.router.transitionTo(tile.route, {}, {q: query.fullText});
+    this.props.dispatch(indexNav(tile.category, query));
   }
 
   _layout() {

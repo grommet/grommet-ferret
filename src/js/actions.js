@@ -26,6 +26,7 @@ export const DASHBOARD_LOAD = 'DASHBOARD_LOAD';
 export const DASHBOARD_UNLOAD = 'DASHBOARD_UNLOAD';
 
 // index page
+export const INDEX_NAV = 'INDEX_NAV';
 export const INDEX_LOAD = 'INDEX_LOAD';
 export const INDEX_ACTIVATE = 'INDEX_ACTIVATE';
 export const INDEX_SELECT = 'INDEX_SELECT';
@@ -132,6 +133,11 @@ function defaultParams(category, index) {
     sort: index.sort,
     start: 0
   };
+}
+
+export function indexNav(category, query) {
+  history.pushState(null, '/' + category, {q: query.fullText});
+  return { type: INDEX_NAV, category: category, query: query };
 }
 
 export function indexLoad(category, index) {

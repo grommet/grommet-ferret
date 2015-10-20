@@ -37,8 +37,7 @@ class IndexerLogin extends Component {
     }
     return (
       <Split flex="left" separator={true}>
-        <Section full={true} pad="none" texture="url(img/vaults.jpg)">
-        </Section>
+        <Section full={true} pad="none" texture="url(img/vaults.jpg)" />
         <Sidebar justify="center" align="center" pad="medium" size="large">
           <LoginForm
             logo={<Logo size="large" />}
