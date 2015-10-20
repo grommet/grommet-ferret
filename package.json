@@ -1,0 +1,23 @@
+{
+  "name": "grommet-ferret",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/grommet/grommet-ferret.git"
+  },
+  "dependencies": {
+    "grommet": "https://github.com/grommet/grommet/tarball/stable",
+    "history": "^1.12.5",
+    "react": "^0.14.0",
+    "react-dom": "^0.14.0",
+    "react-redux": "^3.1.0",
+    "react-router": "^1.0.0-rc3",
+    "redux": "^3.0.2",
+    "redux-thunk": "^1.0.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "redux-devtools": "^2.1.5"
+  }
+}

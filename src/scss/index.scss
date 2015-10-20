@@ -1,0 +1,31 @@
+// (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
+
+@import '~grommet/scss/hpe/hpe.defaults';
+@import '~grommet/scss/grommet-core/index';
+
+// TODO: explore moving to grommet-core
+.title {
+  &:hover {
+   .logo-icon {
+     g {
+       stroke: $brand-color;
+     }
+   }
+  }
+}
+
+.sidebar {
+  @include media-query(lap-and-up) {
+    @include animation('slide-sidebar 0.2s');
+  }
+}
+
+@include keyframes(slide-sidebar) {
+  0% {
+    width: 0px;
+  }
+
+  100% {
+    width: $sidebar-width;
+  }
+}

@@ -1,0 +1,10 @@
+**bower_components**
+node_modules
+**/dist*/**
+**/dist-bower*/**
+.DS_Store
+.sass-cache
+*.log
+*tmp*
+**sublime-project**
+**sublime-workspace**
