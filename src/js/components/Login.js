@@ -3,7 +3,9 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { login } from '../actions';
-import Login from 'grommet/components/Login';
+import Split from 'grommet/components/Split';
+import Section from 'grommet/components/Section';
+import Sidebar from 'grommet/components/Sidebar';
 import LoginForm from 'grommet/components/LoginForm';
 import Logo from './Logo';
 
@@ -34,13 +36,17 @@ class IndexerLogin extends Component {
       errors.push(resolution);
     }
     return (
-      <Login background={"img/vaults.jpg"}>
-        <LoginForm
-          logo={<Logo />}
-          title="Indexer"
-          onSubmit={this._onSubmit}
-          errors={errors} />
-      </Login>
+      <Split flex="left" separator={true}>
+        <Section full={true} pad="none" texture="url(img/vaults.jpg)">
+        </Section>
+        <Sidebar justify="center" align="center" pad="medium" size="large">
+          <LoginForm
+            logo={<Logo size="large" />}
+            title="Ferret"
+            onSubmit={this._onSubmit}
+            errors={errors} />
+        </Sidebar>
+      </Split>
     );
   }
 }
