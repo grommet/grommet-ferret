@@ -1,8 +1,7 @@
 var gulp = require('gulp');
 var path = require('path');
 //var nodemon = require('gulp-nodemon');
-//var gulpTasks = require('grommet/utils/gulp/gulp-tasks');
-var gulpTasks = require('../grommet/src/utils/gulp/gulp-tasks');
+var gulpTasks = require('grommet/utils/gulp/gulp-tasks');
 
 var opts = {
   base: '.',
