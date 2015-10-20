@@ -175,7 +175,7 @@ class Dashboard extends Component {
           onMouseOut={this._onOutTitle}>
           <Title onClick={this._onClickTitle}>
             <Logo />
-            <span>Indexer</span>
+            <span>Ferret</span>
           </Title>
         </span>
       );

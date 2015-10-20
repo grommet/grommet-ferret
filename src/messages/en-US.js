@@ -1,9 +1,10 @@
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 module.exports = {
   'Active Alerts': 'Active Alerts',
-  Dashboard: 'Dashboard',
   Activity: 'Activity',
+  Dashboard: 'Dashboard',
   Enclosures: 'Enclosures',
+  Ferret: 'Ferret',
   'Server Hardware': 'Server Hardware',
   'Server Profiles': 'Server Profiles',
   Reports: 'Reports',

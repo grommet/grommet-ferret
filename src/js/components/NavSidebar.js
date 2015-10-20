@@ -39,7 +39,7 @@ class NavSidebar extends Component {
         <Header large={true} justify="between" pad={{horizontal: 'medium'}}>
           <Title onClick={this._onClose}>
             <Logo />
-            <span>Indexer</span>
+            <span>Ferret</span>
           </Title>
           <Menu responsive={false}>
             <div onClick={this._onClose}>

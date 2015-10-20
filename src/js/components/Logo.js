@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 
-class IndexerLogo extends Component {
+class FerretLogo extends Component {
 
   render() {
     var className = 'logo-icon';
@@ -11,17 +11,12 @@ class IndexerLogo extends Component {
     }
     return (
       <svg className={className} viewBox="0 0 120 120" version="1.1">
-        <g stroke="#231F20" strokeWidth="5" fill="none" fillRule="evenodd" transform="translate(-31.000000, -2.000000)">
-          <g transform="translate(91.000000, 34.000000) rotate(45.000000) translate(-91.000000, -34.000000) translate(67.000000, 10.000000)">
-              <path d="M37.9151515,18.9575758 C37.9151515,29.4275103 29.4275103,37.9151515 18.9575758,37.9151515 C8.48764121,37.9151515 0,29.4275103 0,18.9575758 C0,8.48764121 8.48764121,0 18.9575758,0 C29.4275103,0 37.9151515,8.48764121 37.9151515,18.9575758 L37.9151515,18.9575758 Z M32.3878788,32.3878788 L48,48 L32.3878788,32.3878788 Z" id="Shape"></path>
-          </g>
-          <path d="M99,34 C99,78.4890633 127.91172,102 167,102" transform="translate(133.000000, 68.000000) rotate(45.000000) translate(-133.000000, -68.000000) "></path>
-          <path d="M15,33 C15,77.4890633 43.9117203,101 83,101" transform="translate(49.000000, 67.000000) scale(-1, -1) rotate(45.000000) translate(-49.000000, -67.000000) "></path>
-          <g transform="translate(71.000000, 78.000000)">
-            <path d="M12.5,2.5 L28.5,2.5"></path>
-            <path d="M6.5,17.5 L34.5,17.5"></path>
-            <path d="M0,32.5 L40,32.5"></path>
-          </g>
+        <g stroke="#231F20" strokeWidth="5" fill="none" fillRule="evenodd">
+          <path d="M51.9151515,59.9575758 C51.9151515,70.4275103 43.4275103,78.9151515 32.9575758,78.9151515 C22.4876412,78.9151515 14,70.4275103 14,59.9575758 C14,49.4876412 22.4876412,41 32.9575758,41 C43.4275103,41 51.9151515,49.4876412 51.9151515,59.9575758 L51.9151515,59.9575758 Z M46.3878788,73.3878788 L62,89 L46.3878788,73.3878788 Z"></path>
+          <path d="M95.9151515,59.9575758 C95.9151515,70.4275103 87.4275103,78.9151515 76.9575758,78.9151515 C66.4876412,78.9151515 58,70.4275103 58,59.9575758 C58,49.4876412 66.4876412,41 76.9575758,41 C87.4275103,41 95.9151515,49.4876412 95.9151515,59.9575758 L95.9151515,59.9575758 Z M90.3878788,73.3878788 L106,89 L90.3878788,73.3878788 Z" transform="translate(82.000000, 65.000000) scale(-1, 1) translate(-82.000000, -65.000000) "></path>
+          <path d="M60,46.5 C60,23.9365968 31.8617961,11.3045872 16,10.5"></path>
+          <path d="M104,46.5 C104,23.9365968 75.8617961,11.3045872 60,10.5" transform="translate(82.000000, 28.500000) scale(-1, 1) translate(-82.000000, -28.500000) "></path>
+          <path d="M60,44.4999988 L60,5.529948" strokeLinecap="square"></path>
         </g>
       </svg>
     );
@@ -29,4 +24,4 @@ class IndexerLogo extends Component {
 
 }
 
-module.exports = IndexerLogo;
+module.exports = FerretLogo;
