@@ -3,7 +3,7 @@
 import Rest from 'grommet/utils/Rest';
 import history from './RouteHistory';
 import Query from 'grommet-index/utils/Query';
-import IndexApi from 'grommet-index/utils/Api';
+import IndexApi from './Api';
 
 // session
 export const INIT = 'INIT';

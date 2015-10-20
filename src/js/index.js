@@ -6,7 +6,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Router from 'react-router';
 import Rest from 'grommet/utils/Rest';
-import RestWatch from 'grommet-index/utils/RestWatch';
+import RestWatch from './RestWatch';
 //var Locale = require('grommet/utils/Locale');
 import Routes from './Routes';
 ////import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
