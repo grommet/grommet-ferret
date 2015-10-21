@@ -41,6 +41,7 @@ export const ITEM_ACTIVATE = 'ITEM_ACTIVATE';
 export const ITEM_UNLOAD = 'ITEM_UNLOAD';
 export const ITEM_NEW = 'ITEM_NEW';
 export const ITEM_ADD = 'ITEM_ADD';
+export const ITEM_REMOVE = 'ITEM_REMOVE';
 
 // index api
 export const INDEX_SUCCESS = 'INDEX_SUCCESS';
@@ -266,6 +267,15 @@ export function itemAdd(item) {
           }
         });
       }
+    });
+  };
+}
+
+export function itemRemove(category, uri) {
+  return function (dispatch) {
+    Rest.del(uri).end((err, res) => {
+      dispatch({ type: ITEM_REMOVE, uri: uri });
+      history.pushState(null, '/' + category + document.location.search);
     });
   };
 }
