@@ -1,72 +1,34 @@
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 
-var React = require('react');
-var Article = require('grommet/components/Article');
-var Header = require('grommet/components/Header');
-var Title = require('grommet/components/Title');
-var Menu = require('grommet/components/Menu');
-var CloseIcon = require('grommet/components/icons/Clear');
-var Link = require('react-router').Link;
-var Rest = require('grommet/utils/Rest');
-var ServerProfileForm = require('./ServerProfileForm');
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { Link } from 'react-router';
+import { itemNew, itemAdd } from '../../actions';
+import Article from 'grommet/components/Article';
+import Header from 'grommet/components/Header';
+import Title from 'grommet/components/Title';
+import Menu from 'grommet/components/Menu';
+import CloseIcon from 'grommet/components/icons/Clear';
+import ServerProfileForm from './ServerProfileForm';
 
-var ServerProfileAdd = React.createClass({
+class ServerProfileAdd extends Component {
 
-  getInitialState: function () {
-    return {
-      serverProfile: {
-        category: 'server-profiles',
-        name: '',
-        description: '',
-        serverHardware: {},
-        affinity: 'Device bay',
-        firmware: '',
-        connections: [],
-        manageLocalStorage: false,
-        logicalDrive: 'None',
-        logicalDriveBootable: false,
-        logicalDriveInitialize: false,
-        manageSanStorage: false,
-        hostOsType: 'Windows 2012',
-        volumes: [],
-        manageBootOrder: false
-      },
-      adding: false
-    };
-  },
+  constructor() {
+    super();
+    this._onSubmit = this._onSubmit.bind(this);
+  }
 
-  _onTaskResponse: function (err, res) {
-    if (err) {
-      throw err;
-    }
+  componentDidMount() {
+    this.props.dispatch(itemNew('server-profiles'));
+  }
 
-    if (res.ok) {
-      var task = res.body;
-      this.context.router.transitionTo('server profile overview',
-        {splat: task.attributes.associatedResourceUri});
-    }
-  },
+  _onSubmit(serverProfile) {
+    this.props.dispatch(itemAdd(serverProfile));
+  }
 
-  _onAddResponse: function (err, res) {
-    if (err) {
-      throw err;
-    }
-
-    if (res.ok) {
-      Rest.get(res.body.taskUri).end(this._onTaskResponse);
-    }
-  },
-
-  _onSubmit: function (serverProfile) {
-    this.setState({adding: true});
-    // POST it to the back end and make sure it passes initial muster.
-    Rest.post('/rest/server-profiles', serverProfile)
-      .end(this._onAddResponse);
-  },
-
-  render: function () {
+  render() {
     var message;
-    if (this.state.adding) {
+    if (this.props.changing) {
       message = 'Adding';
     }
 
@@ -79,13 +41,25 @@ var ServerProfileAdd = React.createClass({
           </Menu>
         </Header>
 
-        <ServerProfileForm serverProfile={this.state.serverProfile}
+        <ServerProfileForm serverProfile={this.props.serverProfile}
           onSubmit={this._onSubmit} buttonLabel="Add"
           processingMessage={message} />
 
       </Article>
     );
   }
-});
+}
 
-module.exports = ServerProfileAdd;
+ServerProfileAdd.propTypes = {
+  changing: PropTypes.bool.isRequired,
+  serverProfile: PropTypes.object.isRequired
+};
+
+let select = (state) => {
+  return {
+    changing: state.item.changing,
+    serverProfile: state.item.item
+  };
+};
+
+export default connect(select)(ServerProfileAdd);

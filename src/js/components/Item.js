@@ -29,7 +29,7 @@ class Item extends Component {
   }
 
   render() {
-    let result = this.props.result;
+    let item = this.props.item;
     return (
       <div>
         <Header large={true} justify="between" fixed={true} pad={{horizontal: "medium"}}>
@@ -42,10 +42,10 @@ class Item extends Component {
         </Header>
         <Article>
           <Header tag="h1" pad={{horizontal: 'medium'}}>
-            <StatusIcon value={result.status} large={true} />
-            {result.name}
+            <StatusIcon value={item.status} large={true} />
+            {item.name}
           </Header>
-          <Grobject data={result} />
+          <Grobject data={item} />
         </Article>
       </div>
     );
@@ -65,7 +65,7 @@ let select = (state, props) => {
     category: category,
     uri: '/' + props.params.splat,
     closePath: '/' + category + document.location.search,
-    result: state.item.result,
+    item: state.item.item,
     watcher: state.item.watcher
   };
 };

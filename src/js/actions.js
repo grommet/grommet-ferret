@@ -39,11 +39,15 @@ export const INDEX_UNLOAD = 'INDEX_UNLOAD';
 export const ITEM_LOAD = 'ITEM_LOAD';
 export const ITEM_ACTIVATE = 'ITEM_ACTIVATE';
 export const ITEM_UNLOAD = 'ITEM_UNLOAD';
+export const ITEM_NEW = 'ITEM_NEW';
+export const ITEM_ADD = 'ITEM_ADD';
 
 // index api
 export const INDEX_SUCCESS = 'INDEX_SUCCESS';
 export const INDEX_AGGREGATE_SUCCESS = 'INDEX_AGGREGATE_SUCCESS';
 export const ITEM_SUCCESS = 'ITEM_SUCCESS';
+export const ITEM_ADD_SUCCESS = 'ITEM_ADD_SUCCESS';
+export const ITEM_ADD_FAILURE = 'ITEM_ADD_FAILURE';
 
 export function init(email, token) {
   return { type: INIT, email: email, token: token };
@@ -240,11 +244,48 @@ export function itemActivate(uri) {
   return { type: ITEM_ACTIVATE, uri: uri };
 }
 
+export function itemNew(category) {
+  return { type: ITEM_NEW, category: category };
+}
+
+export function itemAdd(item) {
+  return function (dispatch) {
+    dispatch({ type: ITEM_ADD, item: item });
+    Rest.post('/rest/' + item.category, item).end((err, res) => {
+      if (err) {
+        dispatch(itemAddFailure(err));
+      } else if (res.ok) {
+        Rest.get(res.body.taskUri).end((err, res) => {
+          if (err) {
+            throw err;
+          } else if (res.ok) {
+            var task = res.body;
+            dispatch(itemAddSuccess());
+            dispatch(indexSelect('server-profiles',
+              task.attributes.associatedResourceUri));
+          }
+        });
+      }
+    });
+  };
+}
+
 export function itemSuccess(watcher, uri, result) {
   return {
     type: ITEM_SUCCESS,
     watcher: watcher,
     uri: uri,
-    result: result
+    item: result
+  };
+}
+
+export function itemAddSuccess() {
+  return { type: ITEM_ADD_SUCCESS };
+}
+
+export function itemAddFailure(error) {
+  return {
+    type: ITEM_ADD_FAILURE,
+    error: error
   };
 }
