@@ -41,6 +41,7 @@ export const ITEM_ACTIVATE = 'ITEM_ACTIVATE';
 export const ITEM_UNLOAD = 'ITEM_UNLOAD';
 export const ITEM_NEW = 'ITEM_NEW';
 export const ITEM_ADD = 'ITEM_ADD';
+export const ITEM_UPDATE = 'ITEM_UPDATE';
 export const ITEM_REMOVE = 'ITEM_REMOVE';
 
 // index api
@@ -264,6 +265,26 @@ export function itemAdd(item) {
             dispatch(itemAddSuccess());
             dispatch(indexSelect('server-profiles',
               task.attributes.associatedResourceUri));
+          }
+        });
+      }
+    });
+  };
+}
+
+export function itemUpdate(item) {
+  return function (dispatch) {
+    Rest.put(item.uri, item).end((err, res) => {
+      if (err) {
+        dispatch(itemAddFailure(err));
+      } else if (res.ok) {
+        Rest.get(res.body.taskUri).end((err, res) => {
+          if (err) {
+            throw err;
+          } else if (res.ok) {
+            //var task = res.body;
+            history.pushState(null, '/' + item.category + '/' + item.uri +
+              document.location.search);
           }
         });
       }

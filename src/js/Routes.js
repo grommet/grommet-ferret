@@ -8,6 +8,7 @@ import TBD from 'grommet/components/TBD';
 import Items from './components/Items';
 import Item from './components/Item';
 import ServerProfileAdd from './components/server-profiles/ServerProfileAdd';
+import ServerProfileEdit from './components/server-profiles/ServerProfileEdit';
 
 var rootPath = "/indexer/";
 if (NODE_ENV === 'development') {
@@ -28,6 +29,7 @@ const categoryRoutes = CATEGORIES.map((category) => {
     ]
   };
   if (category === 'server-profiles') {
+    result.childRoutes.unshift({ path: 'edit/*', component: ServerProfileEdit });
     result.childRoutes.unshift({ path: 'add', component: ServerProfileAdd });
   }
   return result;

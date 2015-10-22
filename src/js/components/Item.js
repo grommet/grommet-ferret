@@ -20,7 +20,7 @@ import Button from 'grommet/components/Button';
 class Item extends Component {
 
   constructor() {
-    super()
+    super();
     this._onRemoveOpen = this._onRemoveOpen.bind(this);
     this._onRemoveClose = this._onRemoveClose.bind(this);
     this._onRemove = this._onRemove.bind(this);
@@ -86,6 +86,7 @@ class Item extends Component {
       <div>
         <Header large={true} justify="between" fixed={true} pad={{horizontal: "medium"}}>
           <Menu inline={false}>
+            <Anchor href={this.props.editPath}>Edit</Anchor>
             <Anchor onClick={this._onRemoveOpen}>Remove</Anchor>
           </Menu>
           <Menu>
@@ -120,6 +121,7 @@ let select = (state, props) => {
     category: category,
     uri: '/' + props.params.splat,
     closePath: '/' + category + document.location.search,
+    editPath: '/' + category + '/edit/' + props.params.splat,
     item: state.item.item,
     watcher: state.item.watcher
   };
