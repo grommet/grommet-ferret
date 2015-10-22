@@ -50,6 +50,7 @@ export const INDEX_AGGREGATE_SUCCESS = 'INDEX_AGGREGATE_SUCCESS';
 export const ITEM_SUCCESS = 'ITEM_SUCCESS';
 export const ITEM_ADD_SUCCESS = 'ITEM_ADD_SUCCESS';
 export const ITEM_ADD_FAILURE = 'ITEM_ADD_FAILURE';
+export const ITEM_NOTIFICATIONS_SUCCESS = 'ITEM_NOTIFICATIONS_SUCCESS';
 
 export function init(email, token) {
   return { type: INIT, email: email, token: token };
@@ -232,13 +233,26 @@ export function itemLoad(uri) {
     let watcher = IndexApi.watchItem(uri, (result) => {
       dispatch(itemSuccess(watcher, uri, result));
     });
+
+    // Watch for any notifications on this item
+    let params = {
+      category: ['alerts', 'tasks'],
+      start: 0,
+      count: 10,
+      query: "associatedResourceUri:" + uri +
+        " AND (state:Active OR state:Locked OR state:Running)"
+    };
+    let notificationWatcher = IndexApi.watchItems(params, (result) => {
+      dispatch(itemNotificationsSuccess(notificationWatcher, uri, result));
+    });
   };
 }
 
-export function itemUnload(watcher) {
+export function itemUnload(item) {
   return function (dispatch) {
     dispatch(itemActivate(null));
-    IndexApi.stopWatching(watcher);
+    IndexApi.stopWatching(item.watcher);
+    IndexApi.stopWatching(item.notificationWatcher);
   };
 }
 
@@ -319,4 +333,8 @@ export function itemAddFailure(error) {
     type: ITEM_ADD_FAILURE,
     error: error
   };
+}
+
+export function itemNotificationsSuccess(watcher, uri, result) {
+  return { type: ITEM_NOTIFICATIONS_SUCCESS, watcher: watcher, uri: uri, result: result };
 }

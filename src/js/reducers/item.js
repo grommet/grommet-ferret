@@ -1,6 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 
-import { ITEM_SUCCESS, ITEM_ACTIVATE, ITEM_NEW, ITEM_ADD, ITEM_ADD_SUCCESS } from '../actions';
+import { ITEM_SUCCESS, ITEM_ACTIVATE, ITEM_NEW, ITEM_ADD, ITEM_ADD_SUCCESS, ITEM_NOTIFICATIONS_SUCCESS } from '../actions';
 
 const NEW_ITEMS = {
   'server-profiles': {
@@ -25,11 +25,14 @@ const NEW_ITEMS = {
 const initialState = {
   uri: null,
   changing: false,
-  item: {}
+  item: {},
+  notifications: []
 };
 
 const handlers = {
-  [ITEM_ACTIVATE]: (state, action) => ({ uri: action.uri }),
+  [ITEM_ACTIVATE]: (state, action) => {
+    return { uri: action.uri, item: {}, notifications: [] };
+  },
   [ITEM_SUCCESS]: (state, action) => ({ item: action.item, watcher: action.watcher }),
   [ITEM_NEW]: (state, action) => {
     let item;
@@ -44,7 +47,10 @@ const handlers = {
     return { item: item };
   },
   [ITEM_ADD]: (state, action) => ({ item: action.item, changing: true }),
-  [ITEM_ADD_SUCCESS]: (state, action) => ({ item: {}, changing: false })
+  [ITEM_ADD_SUCCESS]: (state, action) => ({ item: {}, changing: false }),
+  [ITEM_NOTIFICATIONS_SUCCESS]: (state, action) => {
+    return { notifications: action.result, notificationsWatcher: action.watcher };
+  }
 };
 
 export default function itemReducer (state = initialState, action) {

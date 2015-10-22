@@ -16,6 +16,7 @@ import Form from 'grommet/components/Form';
 import FormFields from 'grommet/components/FormFields';
 import Footer from 'grommet/components/Footer';
 import Button from 'grommet/components/Button';
+import Notification from 'grommet/components/Notification';
 
 class Item extends Component {
 
@@ -33,7 +34,7 @@ class Item extends Component {
 
   componentWillReceiveProps(newProps) {
     if (this.props.uri !== newProps.uri) {
-      this.props.dispatch(itemUnload(this.props.watcher));
+      this.props.dispatch(itemUnload(this.props.item));
       this.props.dispatch(itemLoad(newProps.uri));
     }
   }
@@ -56,7 +57,7 @@ class Item extends Component {
   }
 
   render() {
-    let item = this.props.item;
+    let item = this.props.item.item;
 
     let removeConfirm;
     if (this.state.removing) {
@@ -64,11 +65,11 @@ class Item extends Component {
         <Layer align="right" closer={true} onClose={this._onRemoveClose}>
           <Form onSubmit={this._onRemove} compact={true}>
             <Header>
-              <h1>Remove {this.props.item.name}</h1>
+              <h1>Remove {item.name}</h1>
             </Header>
             <FormFields>
               <fieldset>
-                <p>Are you sure you want to remove {this.props.item.name}?</p>
+                <p>Are you sure you want to remove {item.name}?</p>
               </fieldset>
             </FormFields>
             <Footer pad={{vertical: 'medium'}}>
@@ -80,6 +81,19 @@ class Item extends Component {
           </Form>
         </Layer>
       );
+    }
+
+    let notifications;
+    if (this.props.item.notifications.items) {
+      notifications = this.props.item.notifications.items.map((notification) => {
+        return (
+          <Notification key={notification.uri} flush={false}
+            status={notification.status}
+            message={notification.name}
+            state={notification.state}
+            timestamp={new Date(notification.created)} />
+        );
+      });
     }
 
     return (
@@ -100,6 +114,7 @@ class Item extends Component {
             <StatusIcon value={item.status} large={true} />
             {item.name}
           </Header>
+          {notifications}
           <Grobject data={item} />
         </Article>
         {removeConfirm}
@@ -122,8 +137,7 @@ let select = (state, props) => {
     uri: '/' + props.params.splat,
     closePath: '/' + category + document.location.search,
     editPath: '/' + category + '/edit/' + props.params.splat,
-    item: state.item.item,
-    watcher: state.item.watcher
+    item: state.item
   };
 };
 
