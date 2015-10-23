@@ -40,7 +40,7 @@ class Item extends Component {
   }
 
   componentWillUnmount() {
-    this.props.dispatch(itemUnload(this.props.watcher));
+    this.props.dispatch(itemUnload(this.props.item));
   }
 
   _onRemoveOpen() {

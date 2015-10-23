@@ -1,6 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 
-import { ITEM_SUCCESS, ITEM_ACTIVATE, ITEM_NEW, ITEM_ADD, ITEM_ADD_SUCCESS, ITEM_NOTIFICATIONS_SUCCESS } from '../actions';
+import { ITEM_SUCCESS, ITEM_ACTIVATE, ITEM_NEW, ITEM_ADD, ITEM_ADD_SUCCESS, ITEM_NOTIFICATIONS_SUCCESS, ITEM_UNLOAD } from '../actions';
 
 const NEW_ITEMS = {
   'server-profiles': {
@@ -30,6 +30,7 @@ const initialState = {
 };
 
 const handlers = {
+  [ITEM_UNLOAD]: (state, action) => ({ uri: null }),
   [ITEM_ACTIVATE]: (state, action) => {
     return { uri: action.uri, item: {}, notifications: [] };
   },

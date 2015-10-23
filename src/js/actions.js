@@ -24,6 +24,8 @@ export const NAV_RESPONSIVE = 'NAV_RESPONSIVE';
 export const DASHBOARD_LAYOUT = 'DASHBOARD_LAYOUT';
 export const DASHBOARD_LOAD = 'DASHBOARD_LOAD';
 export const DASHBOARD_UNLOAD = 'DASHBOARD_UNLOAD';
+export const DASHBOARD_SEARCH = 'DASHBOARD_SEARCH';
+export const DASHBOARD_SEARCH_SUCCESS = 'DASHBOARD_SEARCH_SUCCESS';
 
 // index page
 export const INDEX_NAV = 'INDEX_NAV';
@@ -110,6 +112,7 @@ export function dashboardLayout(graphicSize, count, legendPlacement) {
 
 export function dashboardLoad(tiles) {
   return function (dispatch) {
+    dispatch({ type: DASHBOARD_LOAD });
     tiles.forEach((tile) => {
       let params = {
         category: tile.category,
@@ -127,9 +130,30 @@ export function dashboardLoad(tiles) {
 
 export function dashboardUnload(tiles) {
   return function (dispatch) {
+    dispatch({ type: DASHBOARD_UNLOAD });
     tiles.forEach((tile) => {
       IndexApi.stopWatching(tile.watcher);
     });
+  };
+}
+
+export function dashboardSearch(text) {
+  return function (dispatch) {
+    dispatch({ type: DASHBOARD_SEARCH, text: text });
+    if (text && text.length > 0) {
+      let params = {
+        start: 0,
+        count: 5,
+        query: text
+      };
+      Rest.get('/rest/index/search-suggestions', params).end((err, res) => {
+        if (err) {
+          throw err;
+        } else if (res.ok) {
+          dispatch({ type: DASHBOARD_SEARCH_SUCCESS, result: res.body });
+        }
+      });
+    }
   };
 }
 
@@ -149,6 +173,7 @@ export function indexNav(category, query) {
 
 export function indexLoad(category, index) {
   return function (dispatch) {
+    dispatch({ type: INDEX_LOAD, category: category });
     // bring in any query from the location
     const loc = history.createLocation(document.location.pathname + document.location.search);
     let params = defaultParams(category, index);
@@ -166,8 +191,10 @@ export function indexLoad(category, index) {
 
 export function indexUnload(index) {
   return function (dispatch) {
-    dispatch(indexActivate(null));
-    IndexApi.stopWatching(index.watcher);
+    if (index.activeCategory) {
+      IndexApi.stopWatching(index.watcher);
+      dispatch({ type: INDEX_UNLOAD });
+    }
   };
 }
 
@@ -250,7 +277,7 @@ export function itemLoad(uri) {
 
 export function itemUnload(item) {
   return function (dispatch) {
-    dispatch(itemActivate(null));
+    dispatch({ type: ITEM_UNLOAD });
     IndexApi.stopWatching(item.watcher);
     IndexApi.stopWatching(item.notificationWatcher);
   };

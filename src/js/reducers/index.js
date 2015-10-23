@@ -1,7 +1,7 @@
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 
 import update from 'react/lib/update';
-import { INDEX_ACTIVATE, INDEX_QUERY, INDEX_SUCCESS } from '../actions';
+import { INDEX_ACTIVATE, INDEX_QUERY, INDEX_SUCCESS, INDEX_UNLOAD } from '../actions';
 
 const statusAttribute = {name: 'status', label: 'Status', size: 'small', header: true,
   filter: ['Error', 'Warning', 'OK', 'Unknown']};
@@ -43,6 +43,17 @@ const initialState = {
 };
 
 const handlers = {
+  [INDEX_UNLOAD]: (state, action) => {
+    return update(state, {
+      activeCategory: { $set: null },
+      categories: {
+        [state.activeCategory]: {
+          watcher: { $set: null }
+        }
+      }
+    });
+  },
+
   [INDEX_ACTIVATE]: (state, action) => {
     let changes = { activeCategory: { $set: action.category }, categories: {} };
     if (state.activeCategory &&

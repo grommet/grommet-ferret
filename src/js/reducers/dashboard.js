@@ -1,12 +1,14 @@
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 
 import update from 'react/lib/update';
-import { DASHBOARD_LAYOUT, INDEX_AGGREGATE_SUCCESS } from '../actions';
+import { DASHBOARD_LAYOUT, INDEX_AGGREGATE_SUCCESS, DASHBOARD_SEARCH, DASHBOARD_SEARCH_SUCCESS, DASHBOARD_UNLOAD } from '../actions';
 import Query from 'grommet-index/utils/Query';
 
 const initialState = {
   graphicSize: 'medium',
   legendPlacement: 'bottom',
+  searchSuggestions: [],
+  searchText: '',
   tiles: [
     {
       name: 'Server Profile Changes',
@@ -69,7 +71,23 @@ const handlers = {
       return tile;
     });
     return { tiles: tiles };
-  }
+  },
+
+  [DASHBOARD_SEARCH]: (state, action) => {
+    let changes = { searchText: action.text };
+    if (action.text.length === 0) {
+      changes.searchSuggestions = [];
+    }
+    return changes;
+  },
+
+  [DASHBOARD_SEARCH_SUCCESS]: (state, action) => {
+    // add label property
+    let suggestions = action.result.map((s) => ({ ...s, ...{label: s.name} }));
+    return { searchSuggestions: suggestions };
+  },
+
+  [DASHBOARD_UNLOAD]: (state, action) => ({ searchSuggestions: [] })
 };
 
 export default function dashboardReducer (state = initialState, action) {

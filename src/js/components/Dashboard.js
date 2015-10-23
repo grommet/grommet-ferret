@@ -2,7 +2,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { navActivate, dashboardLayout, dashboardLoad, dashboardUnload, indexNav } from '../actions';
+import { navActivate, dashboardLayout, dashboardLoad, dashboardSearch, dashboardUnload, indexNav, indexSelect } from '../actions';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Header from 'grommet/components/Header';
@@ -18,13 +18,16 @@ class Dashboard extends Component {
 
   constructor() {
     super();
+
     this._onOverTitle = this._onOverTitle.bind(this);
     this._onOutTitle = this._onOutTitle.bind(this);
     this._onClickTitle = this._onClickTitle.bind(this);
     this._onCloseNav = this._onCloseNav.bind(this);
     this._onClickSegment = this._onClickSegment.bind(this);
+    this._onSearch = this._onSearch.bind(this);
     this._onResize = this._onResize.bind(this);
     this._layout = this._layout.bind(this);
+
     this.state = {
       graphicSize: 'medium',
       dashboard: store.getState().dashboard,
@@ -62,6 +65,15 @@ class Dashboard extends Component {
 
   _onClickSegment(tile, query) {
     this.props.dispatch(indexNav(tile.category, query));
+  }
+
+  _onSearch(value) {
+    if (value.hasOwnProperty('uri')) {
+      // this is a suggestion
+      this.props.dispatch(indexSelect(value.category, value.uri));
+    } else {
+      this.props.dispatch(dashboardSearch(value));
+    }
   }
 
   _layout() {
@@ -162,7 +174,7 @@ class Dashboard extends Component {
   }
 
   render() {
-    const { tiles } = this.props.dashboard;
+    const { tiles, searchText, searchSuggestions } = this.props.dashboard;
     const { active: navActive } = this.props.nav;
 
     let tileComponents = tiles.map(this._renderTile, this);
@@ -184,7 +196,9 @@ class Dashboard extends Component {
       <div>
         <Header direction="row" justify="between" large={true} pad={{horizontal: 'medium'}}>
           {title}
-          <Search ref="search" inline={true} className="flex" />
+          <Search ref="search" inline={true} className="flex"
+            defaultValue={searchText} onChange={this._onSearch}
+            suggestions={searchSuggestions} />
           {/*}
           <SessionMenu dropAlign={{right: 'right'}} />
           {*/}
@@ -205,6 +219,12 @@ Dashboard.propTypes = {
     history: PropTypes.bool,
     interval: PropTypes.string,
     legendPlacement: PropTypes.oneOf(['right', 'bottom']),
+    searchSuggestions: PropTypes.arrayOf(PropTypes.shape({
+      category: React.PropTypes.string,
+      name: React.PropTypes.string,
+      uri: React.PropTypes.string
+    })),
+    searchText: PropTypes.string,
     tiles: PropTypes.arrayOf(PropTypes.shape({
       attribute: PropTypes.string.isRequired,
       category: PropTypes.string.isRequired,
@@ -215,6 +235,8 @@ Dashboard.propTypes = {
   }).isRequired
 };
 
-let select = (state) => ({ dashboard: state.dashboard, nav: state.nav });
+let select = (state) => {
+  return ({ dashboard: state.dashboard, nav: state.nav });
+};
 
 export default connect(select)(Dashboard);
