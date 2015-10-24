@@ -1,7 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
 
 var merge = require('lodash/object/merge');
-var Rest = require('grommet/utils/Rest');
 var RestWatch = require('./RestWatch');
 
 var state = {
@@ -26,10 +25,6 @@ var Api = {
 
   urlPrefix: function(urlPrefix) {
     state.urlPrefix = urlPrefix;
-  },
-
-  getItems: function (params) {
-    return Rest.get(state.urlPrefix + '/rest/index/resources', params);
   },
 
   watchItems: function (params, handler) {
