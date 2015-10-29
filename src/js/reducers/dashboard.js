@@ -1,4 +1,4 @@
-// (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
+// (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 import update from 'react/lib/update';
 import { DASHBOARD_LAYOUT, INDEX_AGGREGATE_SUCCESS, DASHBOARD_SEARCH, DASHBOARD_SEARCH_SUCCESS, DASHBOARD_UNLOAD } from '../actions';

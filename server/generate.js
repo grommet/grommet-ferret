@@ -1,4 +1,4 @@
-// (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
+// (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 var ITEM_COUNT = 1;
 var TYPES = ['enclosures'] //, 'enclosure-groups', 'ethernet-networks', 'server-profiles', 'server-profile-templates', 'server-hardware'];

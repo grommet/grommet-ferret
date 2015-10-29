@@ -1,4 +1,4 @@
-// (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
+// (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 import update from 'react/lib/update';
 import { INDEX_ACTIVATE, INDEX_QUERY, INDEX_SUCCESS, INDEX_UNLOAD } from '../actions';
