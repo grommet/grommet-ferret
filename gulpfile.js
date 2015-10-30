@@ -2,6 +2,9 @@ var gulp = require('gulp');
 var path = require('path');
 //var nodemon = require('gulp-nodemon');
 var gulpTasks = require('grommet/utils/gulp/gulp-tasks');
+var git = require('gulp-git');
+var del = require('del');
+var mkdirp = require('mkdirp');
 
 var opts = {
   base: '.',
