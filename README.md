@@ -15,7 +15,7 @@ To run this application, execute the following commands:
 
   1. Install NPM modules
     ```
-    $ cd grommet-index
+    $ cd grommet-ferret
     $ npm install
     $ cd server
     $ npm install
