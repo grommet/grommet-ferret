@@ -84,9 +84,9 @@ export function logout() {
   return { type: LOGOUT };
 }
 
-export function routeChanged(route) {
+export function routeChanged(route, prefix) {
   console.log('!!! routeChanged', route);
-  return { type: ROUTE_CHANGED, route: route };
+  return { type: ROUTE_CHANGED, route: route, prefix: prefix };
 }
 
 export function navPeek(peek) {

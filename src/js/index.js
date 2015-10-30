@@ -11,8 +11,7 @@ import RestWatch from './RestWatch';
 import Routes from './Routes';
 ////import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
 import { Provider } from 'react-redux';
-// TODO: Use IntlProvider, wasn't working
-//import { IntlProvider } from 'react-intl';
+import { IntlProvider } from 'react-intl';
 
 import store from './store';
 import history from './RouteHistory';
@@ -55,7 +54,9 @@ let element = document.getElementById('content');
 ReactDOM.render((
   <div>
     <Provider store={store}>
-      <Router routes={Routes.routes} history={createStoreHistory()} />
+      <IntlProvider locale="en">
+        <Router routes={Routes.routes} history={createStoreHistory()} />
+      </IntlProvider>
     </Provider>
     {/*}
     <DebugPanel top right bottom>
@@ -78,13 +79,13 @@ let sessionWatcher = () => {
     if (route.pathname === '/login' && session.token) {
       localStorage.email = session.email;
       localStorage.token = session.token;
-      history.pushState(null, '/dashboard'); // TODO: remember initial URL to restore it
-    } else if (route.pathname !== '/login' && ! session.token) {
+      history.pushState(null, Routes.path('/dashboard')); // TODO: remember initial URL to restore it
+    } else if (route.pathname !== Routes.path('/login') && ! session.token) {
       localStorage.removeItem('email');
       localStorage.removeItem('token');
-      history.pushState(null, '/login');
+      history.pushState(null, Routes.path('/login'));
     } else if (route.pathname === '/') {
-      history.replaceState(null, '/dashboard');
+      history.replaceState(null, Routes.path('/dashboard'));
     }
   }
 };
@@ -92,5 +93,5 @@ store.subscribe(sessionWatcher);
 
 // listen for history changes and initiate routeChanged actions for them
 history.listen(function (location) {
-  store.dispatch(routeChanged(location));
+  store.dispatch(routeChanged(location, Routes.prefix));
 });

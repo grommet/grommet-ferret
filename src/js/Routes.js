@@ -10,10 +10,10 @@ import Item from './components/Item';
 import ServerProfileAdd from './components/server-profiles/ServerProfileAdd';
 import ServerProfileEdit from './components/server-profiles/ServerProfileEdit';
 
-var rootPath = "/indexer/";
-if (NODE_ENV === 'development') {
-  rootPath = "/"; // webpack-dev-server
-}
+var rootPath = "/"; //"/ferret/";
+//if (NODE_ENV === 'development') {
+//  rootPath = "/"; // webpack-dev-server
+//}
 
 const CATEGORIES = [
   'enclosures',
@@ -36,6 +36,10 @@ const categoryRoutes = CATEGORIES.map((category) => {
 });
 
 module.exports = {
+
+  prefix: rootPath.slice(0, -1),
+
+  path: (path) => (rootPath + path.slice(1)),
 
   routes: [
     { path: rootPath, component: Ferret,

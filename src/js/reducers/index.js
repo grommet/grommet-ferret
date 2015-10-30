@@ -43,6 +43,7 @@ const initialState = {
 };
 
 const handlers = {
+
   [INDEX_UNLOAD]: (state, action) => {
     return update(state, {
       activeCategory: { $set: null },

@@ -24,18 +24,17 @@ app.use(bodyParser.json());
 
 var path = require('path');
 
-app.use('/medium-app/', express.static(path.join(__dirname, '/../dist')));
-app.get('/medium-app/*', function (req, res) {
+app.use('/rest', rest.router);
+app.use('/', express.static(path.join(__dirname, '/../dist')));
+app.get('/*', function (req, res) {
   res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
 });
 
-app.get('/', function (req, res) {
-  res.redirect('/medium-app');
-});
+//app.get('/', function (req, res) {
+//  res.redirect('/ferret');
+//});
 
-app.
-  use('/rest', rest.router).
-  use('', router);
+app.use('', router);
 
 var server = http.createServer(app);
 

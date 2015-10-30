@@ -9,6 +9,7 @@ import Header from 'grommet/components/Header';
 import Title from 'grommet/components/Title';
 import Search from 'grommet/components/Search';
 import Logo from './Logo';
+import SessionMenu from './SessionMenu';
 import Aggregate from 'grommet-index/components/Aggregate';
 import IndexHistory from 'grommet-index/components/History';
 import { Link } from 'react-router';
@@ -199,9 +200,7 @@ class Dashboard extends Component {
           <Search ref="search" inline={true} className="flex"
             defaultValue={searchText} onChange={this._onSearch}
             suggestions={searchSuggestions} />
-          {/*}
           <SessionMenu dropAlign={{right: 'right'}} />
-          {*/}
         </Header>
         <Tiles fill={true} flush={false}>
           {tileComponents}
