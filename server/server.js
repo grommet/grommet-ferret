@@ -10,7 +10,7 @@ var cookieParser = require('cookie-parser');
 var rest = require('./rest');
 var path = require('path');
 
-var PORT = 8010;
+var PORT = process.env.PORT || 8010;
 
 var app = express();
 
