@@ -16,11 +16,14 @@
     "redux-thunk": "^1.0.0"
   },
   "devDependencies": {
+    "del": "^2.0.2",
     "gulp": "^3.9.0",
+    "gulp-git": "^1.2.3",
+    "mkdirp": "^0.5.1",
     "redux-devtools": "^2.1.5"
   },
   "scripts": {
     "build": "gulp dist",
-    "start": "node server/server.js"
+    "start": "cd server && npm install && node server.js"
   }
 }

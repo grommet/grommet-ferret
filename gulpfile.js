@@ -2,6 +2,9 @@ var gulp = require('gulp');
 var path = require('path');
 //var nodemon = require('gulp-nodemon');
 var gulpTasks = require('grommet/utils/gulp/gulp-tasks');
+var git = require('gulp-git');
+var del = require('del');
+var mkdirp = require('mkdirp');
 
 var opts = {
   base: '.',
@@ -54,6 +57,17 @@ gulp.task('start-backend', function() {
   });
 });
 */
+
+gulp.task('release:createTmp', function(done) {
+  del.sync(['./tmp']);
+  mkdirp('./tmp', function(err) {
+    if (err) {
+      throw err;
+    }
+    done();
+  });
+});
+
 gulp.task('release:heroku', ['dist', 'release:createTmp'], function(done) {
   if (process.env.CI) {
     git.clone('https://' + process.env.GH_TOKEN + '@github.com/grommet/grommet-ferret.git',
