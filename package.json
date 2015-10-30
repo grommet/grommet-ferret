@@ -21,6 +21,6 @@
   },
   "scripts": {
     "build": "gulp dist",
-    "start": "node server/server.js"
+    "start": "cd server && npm install && node server.js"
   }
 }
