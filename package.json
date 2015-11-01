@@ -1,13 +1,13 @@
 {
   "name": "grommet-ferret",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/grommet/grommet-ferret.git"
   },
   "dependencies": {
-    "grommet": "https://github.com/grommet/grommet/tarball/next",
+    "grommet": "^0.4.0",
     "grommet-index": "^0.1.0",
     "history": "^1.12.5",
     "react-redux": "^3.1.0",
