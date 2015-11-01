@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "grommet": "^0.4.0",
-    "grommet-index": "^0.1.0",
+    "grommet-index": "^0.2.0",
     "history": "^1.12.5",
     "react-redux": "^3.1.0",
     "react-router": "^1.0.0-rc3",
