@@ -1,7 +1,7 @@
 # Grommet Example App: ferret
 
 ## Demo
-[Live demo](http://grommet.io/ferret/) of an example application using grommet and grommet-index.
+[Live demo](http://ferret.grommet.io/) of an example application using grommet and grommet-index.
 
 Login credentials: `Username` any string that looks like an email address and any `Password` (not used or stored).
 
