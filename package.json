@@ -7,7 +7,7 @@
     "url": "https://github.com/grommet/grommet-ferret.git"
   },
   "dependencies": {
-    "grommet": "^0.4.0",
+    "grommet": "https://github.com/grommet/grommet/tarball/stable",
     "grommet-index": "^0.2.0",
     "history": "^1.12.5",
     "react-redux": "^3.1.0",
