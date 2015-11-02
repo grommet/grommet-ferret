@@ -198,6 +198,7 @@ class Dashboard extends Component {
         <Header direction="row" justify="between" large={true} pad={{horizontal: 'medium'}}>
           {title}
           <Search ref="search" inline={true} className="flex"
+            placeHolder="Search"
             defaultValue={searchText} onChange={this._onSearch}
             suggestions={searchSuggestions} />
           <SessionMenu dropAlign={{right: 'right'}} />
