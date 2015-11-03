@@ -1,6 +1,7 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { navActivate, dashboardLayout, dashboardLoad, dashboardSearch, dashboardUnload, indexNav, indexSelect } from '../actions';
 import Tiles from 'grommet/components/Tiles';
@@ -43,6 +44,14 @@ class Dashboard extends Component {
     this.props.dispatch(dashboardLoad(this.state.dashboard.tiles));
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.nav.active !== nextProps.nav.active) {
+      // The NavSidebar is changing, relayout when it finishes animating.
+      // TODO: Convert to an animation event listener.
+      this._onResize();
+    }
+  }
+
   componentWillUnmount() {
     window.removeEventListener('resize', this._onResize);
     this.props.dispatch(dashboardUnload(this.state.dashboard.tiles));
@@ -79,10 +88,13 @@ class Dashboard extends Component {
 
   _layout() {
     const { dispatch, dashboard: {tiles, legendPlacement} } = this.props;
+    var rect = this.refs.content.getBoundingClientRect();
+    var tilesOffset = ReactDOM.findDOMNode(this.refs.tiles).
+      getBoundingClientRect().top + document.body.scrollTop;
     var wideTileCount = 0;
     var normalTileCount = 0;
     // set wide chart count according to the space we have
-    var dataPoints = Math.round(Math.max(4, window.innerWidth / 48));
+    let dataPoints = Math.round(Math.max(4, rect.width / 48));
 
     tiles.forEach((tile) => {
       if (tile.wide) {
@@ -93,8 +105,8 @@ class Dashboard extends Component {
     });
 
     // set legend placement
-    let width = window.innerWidth;
-    let height = window.innerHeight - 100;
+    let width = rect.width;
+    let height = rect.height - tilesOffset;
     let ratio = width / height;
     let newLegendPlacement = legendPlacement;
     if (ratio < 1.1 && 'bottom' !== legendPlacement) {
@@ -197,7 +209,7 @@ class Dashboard extends Component {
     }
 
     return (
-      <div>
+      <div ref="content">
         <Header direction="row" justify="between" large={true} pad={{horizontal: 'medium'}}>
           {title}
           <Search ref="search" inline={true} className="flex"
@@ -206,7 +218,7 @@ class Dashboard extends Component {
             suggestions={searchSuggestions} />
           {session}
         </Header>
-        <Tiles fill={true} flush={false}>
+        <Tiles ref="tiles" fill={true} flush={false}>
           {tileComponents}
         </Tiles>
       </div>
