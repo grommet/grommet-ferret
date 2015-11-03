@@ -181,6 +181,7 @@ class Dashboard extends Component {
     let tileComponents = tiles.map(this._renderTile, this);
 
     let title;
+    let session;
     if (! navActive) {
       title = (
         <span onMouseOver={this._onOverTitle}
@@ -191,6 +192,8 @@ class Dashboard extends Component {
           </Title>
         </span>
       );
+
+      session = <SessionMenu dropAlign={{right: 'right'}} />;
     }
 
     return (
@@ -201,7 +204,7 @@ class Dashboard extends Component {
             placeHolder="Search"
             defaultValue={searchText} onChange={this._onSearch}
             suggestions={searchSuggestions} />
-          <SessionMenu dropAlign={{right: 'right'}} />
+          {session}
         </Header>
         <Tiles fill={true} flush={false}>
           {tileComponents}
