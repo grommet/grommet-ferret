@@ -10,7 +10,8 @@ import Footer from 'grommet/components/Footer';
 import Title from 'grommet/components/Title';
 import Logo from './Logo';
 import Menu from 'grommet/components/Menu';
-import CloseIcon from 'grommet/components/icons/Clear';
+import Anchor from 'grommet/components/Anchor';
+import CloseIcon from 'grommet/components/icons/base/Close';
 import SessionMenu from './SessionMenu';
 
 class NavSidebar extends Component {
@@ -42,9 +43,9 @@ class NavSidebar extends Component {
             <span>Ferret</span>
           </Title>
           <Menu responsive={false}>
-            <div onClick={this._onClose}>
+            <Anchor onClick={this._onClose}>
               <CloseIcon />
-            </div>
+            </Anchor>
           </Menu>
         </Header>
         <Menu primary={true}>
