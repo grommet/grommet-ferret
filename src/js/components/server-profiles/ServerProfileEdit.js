@@ -37,7 +37,7 @@ class ServerProfileEdit extends Component {
         <Header fixed={true} large={true} justify="between" pad={{horizontal: 'medium'}}>
           <Title>Edit Server Profile</Title>
           <Menu>
-            <Link to="/server-profiles"><CloseIcon /></Link>
+            <Link to={"/server-profiles/" + this.props.uri}><CloseIcon /></Link>
           </Menu>
         </Header>
 

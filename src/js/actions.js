@@ -43,6 +43,7 @@ export const ITEM_ACTIVATE = 'ITEM_ACTIVATE';
 export const ITEM_UNLOAD = 'ITEM_UNLOAD';
 export const ITEM_NEW = 'ITEM_NEW';
 export const ITEM_ADD = 'ITEM_ADD';
+export const ITEM_EDIT = 'ITEM_EDIT';
 export const ITEM_UPDATE = 'ITEM_UPDATE';
 export const ITEM_REMOVE = 'ITEM_REMOVE';
 
@@ -312,6 +313,11 @@ export function itemAdd(item) {
       }
     });
   };
+}
+
+export function itemEdit(category, item) {
+  history.pushState(null, '/' + category + '/edit' + item.uri + document.location.search);
+  return { type: ITEM_EDIT, item: item };
 }
 
 export function itemUpdate(item) {
