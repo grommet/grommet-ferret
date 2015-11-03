@@ -167,7 +167,8 @@ function defaultParams(category, index) {
 }
 
 export function indexNav(category, query) {
-  history.pushState(null, '/' + category, {q: query.fullText});
+  history.pushState(null, '/' + category + '?q=' + encodeURIComponent(query.fullText));
+  //history.pushState(null, '/' + category, {q: query.fullText});
   return { type: INDEX_NAV, category: category, query: query };
 }
 
