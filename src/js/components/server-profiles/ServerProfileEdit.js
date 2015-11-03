@@ -8,7 +8,7 @@ import Article from 'grommet/components/Article';
 import Header from 'grommet/components/Header';
 import Title from 'grommet/components/Title';
 import Menu from 'grommet/components/Menu';
-import CloseIcon from 'grommet/components/icons/Clear';
+import CloseIcon from 'grommet/components/icons/base/Close';
 import ServerProfileForm from './ServerProfileForm';
 
 class ServerProfileEdit extends Component {

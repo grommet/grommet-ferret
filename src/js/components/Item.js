@@ -7,7 +7,7 @@ import { itemLoad, itemUnload, itemRemove, itemEdit } from '../actions';
 import Header from 'grommet/components/Header';
 import Menu from 'grommet/components/Menu';
 import Anchor from 'grommet/components/Anchor';
-import CloseIcon from 'grommet/components/icons/Clear';
+import CloseIcon from 'grommet/components/icons/base/Close';
 import Article from 'grommet/components/Article';
 import StatusIcon from 'grommet/components/icons/Status';
 import Grobject from 'grommet/components/Object';
