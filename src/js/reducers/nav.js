@@ -1,6 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import { NAV_PEEK, NAV_ACTIVATE, NAV_RESPONSIVE, LOGOUT } from '../actions';
+import { NAV_PEEK, NAV_ACTIVATE, NAV_RESPONSIVE, LOGOUT, ROUTE_CHANGED } from '../actions';
 
 const initialState = {
   active: false,
@@ -24,7 +24,10 @@ const handlers = {
   [NAV_PEEK]: (_, action) => ({peek: action.peek}),
   [NAV_ACTIVATE]: (_, action) => ({active: action.active}),
   [NAV_RESPONSIVE]: (_, action)  => ({responsive: action.responsive}),
-  [LOGOUT]: (_, action) => ({active: false})
+  [LOGOUT]: (_, action) => ({active: false}),
+  [ROUTE_CHANGED]: (state, action) => {
+    return ('single' === state.responsive && state.active) ? { active: false } : {};
+  }
 };
 
 export default function navReducer (state = initialState, action) {
