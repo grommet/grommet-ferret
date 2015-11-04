@@ -1,6 +1,7 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import { ITEM_SUCCESS, ITEM_ACTIVATE, ITEM_NEW, ITEM_ADD, ITEM_ADD_SUCCESS, ITEM_NOTIFICATIONS_SUCCESS, ITEM_UNLOAD } from '../actions';
+import { ITEM_SUCCESS, ITEM_ACTIVATE, ITEM_NEW, ITEM_ADD, ITEM_ADD_SUCCESS,
+  ITEM_NOTIFICATIONS_SUCCESS, ITEM_UNLOAD } from '../actions';
 
 const NEW_ITEMS = {
   'server-profiles': {
@@ -34,7 +35,13 @@ const handlers = {
   [ITEM_ACTIVATE]: (state, action) => {
     return { uri: action.uri, item: {}, notifications: [] };
   },
-  [ITEM_SUCCESS]: (state, action) => ({ item: action.item, watcher: action.watcher }),
+  [ITEM_SUCCESS]: (state, action) => {
+    return {
+      editable: NEW_ITEMS.hasOwnProperty(action.item.category),
+      item: action.item,
+      watcher: action.watcher
+    };
+  },
   [ITEM_NEW]: (state, action) => {
     let item;
     if (NEW_ITEMS.hasOwnProperty(action.category)) {
