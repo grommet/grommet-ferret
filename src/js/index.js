@@ -15,7 +15,7 @@ import { IntlProvider } from 'react-intl';
 
 import store from './store';
 import history from './RouteHistory';
-import { init, routeChanged } from './actions';
+import { init, routeChanged, loginSuccess } from './actions';
 
 // The port number needs to align with devServerProxy and websocketHost in gulpfile.js
 let hostName = NODE_ENV === 'development' ? 'localhost:8010' : window.location.host;
@@ -71,6 +71,8 @@ document.body.classList.remove('loading');
 let localStorage = window.localStorage;
 // init from localStorage
 store.dispatch(init(localStorage.email, localStorage.token));
+// simulate initial login
+store.dispatch(loginSuccess('nobody@grommet.io', 'simulated'));
 
 // check for session
 let sessionWatcher = () => {
