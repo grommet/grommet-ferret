@@ -14,14 +14,26 @@ class IndexerLogin extends Component {
   constructor() {
     super();
     this._onSubmit = this._onSubmit.bind(this);
+    this._onResponsive = this._onResponsive.bind(this);
+    this.state = {responsive: 'multiple'};
   }
 
   _onSubmit(fields) {
     this.props.dispatch(login(fields.username, fields.password));
   }
 
+  _onResponsive(responsive) {
+    this.setState({responsive: responsive});
+  }
+
   render() {
     const { session } = this.props;
+
+    var image;
+    if ('multiple' === this.state.responsive) {
+      image = <Section full={true} pad="none" texture="url(img/vaults.jpg)" />;
+    }
+
     var loginError = session.error;
     var errors = [];
     if (loginError) {
@@ -34,9 +46,10 @@ class IndexerLogin extends Component {
       errors.push(message);
       errors.push(resolution);
     }
+
     return (
-      <Split flex="left" separator={true}>
-        <Section full={true} pad="none" texture="url(img/vaults.jpg)" />
+      <Split flex="left" separator={true} onResponsive={this._onResponsive}>
+        {image}
         <Sidebar justify="center" align="center" pad="medium" size="large">
           <LoginForm
             logo={<Logo size="large" />}
