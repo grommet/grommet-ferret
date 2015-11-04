@@ -10,8 +10,8 @@ const initialState = {
 
 const handlers = {
   [INIT]: (_, action) => ({email: action.email, token: action.token}),
-  [LOGIN]: (_, action) => ({email: action.email}),
-  [LOGIN_SUCCESS]: (_, action) => ({email: action.email, token: action.token}),
+  [LOGIN]: (_, action) => ({email: action.email, error: null}),
+  [LOGIN_SUCCESS]: (_, action) => ({email: action.email, token: action.token, error: null}),
   [LOGIN_FAILURE]: (_, action) => ({error: action.error}),
   [LOGOUT]: () => ({token: null})
 };

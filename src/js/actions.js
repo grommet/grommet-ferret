@@ -65,7 +65,7 @@ export function login(email, password) {
       {email: email, password: password})
       .end(function(err, res) {
         if (err || !res.ok) {
-          dispatch(loginFailure(err));
+          dispatch(loginFailure(res.body));
         } else {
           dispatch(loginSuccess(email, res.body.sessionID));
         }

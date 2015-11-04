@@ -17,8 +17,7 @@ class IndexerLogin extends Component {
   }
 
   _onSubmit(fields) {
-    const { dispatch } = this.props;
-    dispatch(login(fields.username, fields.password));
+    this.props.dispatch(login(fields.username, fields.password));
   }
 
   render() {
@@ -53,7 +52,10 @@ class IndexerLogin extends Component {
 IndexerLogin.propTypes = {
   session: PropTypes.shape({
     email: PropTypes.string,
-    error: PropTypes.string,
+    error: PropTypes.shape({
+      message: PropTypes.string,
+      resolution: PropTypes.string
+    }),
     token: PropTypes.string
   })
 };

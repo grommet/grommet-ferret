@@ -263,11 +263,10 @@ function onResourceChange (events) {
 // REST interaction
 
 router.post('/login-sessions', function(req, res) {
-  if ('error' === req.body.userName) {
-    res.status(400).send({
-      message: "Invalid username or password or directory.",
-      resolution: "Enter correct credentials and try again." +
-        " To obtain a username or password, contact your security administrator."
+  if ('error' === req.body.email || ! req.body.email || ! req.body.password) {
+    res.status(400).json({
+      message: "Invalid username or password.",
+      resolution: "You can log in with any email address and password."
     });
   } else {
     res.json({
