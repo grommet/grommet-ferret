@@ -205,7 +205,7 @@ export function indexActivate(category, query) {
 }
 
 export function indexSelect(category, selection) {
-  history.pushState(null, '/' + category + '/' + selection + document.location.search);
+  history.pushState(null, '/' + category + selection + document.location.search);
   return { type: INDEX_SELECT, selection: selection };
 }
 

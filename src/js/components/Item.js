@@ -101,13 +101,20 @@ class Item extends Component {
       });
     }
 
+    let actions = <span></span>;
+    if (this.props.item.editable) {
+      actions = (
+        <Menu inline={false}>
+          <Anchor onClick={this._onEdit}>Edit</Anchor>
+          <Anchor onClick={this._onRemoveOpen}>Remove</Anchor>
+        </Menu>
+      );
+    }
+
     return (
       <div>
         <Header large={true} justify="between" fixed={true} pad={{horizontal: "medium"}}>
-          <Menu inline={false}>
-            <Anchor onClick={this._onEdit}>Edit</Anchor>
-            <Anchor onClick={this._onRemoveOpen}>Remove</Anchor>
-          </Menu>
+          {actions}
           <Menu>
             <Link to={this.props.closePath}>
               <CloseIcon />

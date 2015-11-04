@@ -135,8 +135,9 @@ let select = (state, props) => {
   return {
     category: category,
     index: state.index.categories[category],
+    responsive: state.index.responsive,
     nav: state.nav,
-    selection: state.item.uri
+    selection: state.index.selection
   };
 };
 

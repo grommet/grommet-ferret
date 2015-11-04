@@ -22,8 +22,17 @@ const initialState = {
 
 const handlers = {
   [NAV_PEEK]: (_, action) => ({peek: action.peek}),
-  [NAV_ACTIVATE]: (_, action) => ({active: action.active}),
-  [NAV_RESPONSIVE]: (_, action)  => ({responsive: action.responsive}),
+  [NAV_ACTIVATE]: (_, action) => ({active: action.active, activateOnMultiple: null}),
+  [NAV_RESPONSIVE]: (state, action)  => {
+    let result = {responsive: action.responsive};
+    if ('single' === action.responsive && state.active) {
+      result.active = false;
+      result.activateOnMultiple = true;
+    } else if ('multiple' === action.responsive && state.activateOnMultiple) {
+      result.active = true;
+    }
+    return result;
+  },
   [LOGOUT]: (_, action) => ({active: false}),
   [ROUTE_CHANGED]: (state, action) => {
     return ('single' === state.responsive && state.active) ? { active: false } : {};
