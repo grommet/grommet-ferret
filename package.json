@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "grommet": "https://github.com/grommet/grommet/tarball/stable",
-    "grommet-index": "^0.2.0",
+    "grommet-index": "https://github.com/grommet/grommet-index/tarball/stable",
     "history": "^1.13.0",
     "react-redux": "^3.1.0",
     "react-router": "^1.0.0-rc3",
