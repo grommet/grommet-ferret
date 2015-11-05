@@ -120,7 +120,10 @@ Items.propTypes = {
   category: PropTypes.string.isRequired,
   index: PropTypes.shape({
     attributes: IndexPropTypes.attributes,
-    category: PropTypes.string,
+    category: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.arrayOf(PropTypes.string)
+    ]),
     label: PropTypes.string,
     result: IndexPropTypes.result,
     view: PropTypes.oneOf(["table", "tiles", "list"]),

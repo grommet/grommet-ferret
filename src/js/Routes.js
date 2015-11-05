@@ -53,6 +53,11 @@ module.exports = {
         { path: 'dashboard', component: Dashboard },
         { path: 'reports', component: TBD },
         { path: 'settings', component: TBD },
+        { path: 'activity', component: Items,
+          childRoutes: [
+            { path: '*', component: Item }
+          ]
+        },
         ...categoryRoutes
       ]
     }

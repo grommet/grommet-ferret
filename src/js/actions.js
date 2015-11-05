@@ -160,7 +160,7 @@ export function dashboardSearch(text) {
 
 function defaultParams(category, index) {
   return {
-    category: category,
+    category: index.category || category,
     count: IndexApi.pageSize,
     sort: index.sort,
     start: 0

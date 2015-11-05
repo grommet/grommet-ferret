@@ -39,6 +39,25 @@ const initialState = {
         {name: 'name', label: 'Name', header: true}
       ],
       addRoute: '/server-profiles/add'
+    },
+    'activity': {
+      category: ['alerts', 'tasks'],
+      label: "Activity",
+      view: 'table',
+      sort: 'created:desc',
+      attributes: [
+        {name: 'associatedResourceName', label: 'Resource', size: 'medium'},
+        statusAttribute,
+        {name: 'name', label: 'Name', header: true},
+        {name: 'created', label: 'Time',
+          timestamp: true, size: 'medium', secondary: true},
+        {name: 'state', label: 'State', size: 'medium', secondary: true,
+          filter: [
+            'Active', 'Cleared', 'Running', 'Completed'
+          ]},
+        {name: 'category', label: 'Category', secondary: true,
+          filter: ['Alerts', 'Tasks']}
+      ]
     }
   }
 };
