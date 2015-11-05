@@ -58,7 +58,15 @@ class Items extends Component {
   }
 
   _renderIndex(navControl, addControl) {
-    const { index: {label, view, attributes, query, result}, selection } = this.props;
+    const { index: {label, attributes, query, result}, selection,
+      responsive } = this.props;
+    let view = this.props.index.view;
+    let size;
+    if (attributes.length > 3 && 'single' === responsive) {
+      // switch to tiles so we don't squish in too much
+      view = 'tiles';
+      size = 'large';
+    }
     return (
       <Index
         label={label}
@@ -67,6 +75,7 @@ class Items extends Component {
         query={query}
         result={result}
         selection={selection}
+        size={size}
         flush={false}
         onSelect={this._onSelect}
         onQuery={this._onQuery}
