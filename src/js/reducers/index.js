@@ -7,6 +7,8 @@ import { INDEX_ACTIVATE, INDEX_QUERY, INDEX_SUCCESS, INDEX_UNLOAD,
 const statusAttribute = {name: 'status', label: 'Status', size: 'small',
   header: true, filter: ['Error', 'Warning', 'OK', 'Unknown']};
 
+const activityCategoryMap = {alerts: 'Alert', tasks: 'Task'};
+
 const initialState = {
   activeCategory: null,
   responsive: 'multiple',
@@ -56,7 +58,10 @@ const initialState = {
             'Active', 'Cleared', 'Running', 'Completed'
           ]},
         {name: 'category', label: 'Category', secondary: true,
-          filter: ['Alerts', 'Tasks']}
+          filter: ['Alerts', 'Tasks'],
+          render: function (item) {
+            return activityCategoryMap[item.category];
+          }}
       ]
     }
   }
