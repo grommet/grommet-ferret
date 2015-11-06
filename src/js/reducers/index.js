@@ -60,7 +60,7 @@ const initialState = {
         {name: 'category', label: 'Category', secondary: true,
           filter: ['Alerts', 'Tasks'],
           render: function (item) {
-            return activityCategoryMap[item.category];
+            return activityCategoryMap[item.category] || '';
           }}
       ]
     }
