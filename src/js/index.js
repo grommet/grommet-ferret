@@ -74,6 +74,8 @@ store.dispatch(init(localStorage.email, localStorage.token));
 // simulate initial login
 store.dispatch(loginSuccess('nobody@grommet.io', 'simulated'));
 
+let postLoginPath = '/dashboard';
+
 // check for session
 let sessionWatcher = () => {
   const {route, session} = store.getState();
@@ -81,10 +83,11 @@ let sessionWatcher = () => {
     if (route.pathname === '/login' && session.token) {
       localStorage.email = session.email;
       localStorage.token = session.token;
-      history.pushState(null, Routes.path('/dashboard')); // TODO: remember initial URL to restore it
+      history.pushState(null, Routes.path(postLoginPath));
     } else if (route.pathname !== Routes.path('/login') && ! session.token) {
       localStorage.removeItem('email');
       localStorage.removeItem('token');
+      postLoginPath = route.pathname;
       history.pushState(null, Routes.path('/login'));
     } else if (route.pathname === '/') {
       history.replaceState(null, Routes.path('/dashboard'));
