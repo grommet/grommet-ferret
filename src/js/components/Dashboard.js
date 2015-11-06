@@ -14,7 +14,6 @@ import SessionMenu from './SessionMenu';
 import Aggregate from 'grommet-index/components/Aggregate';
 import IndexHistory from 'grommet-index/components/History';
 import { Link } from 'react-router';
-import store from '../store';
 
 class Dashboard extends Component {
 
@@ -30,18 +29,13 @@ class Dashboard extends Component {
     this._onResize = this._onResize.bind(this);
     this._layout = this._layout.bind(this);
 
-    this.state = {
-      graphicSize: 'medium',
-      dashboard: store.getState().dashboard,
-      nav: store.getState().nav
-    };
   }
 
   componentDidMount() {
     this.refs.search.focus();
     window.addEventListener('resize', this._onResize);
     this._onResize();
-    this.props.dispatch(dashboardLoad(this.state.dashboard.tiles));
+    this.props.dispatch(dashboardLoad(this.props.dashboard.tiles));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -54,7 +48,7 @@ class Dashboard extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this._onResize);
-    this.props.dispatch(dashboardUnload(this.state.dashboard.tiles));
+    this.props.dispatch(dashboardUnload(this.props.dashboard.tiles));
   }
 
   _onOverTitle() {
