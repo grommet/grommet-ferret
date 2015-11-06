@@ -3,10 +3,9 @@ node_js:
 - '0.12'
 sudo: false
 cache:
+  bundler: true
   directories:
   - node_modules
-before_cache:
-  - rm -rf node_modules/grommet node_modules/grommet-index
 before_script:
 - npm install -g gulp
 - gem install scss_lint -v 0.38.0
