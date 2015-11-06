@@ -6,6 +6,13 @@
 
 // TODO: explore moving to grommet-core
 .title {
+
+  @include media-query(lap-and-up) {
+    g {
+      transition: stroke $base-animation-duration ease-in-out;
+    }
+  }
+
   &:hover {
    .logo-icon {
      g {
