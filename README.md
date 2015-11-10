@@ -17,8 +17,6 @@ To run this application, execute the following commands:
     ```
     $ cd grommet-ferret
     $ npm install
-    $ cd server
-    $ npm install
     ```
   2. Start the server
 
@@ -33,3 +31,10 @@ To run this application, execute the following commands:
     ```
 
   4. Login credentials: `Username` any string that looks like an email address and any `Password` (not used or stored).
+
+  5. Check Ferret production server
+    ```
+    $ cd grommet-ferret
+    $ gulp dist
+    $ node server/server.js
+    ```
