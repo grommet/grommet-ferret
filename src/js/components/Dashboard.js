@@ -103,9 +103,9 @@ class Dashboard extends Component {
     let height = rect.height - tilesOffset;
     let ratio = width / height;
     let newLegendPlacement = legendPlacement;
-    if (ratio < 1.1 && 'bottom' !== legendPlacement) {
+    if (ratio < 1.05 && 'bottom' !== legendPlacement) {
       newLegendPlacement = 'bottom';
-    } else if (ratio > 1.3 && 'right' !== legendPlacement) {
+    } else if (ratio > 1.2 && 'right' !== legendPlacement) {
       newLegendPlacement = 'right';
     }
 
@@ -113,13 +113,13 @@ class Dashboard extends Component {
     // TODO: These numbers are empirical. Redo to be more formal.
     let graphicSize = 'medium';
     let roughRows = Math.ceil(wideTileCount + (normalTileCount / 3));
-    if ((width / 300) < 3) {
+    if ((width / 410) < 3) {
       graphicSize = 'small';
-    } else if ((height / roughRows) < 300) {
+    } else if ((height / roughRows) < 370) {
       graphicSize = 'small';
-    } else if ((width / 660) > 3) {
+    } else if ((width / 510) > 3) {
       graphicSize = 'large';
-    } else if ((height / roughRows) > 400) {
+    } else if ((height / roughRows) > 500) {
       graphicSize = 'large';
     }
 
