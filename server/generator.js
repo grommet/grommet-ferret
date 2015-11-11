@@ -301,12 +301,14 @@ function createActivity () {
       parentTaskUri: null
     };
     task.state = distribute([['Running', 13], ['Error', 9], ['Warning', 7], 'Completed']);
-    task.status = ('Running' === task.state ? 'Unknown' :
-      {
-        'Completed': 'OK',
-        'Warning': 'Warning',
-        'Error': 'Error'
-      }[task.state]);
+    var taskStateMap = {
+      'Completed': 'OK',
+      'Warning': 'Warning',
+      'Error': 'Error'
+    };
+    task.status = (
+      'Running' === task.state ? 'Unknown' : taskStateMap[task.state]
+    );
   });
 }
 
