@@ -40,6 +40,6 @@
   },
   "scripts": {
     "build": "gulp dist",
-    "start": "cd server && npm install && node server.js"
+    "start": "node server/server.js"
   }
 }
