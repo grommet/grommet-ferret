@@ -123,7 +123,8 @@ class Dashboard extends Component {
       graphicSize = 'large';
     }
 
-    dispatch(dashboardLayout(graphicSize, dataPoints, newLegendPlacement));
+    dispatch(dashboardLayout(graphicSize, dataPoints, newLegendPlacement,
+      this.props.dashboard.tiles));
   }
 
   _onResize() {
