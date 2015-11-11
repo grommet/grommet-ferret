@@ -102,12 +102,28 @@ export function navResponsive(responsive) {
   return { type: NAV_RESPONSIVE, responsive: responsive };
 }
 
-export function dashboardLayout(graphicSize, count, legendPlacement) {
-  return {
-    type: DASHBOARD_LAYOUT,
-    graphicSize: graphicSize,
-    count: count,
-    legendPlacement: legendPlacement
+export function dashboardLayout(graphicSize, count, legendPlacement, tiles) {
+  return function (dispatch) {
+    dispatch({
+      type: DASHBOARD_LAYOUT,
+      graphicSize: graphicSize,
+      count: count,
+      legendPlacement: legendPlacement
+    });
+    // reset what we're watching for
+    tiles.filter((tile) => (tile.history)).forEach((tile) => {
+      IndexApi.stopWatching(tile.watcher);
+      let params = {
+        category: tile.category,
+        query: tile.query,
+        attribute: tile.attribute,
+        interval: tile.interval,
+        count: count
+      };
+      let watcher = IndexApi.watchAggregate(params, (result) => {
+        dispatch(indexAggregateSuccess(watcher, tile.name, result));
+      });
+    });
   };
 }
 
