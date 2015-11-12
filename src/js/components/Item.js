@@ -3,7 +3,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
-import { itemLoad, itemUnload, itemRemove, itemEdit } from '../actions';
+import { itemLoad, itemUnload, itemEdit } from '../actions';
 import Header from 'grommet/components/Header';
 import Menu from 'grommet/components/Menu';
 import Anchor from 'grommet/components/Anchor';
@@ -11,12 +11,8 @@ import CloseIcon from 'grommet/components/icons/base/Close';
 import Article from 'grommet/components/Article';
 import StatusIcon from 'grommet/components/icons/Status';
 import Grobject from 'grommet/components/Object';
-import Layer from 'grommet/components/Layer';
-import Form from 'grommet/components/Form';
-import FormFields from 'grommet/components/FormFields';
-import Footer from 'grommet/components/Footer';
-import Button from 'grommet/components/Button';
 import Notification from 'grommet/components/Notification';
+import RemoveConfirm from './RemoveConfirm';
 
 class Item extends Component {
 
@@ -25,7 +21,6 @@ class Item extends Component {
     this._onEdit = this._onEdit.bind(this);
     this._onRemoveOpen = this._onRemoveOpen.bind(this);
     this._onRemoveClose = this._onRemoveClose.bind(this);
-    this._onRemove = this._onRemove.bind(this);
     this.state = {removing: false};
   }
 
@@ -56,39 +51,25 @@ class Item extends Component {
     this.setState({removing: false});
   }
 
-  _onRemove() {
-    this.setState({removing: false});
-    this.props.dispatch(itemRemove(this.props.category, this.props.uri));
-  }
-
   render() {
     let item = this.props.item.item;
-
+    let name;
     let removeConfirm;
+    let notifications;
+    let actions = <span></span>; // span forces close to right side
+    let object;
+
+    name = item.name || this.props.item.name;
+
     if (this.state.removing) {
       removeConfirm = (
-        <Layer align="right" closer={true} onClose={this._onRemoveClose}>
-          <Form onSubmit={this._onRemove} compact={true}>
-            <Header>
-              <h1>Remove {item.name}</h1>
-            </Header>
-            <FormFields>
-              <fieldset>
-                <p>Are you sure you want to remove {item.name}?</p>
-              </fieldset>
-            </FormFields>
-            <Footer pad={{vertical: 'medium'}}>
-              <Menu>
-                <Button label="Yes, Remove" primary={true} strong={true}
-                  onClick={this._onRemove} />
-              </Menu>
-            </Footer>
-          </Form>
-        </Layer>
+        <RemoveConfirm category={this.props.category}
+          item={this.props.item}
+          uri={this.props.uri}
+          onClose={this._onRemoveClose} />
       );
     }
 
-    let notifications;
     if (this.props.item.notifications.items) {
       notifications = this.props.item.notifications.items.map((notification) => {
         return (
@@ -101,7 +82,7 @@ class Item extends Component {
       });
     }
 
-    let actions = <span></span>;
+
     if (this.props.item.editable) {
       actions = (
         <Menu inline={false}>
@@ -110,6 +91,8 @@ class Item extends Component {
         </Menu>
       );
     }
+
+    object = <Grobject data={item} />;
 
     return (
       <div>
@@ -124,10 +107,10 @@ class Item extends Component {
         <Article>
           <Header tag="h1" pad={{horizontal: 'medium'}}>
             <StatusIcon value={item.status} large={true} />
-            {item.name}
+            {name}
           </Header>
           {notifications}
-          <Grobject data={item} />
+          {object}
         </Article>
         {removeConfirm}
       </div>

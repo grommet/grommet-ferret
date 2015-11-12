@@ -27,16 +27,16 @@ var Api = {
     state.urlPrefix = urlPrefix;
   },
 
-  watchItems: function (params, handler) {
+  watchItems: function (params, success, failure) {
     var url = state.urlPrefix + '/rest/index/resources';
     params = normalizeParams(params);
-    var watcher = RestWatch.start(url, params, handler);
+    var watcher = RestWatch.start(url, params, success, failure);
     return watcher;
   },
 
-  watchItem: function (uri, handler) {
+  watchItem: function (uri, success, failure) {
     var url = state.urlPrefix + uri;
-    var watcher = RestWatch.start(url, {}, handler);
+    var watcher = RestWatch.start(url, {}, success, failure);
     return watcher;
   },
 

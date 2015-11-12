@@ -175,7 +175,7 @@ function respondToRequest (connection, request) {
     }
   } catch (e) {
     response.op = 'error';
-    response.resule = e.message;
+    response.result = e.message;
   }
 
   if (connection.ws) {
@@ -185,9 +185,9 @@ function respondToRequest (connection, request) {
     connection.ws.send(serializedResponse);
   }
 
-  if ('error' === response.op) {
-    closeConnection(connection);
-  }
+  // if ('error' === response.op) {
+  //   closeConnection(connection);
+  // }
 }
 
 function onMessage (connection, request) {
@@ -443,6 +443,18 @@ router.delete('/:categoryName/*', function(req, res) {
 
   setTimeout(function() {
     data.deleteResource(categoryName, '/rest' + req.url);
+    // Delete associated alerts and tasks, except this task
+    var params = {
+      category: ['alerts', 'tasks'], start: 0, count: 100,
+      query: "associatedResourceUri:" + '/rest' + req.url
+    };
+    var items = getItems(null, params).items;
+    items.forEach(function (item) {
+      if (item.uri !== task.uri) {
+        data.deleteResource(item.category, item.uri);
+      }
+    });
+
     task.status = 'OK';
     task.state = 'Completed';
     task.modified = (new Date()).toISOString();
