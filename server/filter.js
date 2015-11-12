@@ -161,7 +161,8 @@ function Expression () {
         expression.op(op);
         this._right = expression;
       } else {
-        throw 'Multiple operations';
+        // right is an expression, add to it
+        this._right.op(op);
       }
     }
   };

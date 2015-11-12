@@ -51,9 +51,11 @@ export const ITEM_REMOVE = 'ITEM_REMOVE';
 export const INDEX_SUCCESS = 'INDEX_SUCCESS';
 export const INDEX_AGGREGATE_SUCCESS = 'INDEX_AGGREGATE_SUCCESS';
 export const ITEM_SUCCESS = 'ITEM_SUCCESS';
+export const ITEM_FAILURE = 'ITEM_FAILURE';
 export const ITEM_ADD_SUCCESS = 'ITEM_ADD_SUCCESS';
 export const ITEM_ADD_FAILURE = 'ITEM_ADD_FAILURE';
 export const ITEM_NOTIFICATIONS_SUCCESS = 'ITEM_NOTIFICATIONS_SUCCESS';
+export const ITEM_NOTIFICATIONS_FAILURE = 'ITEM_NOTIFICATIONS_FAILURE';
 
 export function init(email, token) {
   return { type: INIT, email: email, token: token };
@@ -272,24 +274,28 @@ export function indexResponsive(responsive) {
   return { type: INDEX_RESPONSIVE, responsive: responsive };
 }
 
+function watchNotifications(dispatch, uri, activityUri) {
+  let params = { category: ['alerts', 'tasks'], start: 0, count: 10 };
+  let specialUri = (activityUri ? " OR uri:" + activityUri : '');
+  let query = "associatedResourceUri:" + uri +
+    " AND (state:Active OR state:Locked OR state:Running" + specialUri + ")";
+  params.query = query;
+  let notificationsWatcher = IndexApi.watchItems(params, (result) => {
+    dispatch(itemNotificationsSuccess(notificationsWatcher, uri, result));
+  }, (error) => {
+    dispatch(itemNotificationsFailure(notificationsWatcher, uri, error));
+  });
+}
+
 export function itemLoad(uri) {
   return function (dispatch) {
     dispatch(itemActivate(uri));
     let watcher = IndexApi.watchItem(uri, (result) => {
       dispatch(itemSuccess(watcher, uri, result));
+    }, (error) => {
+      dispatch(itemFailure(watcher, uri, error));
     });
-
-    // Watch for any notifications on this item
-    let params = {
-      category: ['alerts', 'tasks'],
-      start: 0,
-      count: 10,
-      query: "associatedResourceUri:" + uri +
-        " AND (state:Active OR state:Locked OR state:Running)"
-    };
-    let notificationWatcher = IndexApi.watchItems(params, (result) => {
-      dispatch(itemNotificationsSuccess(notificationWatcher, uri, result));
-    });
+    watchNotifications(dispatch, uri);
   };
 }
 
@@ -297,7 +303,7 @@ export function itemUnload(item) {
   return function (dispatch) {
     dispatch({ type: ITEM_UNLOAD });
     IndexApi.stopWatching(item.watcher);
-    IndexApi.stopWatching(item.notificationWatcher);
+    IndexApi.stopWatching(item.notificationsWatcher);
   };
 }
 
@@ -322,7 +328,7 @@ export function itemAdd(item) {
           } else if (res.ok) {
             var task = res.body;
             dispatch(itemAddSuccess());
-            dispatch(indexSelect('server-profiles',
+            dispatch(indexSelect(item.category,
               task.attributes.associatedResourceUri));
           }
         });
@@ -356,11 +362,14 @@ export function itemUpdate(item) {
   };
 }
 
-export function itemRemove(category, uri) {
+export function itemRemove(category, item) {
   return function (dispatch) {
-    Rest.del(uri).end((err, res) => {
-      dispatch({ type: ITEM_REMOVE, uri: uri });
-      history.pushState(null, '/' + category + document.location.search);
+    Rest.del(item.uri).end((err, res) => {
+      const taskUri = res.body.taskUri;
+      IndexApi.stopWatching(item.notificationsWatcher);
+      dispatch({ type: ITEM_REMOVE, uri: item.uri, deleteTaskUri: taskUri });
+      watchNotifications(dispatch, item.uri, taskUri);
+      //history.pushState(null, '/' + category + document.location.search);
     });
   };
 }
@@ -371,6 +380,15 @@ export function itemSuccess(watcher, uri, result) {
     watcher: watcher,
     uri: uri,
     item: result
+  };
+}
+
+export function itemFailure(watcher, uri, error) {
+  return {
+    type: ITEM_FAILURE,
+    watcher: watcher,
+    uri: uri,
+    error: error
   };
 }
 
@@ -387,4 +405,8 @@ export function itemAddFailure(error) {
 
 export function itemNotificationsSuccess(watcher, uri, result) {
   return { type: ITEM_NOTIFICATIONS_SUCCESS, watcher: watcher, uri: uri, result: result };
+}
+
+export function itemNotificationsFailure(watcher, uri, result) {
+  return { type: ITEM_NOTIFICATIONS_FAILURE, watcher: watcher, uri: uri, result: result };
 }

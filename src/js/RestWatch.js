@@ -44,7 +44,12 @@ var RestWatch = {
     // know which action to deliver the response with.
     state.requests.some(function(request) {
       if (request.id === message.id) {
-        request.handler(message.result);
+        // console.log('!!! RestWatch _onMessage', message);
+        if ('error' === message.op) {
+          request.failure(message.result);
+        } else {
+          request.success(message.result);
+        }
       }
     });
   },
@@ -59,24 +64,21 @@ var RestWatch = {
   },
 
   _getREST: function(request) {
-    console.log('!!! RestWatch _getREST');
     request.pollBusy = true;
     Rest.get(request.url, request.params)
       .end(function(err, res) {
-        console.log('!!! RestWatch end', err, res);
         if (err) {
-          throw err;
+          request.failure(err);
         }
 
         if (res.ok) {
-          request.handler(res.body);
+          request.success(res.body);
         }
         request.pollBusy = false;
       });
   },
 
   _poll: function() {
-    console.log('!!! RestWatch _poll');
     state.requests.forEach(function(request) {
       if (!request.pollBusy) {
         this._getREST(request);
@@ -100,13 +102,14 @@ var RestWatch = {
     return ('WebSocket' in window || 'MozWebSocket' in window);
   },
 
-  start: function(url, params, handler) {
+  start: function(url, params, success, failure) {
     this.initialize();
     var request = {
       id: state.nextRequestId,
       url: url,
       params: params,
-      handler: handler
+      success: success,
+      failure: failure
     };
     state.nextRequestId += 1;
     state.requests.push(request);
