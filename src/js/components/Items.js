@@ -3,7 +3,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
-import { indexLoad, indexUnload, indexMore, indexQuery, indexSelect, indexResponsive, navActivate } from '../actions';
+import { indexLoad, indexUnload, indexMore, indexQuery, indexSelect, navActivate } from '../actions';
 import Split from 'grommet/components/Split';
 import Index from 'grommet-index/components/Index';
 import IndexPropTypes from 'grommet-index/utils/PropTypes';
@@ -16,7 +16,6 @@ class Items extends Component {
   constructor() {
     super();
     this._onClickTitle = this._onClickTitle.bind(this);
-    this._onResponsive = this._onResponsive.bind(this);
     this._onSelect = this._onSelect.bind(this);
     this._onMore = this._onMore.bind(this);
     this._onQuery = this._onQuery.bind(this);
@@ -55,13 +54,8 @@ class Items extends Component {
     this.props.dispatch(indexQuery(this.props.category, this.props.index, query));
   }
 
-  _onResponsive (responsive) {
-    this.props.dispatch(indexResponsive(responsive));
-  }
-
   _renderIndex(navControl, addControl) {
-    const { index: {label, attributes, query, result}, selection,
-      responsive } = this.props;
+    const { index: {label, attributes, query, result}, selection } = this.props;
     let view = this.props.index.view;
     let size;
     if (attributes.length > 3 && 'single' === responsive) {
@@ -88,7 +82,7 @@ class Items extends Component {
   }
 
   render() {
-    const { nav: {active: navActive}, responsive, index, selection } = this.props;
+    const { nav: {active: navActive}, index } = this.props;
     let navControl;
     if (! navActive) {
       navControl = (
@@ -103,22 +97,11 @@ class Items extends Component {
       addControl = <Link to={index.addRoute}><AddIcon /></Link>;
     }
 
-    let pane1;
-    let pane2;
-
-    if ('single' === responsive) {
-      if (selection) {
-        pane1 = this.props.children;
-      } else {
-        pane1 = this._renderIndex(navControl, addControl);
-      }
-    } else {
-      pane1 = this._renderIndex(navControl, addControl);
-      pane2 = this.props.children;
-    }
+    let pane1 = this._renderIndex(navControl, addControl);
+    let pane2 = this.props.children;
 
     return (
-      <Split onResponsive={this._onResponsive} flex="both">
+      <Split flex="both">
         {pane1}
         {pane2}
       </Split>
