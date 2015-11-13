@@ -134,6 +134,7 @@ Items.propTypes = {
       PropTypes.arrayOf(PropTypes.string)
     ]),
     label: PropTypes.string,
+    query: PropTypes.object,
     result: IndexPropTypes.result,
     view: PropTypes.oneOf(["table", "tiles", "list"]),
     addRoute: PropTypes.string
