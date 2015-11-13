@@ -1,46 +1,47 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-var React = require('react');
-var merge = require('lodash/object/merge');
-var Layer = require('grommet/components/Layer');
-var Form = require('grommet/components/Form');
-var Header = require('grommet/components/Header');
-var Title = require('grommet/components/Title');
-var Menu = require('grommet/components/Menu');
-var CloseIcon = require('grommet/components/icons/Clear');
-var Footer = require('grommet/components/Footer');
-var FormFields = require('grommet/components/FormFields');
-var FormField = require('grommet/components/FormField');
+import React, { Component, PropTypes } from 'react';
+import merge from 'lodash/object/merge';
+import Layer from 'grommet/components/Layer';
+import Form from 'grommet/components/Form';
+import Header from 'grommet/components/Header';
+import Title from 'grommet/components/Title';
+import Menu from 'grommet/components/Menu';
+import Footer from 'grommet/components/Footer';
+import Button from 'grommet/components/Button';
+import FormFields from 'grommet/components/FormFields';
+import FormField from 'grommet/components/FormField';
 
-var ServerProfileVolumeAdd = React.createClass({
+class ServerProfileVolumeAdd extends Component {
 
-  propTypes: {
-    onAdd: React.PropTypes.func.isRequired,
-    onClose: React.PropTypes.func.isRequired
-  },
+  constructor() {
+    super();
 
-  getInitialState: function () {
-    return {
+    this._onAdd = this._onAdd.bind(this);
+    this._onAddPlus = this._onAddPlus.bind(this);
+    this._onChange = this._onChange.bind(this);
+
+    this.state = {
       volume: {
         name: ''
       },
       addedCount: 0,
       primaryAction: 'Add'
     };
-  },
+  }
 
-  componentDidMount: function () {
-    this.refs.first.getDOMNode().focus();
-  },
+  componentDidMount() {
+    this.refs.first.focus();
+  }
 
-  _onAdd: function (event) {
+  _onAdd(event) {
     event.preventDefault();
     this.props.onAdd(merge({}, this.state.volume));
     this.setState({primaryAction: 'Add'});
     this.props.onClose();
-  },
+  }
 
-  _onAddPlus: function (event) {
+  _onAddPlus(event) {
     event.preventDefault();
     var volume = this.state.volume;
     this.props.onAdd(merge({}, volume));
@@ -50,30 +51,24 @@ var ServerProfileVolumeAdd = React.createClass({
       volume: volume,
       addedCount: this.state.addedCount + 1
     });
-  },
+  }
 
-  _onChange: function (event) {
+  _onChange(event) {
     var name = event.target.getAttribute('name');
     var volume = this.state.volume;
     volume[name] = event.target.value;
     this.setState({volume: volume});
-  },
+  }
 
-  render: function () {
+  render() {
     var volume = this.state.volume;
 
-    var actions = [];
-    if ('Add' === this.state.primaryAction) {
-      actions.push(<input key="add" type="submit" className="primary" value="Add"
-        onClick={this._onAdd} />);
-      actions.push(<input key="addp" type="button" value="Add +"
-        onClick={this._onAddPlus} />);
-    } else {
-      actions.push(<input key="add" type="button" value="Add"
-        onClick={this._onAdd} />);
-      actions.push(<input key="addp" type="submit" className="primary" value="Add +"
-        onClick={this._onAddPlus} />);
-    }
+    var primaryAdd = 'Add' === this.state.primaryAction;
+    var actions = [
+      <Button key="add" label="Add" primary={primaryAdd} onClick={this._onAdd} />,
+      <Button key="addplus" label="Add +" primary={!primaryAdd}
+        onClick={this._onAddPlus} />
+    ];
 
     var message;
     if (this.state.addedCount) {
@@ -81,15 +76,10 @@ var ServerProfileVolumeAdd = React.createClass({
     }
 
     return (
-      <Layer align="right">
-        <Form compact={true} onSubmit={this._onAdd}>
+      <Layer align="right" onClose={this.props.onClose} closer={true} flush={true}>
+        <Form onSubmit={this._onAdd}>
           <Header>
             <Title>Add Volume</Title>
-            <Menu>
-              <div onClick={this.props.onClose}>
-                <CloseIcon />
-              </div>
-            </Menu>
           </Header>
           <FormFields>
             <fieldset>
@@ -100,17 +90,21 @@ var ServerProfileVolumeAdd = React.createClass({
               </FormField>
             </fieldset>
           </FormFields>
-          <Footer>
-            <span>{message}</span>
-            <Menu direction="left">
+          <Footer pad={{vertical: 'medium'}}>
+            <Menu direction="row">
               {actions}
             </Menu>
+            <span>{message}</span>
           </Footer>
         </Form>
       </Layer>
     );
   }
-});
+}
 
+ServerProfileVolumeAdd.propTypes = {
+  onAdd: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired
+};
 
 module.exports = ServerProfileVolumeAdd;
