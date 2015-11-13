@@ -1,69 +1,83 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-var React = require('react');
-var merge = require('lodash/object/merge');
-var Form = require('grommet/components/Form');
-var Menu = require('grommet/components/Menu');
-var Footer = require('grommet/components/Footer');
-var FormFields = require('grommet/components/FormFields');
-var FormField = require('grommet/components/FormField');
-var SearchInput = require('grommet/components/SearchInput');
-var CheckBox = require('grommet/components/CheckBox');
-var RadioButton = require('grommet/components/RadioButton');
-var Tiles = require('grommet/components/Tiles');
-var Tile = require('grommet/components/Tile');
-var Header = require('grommet/components/Header');
-var CloseIcon = require('grommet/components/icons/Clear');
-var Rest = require('grommet/utils/Rest');
-var ServerProfileConnectionAdd = require('./ServerProfileConnectionAdd');
-var ServerProfileVolumeAdd = require('./ServerProfileVolumeAdd');
-var BusyIcon = require('grommet/components/icons/Spinning');
+import React, { Component, PropTypes } from 'react';
+import merge from 'lodash/object/merge';
+import Form from 'grommet/components/Form';
+import Menu from 'grommet/components/Menu';
+import Footer from 'grommet/components/Footer';
+import FormFields from 'grommet/components/FormFields';
+import FormField from 'grommet/components/FormField';
+import SearchInput from 'grommet/components/SearchInput';
+import CheckBox from 'grommet/components/CheckBox';
+import RadioButton from 'grommet/components/RadioButton';
+import Tiles from 'grommet/components/Tiles';
+import Tile from 'grommet/components/Tile';
+import Header from 'grommet/components/Header';
+import Button from 'grommet/components/Button';
+import CloseIcon from 'grommet/components/icons/Clear';
+import Rest from 'grommet/utils/Rest';
+import ServerProfileConnectionAdd from './ServerProfileConnectionAdd';
+import ServerProfileVolumeAdd from './ServerProfileVolumeAdd';
+import BusyIcon from 'grommet/components/icons/Spinning';
+import Grobject from 'grommet/components/Object';
 
-var ServerProfileForm = React.createClass({
+class ServerProfileForm extends Component {
 
-  propTypes: {
-    buttonLabel: React.PropTypes.string.isRequired,
-    onSubmit: React.PropTypes.func.isRequired,
-    processingMessage: React.PropTypes.string,
-    serverProfile: React.PropTypes.object.isRequired
-  },
+  constructor(props) {
+    super(props);
+    this._onSubmit = this._onSubmit.bind(this);
+    this._onChange = this._onChange.bind(this);
+    this._onServerHardwareChange = this._onServerHardwareChange.bind(this);
+    this._onServerHardwareSearch = this._onServerHardwareSearch.bind(this);
+    this._onServerHardwareSearchResponse =
+      this._onServerHardwareSearchResponse.bind(this);
+    this._onFirmwareChange = this._onFirmwareChange.bind(this);
+    this._onFirmwareSearch = this._onFirmwareSearch.bind(this);
+    this._onFirmwareSearchResponse = this._onFirmwareSearchResponse.bind(this);
+    this._onAddConnection = this._onAddConnection.bind(this);
+    this._onNewConnectionOpen = this._onNewConnectionOpen.bind(this);
+    this._onNewConnectionClose = this._onNewConnectionClose.bind(this);
+    this._onRemoveConnection = this._onRemoveConnection.bind(this);
+    this._onAddVolume = this._onAddVolume.bind(this);
+    this._onNewVolumeOpen = this._onNewVolumeOpen.bind(this);
+    this._onNewVolumeClose = this._onNewVolumeClose.bind(this);
+    this._onRemoveVolume = this._onRemoveVolume.bind(this);
 
-  getInitialState: function () {
-    return {
-      serverProfile: merge({}, this.props.serverProfile),
+    this.state = {
+      serverProfile: merge({}, props.serverProfile),
       serverHardwareSuggestions: [],
       firmwareSuggestions: []
     };
-  },
+  }
 
-  componentDidMount: function () {
+  componentDidMount() {
     this._onServerHardwareSearch('');
     this._onFirmwareSearch('');
-  },
+  }
 
-  componentWillReceiveProps: function (newProps) {
+  componentWillReceiveProps(newProps) {
     this.setState({serverProfile: newProps.serverProfile});
-  },
+  }
 
-  _onSubmit: function (event) {
+  _onSubmit(event) {
     event.preventDefault();
     this.props.onSubmit(this.state.serverProfile);
-  },
+  }
 
-  _onChange: function (event) {
+  _onChange(event) {
     var serverProfile = this.state.serverProfile;
     serverProfile[event.target.getAttribute('name')] = event.target.value;
     this.setState({serverProfile: serverProfile});
-  },
+  }
 
-  _onServerHardwareChange: function (value) {
+  _onServerHardwareChange(value) {
     var serverProfile = this.state.serverProfile;
     var serverHardware = {uri: value.value, name: value.label};
     serverProfile.serverHardware = serverHardware;
     this.setState({serverProfile: serverProfile});
-  },
+  }
 
-  _onServerHardwareSearchResponse: function (err, res) {
+  _onServerHardwareSearchResponse(err, res) {
     if (err) {
       throw err;
     }
@@ -74,22 +88,22 @@ var ServerProfileForm = React.createClass({
       });
       this.setState({serverHardwareSuggestions: suggestions});
     }
-  },
+  }
 
-  _onServerHardwareSearch: function (value) {
+  _onServerHardwareSearch(value) {
     var params = {category: 'server-hardware', query: value,
       start: 0, count: 5};
     Rest.get('/rest/index/search-suggestions', params)
       .end(this._onServerHardwareSearchResponse);
-  },
+  }
 
-  _onFirmwareChange: function (value) {
+  _onFirmwareChange(value) {
     var serverProfile = this.state.serverProfile;
     serverProfile.firmware = value;
     this.setState({serverProfile: serverProfile});
-  },
+  }
 
-  _onFirmwareSearchResponse: function (err, res) {
+  _onFirmwareSearchResponse(err, res) {
     if (err) {
       throw err;
     }
@@ -100,97 +114,91 @@ var ServerProfileForm = React.createClass({
       });
       this.setState({firmwareSuggestions: names});
     }
-  },
+  }
 
-  _onFirmwareSearch: function (value) {
+  _onFirmwareSearch(value) {
     var params = {category: 'firmware-drivers', query: value,
       start: 0, count: 5};
     Rest.get('/rest/index/search-suggestions', params)
       .end(this._onFirmwareSearchResponse);
-  },
+  }
 
-  _onAddConnection: function (connection) {
+  _onAddConnection(connection) {
     var serverProfile = this.state.serverProfile;
     serverProfile.connections.push(connection);
     this.setState({serverProfile: serverProfile});
-  },
+  }
 
-  _onNewConnectionOpen: function (event) {
+  _onNewConnectionOpen(event) {
     event.preventDefault();
     this.setState({addConnection: true});
-  },
+  }
 
-  _onNewConnectionClose: function () {
+  _onNewConnectionClose() {
     this.setState({addConnection: false});
-  },
+  }
 
-  _onRemoveConnection: function (index) {
+  _onRemoveConnection(index) {
     var serverProfile = this.state.serverProfile;
     serverProfile.connections.splice(index, 1);
     this.setState({serverProfile: serverProfile});
-  },
+  }
 
-  _onAddVolume: function (volume) {
+  _onAddVolume(volume) {
     var serverProfile = this.state.serverProfile;
     serverProfile.volumes.push(volume);
     this.setState({serverProfile: serverProfile});
-  },
+  }
 
-  _onNewVolumeOpen: function (event) {
+  _onNewVolumeOpen(event) {
     event.preventDefault();
     this.setState({addVolume: true});
-  },
+  }
 
-  _onNewVolumeClose: function () {
+  _onNewVolumeClose() {
     this.setState({addVolume: false});
-  },
+  }
 
-  _onRemoveVolume: function (index) {
+  _onRemoveVolume(index) {
     var serverProfile = this.state.serverProfile;
     serverProfile.volumes.splice(index, 1);
     this.setState({serverProfile: serverProfile});
-  },
+  }
 
-  _renderConnections: function () {
+  _renderConnections() {
     return this.state.serverProfile.connections.map(function (connection, index) {
       return (
-        <Tile key={connection.name}>
-          <Header small={true}>
+        <Tile key={connection.name} align="start" pad="none">
+          <Header small={true} justify="between">
             {connection.name}
-            <Menu>
-              <div onClick={this._onRemoveConnection.bind(this, index)}>
-                <CloseIcon />
-              </div>
-            </Menu>
+            <Button type="icon"
+              onClick={this._onRemoveConnection.bind(this, index)}>
+              <CloseIcon />
+            </Button>
           </Header>
-          <div>{connection.type}</div>
-          <div>{connection.network}</div>
-          <div>{connection.bandwidth}</div>
-          <div>{connection.port}</div>
-          <div>{connection.boot}</div>
+          <Grobject data={connection} />
         </Tile>
       );
     }, this);
-  },
+  }
 
-  _renderVolumes: function () {
+  _renderVolumes() {
     return this.state.serverProfile.volumes.map(function (volume, index) {
       return (
-        <Tile key={volume.name}>
-          <Header small={true}>
+        <Tile key={volume.name} align="start" pad="none">
+          <Header small={true} justify="between">
             {volume.name}
-            <Menu>
-              <div onClick={this._onRemoveVolume.bind(this, index)}>
-                <CloseIcon />
-              </div>
-            </Menu>
+            <Button type="icon"
+              onClick={this._onRemoveVolume.bind(this, index)}>
+              <CloseIcon />
+            </Button>
           </Header>
         </Tile>
       );
     }, this);
-  },
+  }
 
-  render: function () {
+  render() {
     var serverProfile = this.state.serverProfile;
 
     var connections;
@@ -284,7 +292,7 @@ var ServerProfileForm = React.createClass({
 
           <fieldset>
             <legend>Connections</legend>
-            <Tiles flush={false}>
+            <Tiles flush={true}>
               {connections}
             </Tiles>
             <button onClick={this._onNewConnectionOpen}>Add Connection</button>
@@ -396,6 +404,13 @@ var ServerProfileForm = React.createClass({
       </Form>
     );
   }
-});
+}
+
+ServerProfileForm.propTypes = {
+  buttonLabel: PropTypes.string.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  processingMessage: PropTypes.string,
+  serverProfile: PropTypes.object.isRequired
+};
 
 module.exports = ServerProfileForm;

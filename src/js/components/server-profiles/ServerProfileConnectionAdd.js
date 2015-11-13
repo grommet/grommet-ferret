@@ -1,29 +1,33 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-var React = require('react');
-var merge = require('lodash/object/merge');
-var Layer = require('grommet/components/Layer');
-var Form = require('grommet/components/Form');
-var Header = require('grommet/components/Header');
-var Title = require('grommet/components/Title');
-var Menu = require('grommet/components/Menu');
-var CloseIcon = require('grommet/components/icons/Clear');
-var Footer = require('grommet/components/Footer');
-var FormFields = require('grommet/components/FormFields');
-var FormField = require('grommet/components/FormField');
-var SearchInput = require('grommet/components/SearchInput');
-var RadioButton = require('grommet/components/RadioButton');
-var Rest = require('grommet/utils/Rest');
+import React, { Component, PropTypes } from 'react';
+import merge from 'lodash/object/merge';
+import Layer from 'grommet/components/Layer';
+import Form from 'grommet/components/Form';
+import Header from 'grommet/components/Header';
+import Title from 'grommet/components/Title';
+import Menu from 'grommet/components/Menu';
+import Footer from 'grommet/components/Footer';
+import FormFields from 'grommet/components/FormFields';
+import FormField from 'grommet/components/FormField';
+import SearchInput from 'grommet/components/SearchInput';
+import RadioButton from 'grommet/components/RadioButton';
+import Button from 'grommet/components/Button';
+import Rest from 'grommet/utils/Rest';
 
-var ServerProfileConnectionAdd = React.createClass({
+class ServerProfileConnectionAdd extends Component {
 
-  propTypes: {
-    onAdd: React.PropTypes.func.isRequired,
-    onClose: React.PropTypes.func.isRequired
-  },
+  constructor() {
+    super();
 
-  getInitialState: function () {
-    return {
+    this._onAdd = this._onAdd.bind(this);
+    this._onAddPlus = this._onAddPlus.bind(this);
+    this._onChange = this._onChange.bind(this);
+    this._onNetworkChange = this._onNetworkChange.bind(this);
+    this._onNetworkSearch = this._onNetworkSearch.bind(this);
+    this._onNetworkSearchResponse = this._onNetworkSearchResponse.bind(this);
+
+    this.state = {
       connection: {
         name: '',
         type: 'Ethernet',
@@ -36,21 +40,21 @@ var ServerProfileConnectionAdd = React.createClass({
       primaryAction: 'Add',
       networkSuggestions: []
     };
-  },
+  }
 
-  componentDidMount: function () {
+  componentDidMount() {
     this._onNetworkSearch('');
-    this.refs.first.getDOMNode().focus();
-  },
+    this.refs.first.focus();
+  }
 
-  _onAdd: function (event) {
+  _onAdd(event) {
     event.preventDefault();
     this.props.onAdd(merge({}, this.state.connection));
     this.setState({primaryAction: 'Add'});
     this.props.onClose();
-  },
+  }
 
-  _onAddPlus: function (event) {
+  _onAddPlus(event) {
     event.preventDefault();
     var connection = this.state.connection;
     this.props.onAdd(merge({}, connection));
@@ -61,9 +65,9 @@ var ServerProfileConnectionAdd = React.createClass({
       connection: connection,
       addedCount: this.state.addedCount + 1
     });
-  },
+  }
 
-  _onChange: function (event) {
+  _onChange(event) {
     var name = event.target.getAttribute('name');
     var connection = this.state.connection;
     connection[name] = event.target.value;
@@ -72,15 +76,15 @@ var ServerProfileConnectionAdd = React.createClass({
       getSuggestions = this._onNetworkSearch;
     }
     this.setState({connection: connection}, getSuggestions);
-  },
+  }
 
-  _onNetworkChange: function (value) {
+  _onNetworkChange(value) {
     var connection = this.state.connection;
     connection.network = value;
     this.setState({connection: connection});
-  },
+  }
 
-  _onNetworkSearchResponse: function (err, res) {
+  _onNetworkSearchResponse(err, res) {
     if (err) {
       throw err;
     }
@@ -91,9 +95,9 @@ var ServerProfileConnectionAdd = React.createClass({
       });
       this.setState({networkSuggestions: names});
     }
-  },
+  }
 
-  _onNetworkSearch: function (value) {
+  _onNetworkSearch(value) {
     var category;
     if ('Ethernet' === this.state.connection.type) {
       category = 'ethernet-networks';
@@ -104,23 +108,17 @@ var ServerProfileConnectionAdd = React.createClass({
       start: 0, count: 5};
     Rest.get('/rest/index/search-suggestions', params)
       .end(this._onNetworkSearchResponse);
-  },
+  }
 
-  render: function () {
+  render() {
     var connection = this.state.connection;
 
-    var actions = [];
-    if ('Add' === this.state.primaryAction) {
-      actions.push(<input key="add" type="submit" className="primary" value="Add"
-        onClick={this._onAdd} />);
-      actions.push(<input key="addp" type="button" value="Add +"
-        onClick={this._onAddPlus} />);
-    } else {
-      actions.push(<input key="add" type="button" value="Add"
-        onClick={this._onAdd} />);
-      actions.push(<input key="addp" type="submit" className="primary" value="Add +"
-        onClick={this._onAddPlus} />);
-    }
+    var primaryAdd = 'Add' === this.state.primaryAction;
+    var actions = [
+      <Button key="add" label="Add" primary={primaryAdd} onClick={this._onAdd} />,
+      <Button key="addplus" label="Add +" primary={!primaryAdd}
+        onClick={this._onAddPlus} />
+    ];
 
     var message;
     if (this.state.addedCount) {
@@ -128,15 +126,10 @@ var ServerProfileConnectionAdd = React.createClass({
     }
 
     return (
-      <Layer align="right">
-        <Form compact={true} onSubmit={this._onAdd}>
+      <Layer align="right" onClose={this.props.onClose} closer={true} flush={true}>
+        <Form onSubmit={this._onAdd}>
           <Header>
             <Title>Add Connection</Title>
-            <Menu>
-              <div onClick={this.props.onClose}>
-                <CloseIcon />
-              </div>
-            </Menu>
           </Header>
           <FormFields>
             <fieldset>
@@ -146,10 +139,10 @@ var ServerProfileConnectionAdd = React.createClass({
                   onChange={this._onChange} />
               </FormField>
               <FormField label="Device type">
-                <RadioButton name="type" label="Ethernet"
+                <RadioButton name="type" id="type-ethernet" label="Ethernet"
                   checked={connection.type === 'Ethernet'}
                   onChange={this._onChange} />
-                <RadioButton name="type" label="Fibre Channel"
+                <RadioButton name="type" id="type-fibre-channel" label="Fibre Channel"
                   checked={connection.type === 'Fibre Channel'}
                   onChange={this._onChange} />
               </FormField>
@@ -177,17 +170,21 @@ var ServerProfileConnectionAdd = React.createClass({
               </FormField>
             </fieldset>
           </FormFields>
-          <Footer>
-            <span>{message}</span>
-            <Menu direction="left">
+          <Footer pad={{vertical: 'medium'}}>
+            <Menu direction="row">
               {actions}
             </Menu>
+            <span>{message}</span>
           </Footer>
         </Form>
       </Layer>
     );
   }
-});
+}
 
+ServerProfileConnectionAdd.propTypes = {
+  onAdd: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired
+};
 
 module.exports = ServerProfileConnectionAdd;
