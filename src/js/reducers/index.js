@@ -2,7 +2,7 @@
 
 import update from 'react/lib/update';
 import { INDEX_ACTIVATE, INDEX_QUERY, INDEX_SUCCESS, INDEX_UNLOAD,
-  INDEX_RESPONSIVE, INDEX_SELECT, ROUTE_CHANGED } from '../actions';
+  INDEX_SELECT, ROUTE_CHANGED } from '../actions';
 
 const statusAttribute = {name: 'status', label: 'Status', size: 'small',
   header: true, filter: ['Error', 'Warning', 'OK', 'Unknown']};
@@ -113,7 +113,6 @@ const handlers = {
     });
   },
 
-  [INDEX_RESPONSIVE]: (_, action)  => ({responsive: action.responsive}),
   [INDEX_SELECT]: (_, action)  => ({selection: action.selection}),
 
   [ROUTE_CHANGED]: (state, action) => {

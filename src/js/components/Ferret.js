@@ -19,28 +19,14 @@ class Indexer extends Component {
   }
 
   render() {
-    const { active: navActive, responsive } = this.props;
-    var pane1;
-    var pane2;
+    const { active: navActive } = this.props;
 
-    if ('single' === responsive) {
-      if (navActive) {
-        pane1 = <NavSidebar />;
-      } else {
-        pane1 = this.props.children;
-      }
-    } else {
-      if (! navActive) {
-        pane1 = this.props.children;
-      } else {
-        pane1 = <NavSidebar />;
-        pane2 = this.props.children;
-      }
-    }
+    var pane1 = navActive ? <NavSidebar /> : null;
+    var pane2 = this.props.children;
 
     return (
       <App centered={false}>
-        <Split flex="right" onResponsive={this._onResponsive}>
+        <Split flex="right" onResponsive={this._onResponsive} priority="left">
           {pane1}
           {pane2}
         </Split>

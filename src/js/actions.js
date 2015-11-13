@@ -34,7 +34,6 @@ export const INDEX_ACTIVATE = 'INDEX_ACTIVATE';
 export const INDEX_SELECT = 'INDEX_SELECT';
 export const INDEX_QUERY = 'INDEX_QUERY';
 export const INDEX_MORE = 'INDEX_MORE';
-export const INDEX_RESPONSIVE = 'INDEX_RESPONSIVE';
 export const INDEX_UNLOAD = 'INDEX_UNLOAD';
 
 // item page
@@ -277,10 +276,6 @@ export function indexAggregateSuccess(watcher, id, result) {
     id: id,
     result: result
   };
-}
-
-export function indexResponsive(responsive) {
-  return { type: INDEX_RESPONSIVE, responsive: responsive };
 }
 
 function watchNotifications(dispatch, uri, activityUri) {
