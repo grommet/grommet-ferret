@@ -235,7 +235,9 @@ export function indexMore(category, index) {
   return function (dispatch) {
     IndexApi.stopWatching(index.watcher);
     let params = defaultParams(category, index);
-    params = { ...params, ...{ count: (index.result.count + IndexApi.pageSize) } };
+    let query = index.query;
+    params = { ...params,
+      ...{ query: query, count: (index.result.count + IndexApi.pageSize) } };
     let watcher = IndexApi.watchItems(params, (result) => {
       dispatch(indexSuccess(watcher, category, result));
     });
