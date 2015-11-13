@@ -116,10 +116,23 @@ const handlers = {
   [INDEX_RESPONSIVE]: (_, action)  => ({responsive: action.responsive}),
   [INDEX_SELECT]: (_, action)  => ({selection: action.selection}),
 
-  [ROUTE_CHANGED]: (_, action) => {
+  [ROUTE_CHANGED]: (state, action) => {
     let result = {};
-    if (action.route.pathname.split('/').length <= 2) {
-      result = {selection: null};
+    const pathParts = action.route.pathname.split('/');
+    const category = pathParts[1];
+    if (state.categories.hasOwnProperty(category)) {
+      result.activeCategory = category;
+      // TODO: uris should be opaque, we need a cleaner way to extract the
+      // selection uri
+      const restParts = action.route.pathname.split('/rest');
+      if (restParts.length < 2) {
+        result.selection = null;
+      } else {
+        result.selection = '/rest' + restParts[1];
+      }
+    } else {
+      result.activeCategory = null;
+      result.selection = null;
     }
     return result;
   }

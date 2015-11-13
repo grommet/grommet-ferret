@@ -191,7 +191,7 @@ export function indexNav(category, query) {
   return { type: INDEX_NAV, category: category, query: query };
 }
 
-export function indexLoad(category, index) {
+export function indexLoad(category, index, selection) {
   return function (dispatch) {
     dispatch({ type: INDEX_LOAD, category: category });
     // bring in any query from the location
@@ -201,6 +201,9 @@ export function indexLoad(category, index) {
     if (loc.query.q) {
       query = Query.create(loc.query.q);
       params = { ...params, ...{ query: query } };
+    }
+    if (selection) {
+      params = { ...params, ...{referenceUri: selection } };
     }
     dispatch(indexActivate(category, query));
     let watcher = IndexApi.watchItems(params, (result) => {
