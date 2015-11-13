@@ -23,13 +23,15 @@ class Items extends Component {
   }
 
   componentDidMount() {
-    this.props.dispatch(indexLoad(this.props.category, this.props.index));
+    this.props.dispatch(
+      indexLoad(this.props.category, this.props.index, this.props.selection));
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.category !== nextProps.category) {
       this.props.dispatch(indexUnload(this.props.index));
-      this.props.dispatch(indexLoad(nextProps.category, nextProps.index));
+      this.props.dispatch(
+        indexLoad(nextProps.category, nextProps.index, this.props.selection));
     }
   }
 
