@@ -223,6 +223,10 @@ export function indexActivate(category, query) {
 }
 
 export function indexSelect(category, selection) {
+  // We have to special case activity since it's a combo category
+  if ('tasks' === category || 'alerts' === category) {
+    category = 'activity';
+  }
   history.pushState(null, '/' + category + selection + document.location.search);
   return { type: INDEX_SELECT, selection: selection };
 }
