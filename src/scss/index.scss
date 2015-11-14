@@ -13,11 +13,15 @@
     }
   }
 
+  [class*="background-color-index-"]:not([class*="background-color-index-light"]) & {
+    .logo-icon g {
+      stroke: $colored-icon-color;
+    }
+  }
+
   &:hover {
-   .logo-icon {
-     g {
-       stroke: $brand-color;
-     }
+   .logo-icon g {
+      stroke: $brand-color;
    }
   }
 }

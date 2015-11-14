@@ -55,7 +55,7 @@ class Items extends Component {
   }
 
   _renderIndex(navControl, addControl) {
-    const { index: {label, attributes, query, result}, selection } = this.props;
+    const { index: {label, attributes, query, result}, responsive, selection } = this.props;
     let view = this.props.index.view;
     let size;
     if (attributes.length > 3 && 'single' === responsive) {
@@ -133,7 +133,7 @@ let select = (state, props) => {
   return {
     category: category,
     index: state.index.categories[category],
-    responsive: state.index.responsive,
+    responsive: state.nav.responsive,
     nav: state.nav,
     selection: state.index.selection
   };

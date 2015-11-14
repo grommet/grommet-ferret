@@ -36,7 +36,7 @@ class NavSidebar extends Component {
     }, this);
 
     return (
-      <Sidebar colorIndex="light-2" fixed={true} separator="right">
+      <Sidebar colorIndex="neutral-2" fixed={true} separator="right">
         <Header large={true} justify="between" pad={{horizontal: 'medium'}}>
           <Title onClick={this._onClose}>
             <Logo />
