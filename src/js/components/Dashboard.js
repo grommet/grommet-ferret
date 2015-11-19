@@ -82,49 +82,52 @@ class Dashboard extends Component {
 
   _layout() {
     const { dispatch, dashboard: {tiles, legendPlacement} } = this.props;
-    var rect = this.refs.content.getBoundingClientRect();
-    var tilesOffset = ReactDOM.findDOMNode(this.refs.tiles).
-      getBoundingClientRect().top + document.body.scrollTop;
-    var wideTileCount = 0;
-    var normalTileCount = 0;
-    // set wide chart count according to the space we have
-    let dataPoints = Math.round(Math.max(4, rect.width / 48));
+    var content = this.refs.content;
+    if (content) {
+      var rect = content.getBoundingClientRect();
+      var tilesOffset = ReactDOM.findDOMNode(this.refs.tiles).
+        getBoundingClientRect().top + document.body.scrollTop;
+      var wideTileCount = 0;
+      var normalTileCount = 0;
+      // set wide chart count according to the space we have
+      let dataPoints = Math.round(Math.max(4, rect.width / 48));
 
-    tiles.forEach((tile) => {
-      if (tile.wide) {
-        wideTileCount += 1;
-      } else {
-        normalTileCount += 1;
+      tiles.forEach((tile) => {
+        if (tile.wide) {
+          wideTileCount += 1;
+        } else {
+          normalTileCount += 1;
+        }
+      });
+
+      // set legend placement
+      let width = rect.width;
+      let height = rect.height - tilesOffset;
+      let ratio = width / height;
+      let newLegendPlacement = legendPlacement;
+      if (ratio < 1.05 && 'bottom' !== legendPlacement) {
+        newLegendPlacement = 'bottom';
+      } else if (ratio > 1.2 && 'right' !== legendPlacement) {
+        newLegendPlacement = 'right';
       }
-    });
 
-    // set legend placement
-    let width = rect.width;
-    let height = rect.height - tilesOffset;
-    let ratio = width / height;
-    let newLegendPlacement = legendPlacement;
-    if (ratio < 1.05 && 'bottom' !== legendPlacement) {
-      newLegendPlacement = 'bottom';
-    } else if (ratio > 1.2 && 'right' !== legendPlacement) {
-      newLegendPlacement = 'right';
+      // set graphic size
+      // TODO: These numbers are empirical. Redo to be more formal.
+      let graphicSize = 'medium';
+      let roughRows = Math.ceil(wideTileCount + (normalTileCount / 3));
+      if ((width / 410) < 3) {
+        graphicSize = 'small';
+      } else if ((height / roughRows) < 370) {
+        graphicSize = 'small';
+      } else if ((width / 510) > 3) {
+        graphicSize = 'large';
+      } else if ((height / roughRows) > 500) {
+        graphicSize = 'large';
+      }
+
+      dispatch(dashboardLayout(graphicSize, dataPoints, newLegendPlacement,
+        this.props.dashboard.tiles));
     }
-
-    // set graphic size
-    // TODO: These numbers are empirical. Redo to be more formal.
-    let graphicSize = 'medium';
-    let roughRows = Math.ceil(wideTileCount + (normalTileCount / 3));
-    if ((width / 410) < 3) {
-      graphicSize = 'small';
-    } else if ((height / roughRows) < 370) {
-      graphicSize = 'small';
-    } else if ((width / 510) > 3) {
-      graphicSize = 'large';
-    } else if ((height / roughRows) > 500) {
-      graphicSize = 'large';
-    }
-
-    dispatch(dashboardLayout(graphicSize, dataPoints, newLegendPlacement,
-      this.props.dashboard.tiles));
   }
 
   _onResize() {
