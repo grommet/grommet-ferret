@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import { navActivate, dashboardLayout, dashboardLoad, dashboardSearch, dashboardUnload, indexNav, indexSelect } from '../actions';
+import Box from 'grommet/components/Box';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Header from 'grommet/components/Header';
@@ -198,8 +199,10 @@ class Dashboard extends Component {
         <span title="Main Menu" onMouseOver={this._onOverTitle}
           onMouseOut={this._onOutTitle}>
           <Title onClick={this._onClickTitle}>
-            <NavIcon />
-            <Logo />
+            <Box responsive={false}>
+              <NavIcon />
+              <Logo />
+            </Box>
             <span>Ferret</span>
           </Title>
         </span>
