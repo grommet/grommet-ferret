@@ -33,6 +33,17 @@ class Item extends Component {
       this.props.dispatch(itemUnload(this.props.item));
       this.props.dispatch(itemLoad(newProps.uri));
     }
+    if (newProps.item.item) {
+      clearTimeout(this._lastItemTimer);
+      this.setState({lastItem: newProps.item.item});
+    } else {
+      // We hold on to the last item for a bit to reduce content flashing
+      // when the user clicks between items.
+      clearTimeout(this._lastItemTimer);
+      this._lastItemTimer = setTimeout(() => {
+        this.setState({lastItem: null});
+      }.bind(this), 200);
+    }
   }
 
   componentWillUnmount() {
@@ -52,7 +63,7 @@ class Item extends Component {
   }
 
   render() {
-    let item = this.props.item.item;
+    let item = this.props.item.item || this.state.lastItem || {};
     let name;
     let removeConfirm;
     let notifications;
