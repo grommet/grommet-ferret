@@ -2,6 +2,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
+import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import { navActivate, dashboardLayout, dashboardLoad, dashboardSearch, dashboardUnload, indexNav, indexSelect } from '../actions';
 import Tiles from 'grommet/components/Tiles';
@@ -9,11 +10,11 @@ import Tile from 'grommet/components/Tile';
 import Header from 'grommet/components/Header';
 import Title from 'grommet/components/Title';
 import Search from 'grommet/components/Search';
-import Logo from './Logo';
-import SessionMenu from './SessionMenu';
+import NavIcon from 'grommet/components/icons/base/More';
 import Aggregate from 'grommet-index/components/Aggregate';
 import IndexHistory from 'grommet-index/components/History';
-import { Link } from 'react-router';
+import Logo from './Logo';
+import SessionMenu from './SessionMenu';
 
 class Dashboard extends Component {
 
@@ -194,9 +195,10 @@ class Dashboard extends Component {
     let session;
     if (! navActive) {
       title = (
-        <span onMouseOver={this._onOverTitle}
+        <span title="Main Menu" onMouseOver={this._onOverTitle}
           onMouseOut={this._onOutTitle}>
           <Title onClick={this._onClickTitle}>
+            <NavIcon />
             <Logo />
             <span>Ferret</span>
           </Title>
