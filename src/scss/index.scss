@@ -32,7 +32,7 @@
 
   svg.control-icon {
     position: absolute;
-    top: $inuit-base-spacing-unit;
+    top: round($inuit-base-spacing-unit * 0.85);
     left: - round($inuit-base-spacing-unit * 0.75);
     transform: rotate(90deg);
   }
