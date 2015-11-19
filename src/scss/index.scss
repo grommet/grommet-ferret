@@ -23,6 +23,18 @@
    .logo-icon g {
       stroke: $brand-color;
    }
+
+   svg.control-icon {
+     fill: $brand-color;
+     stroke: $brand-color;
+   }
+  }
+
+  svg.control-icon {
+    position: absolute;
+    top: $inuit-base-spacing-unit;
+    left: - round($inuit-base-spacing-unit * 0.75);
+    transform: rotate(90deg);
   }
 }
 
