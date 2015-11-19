@@ -125,6 +125,9 @@ class ServerProfileForm extends Component {
 
   _onAddConnection(connection) {
     var serverProfile = this.state.serverProfile;
+    if (! serverProfile.hasOwnProperty('connections')) {
+      serverProfile.connections = [];
+    }
     serverProfile.connections.push(connection);
     this.setState({serverProfile: serverProfile});
   }
