@@ -87,7 +87,6 @@ export function logout() {
 }
 
 export function routeChanged(route, prefix) {
-  console.log('!!! routeChanged', route);
   return { type: ROUTE_CHANGED, route: route, prefix: prefix };
 }
 
