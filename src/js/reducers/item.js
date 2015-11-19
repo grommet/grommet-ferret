@@ -1,6 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import { ITEM_SUCCESS, ITEM_FAILURE, ITEM_ACTIVATE, ITEM_NEW, ITEM_ADD, ITEM_ADD_SUCCESS,
+import { ITEM_LOAD, ITEM_SUCCESS, ITEM_FAILURE, ITEM_NEW, ITEM_ADD, ITEM_ADD_SUCCESS,
   ITEM_NOTIFICATIONS_SUCCESS, ITEM_UNLOAD } from '../actions';
 
 const NEW_ITEMS = {
@@ -26,15 +26,14 @@ const NEW_ITEMS = {
 const initialState = {
   uri: null,
   changing: false,
-  item: {},
+  item: null,
   notifications: []
 };
 
 const handlers = {
-  [ITEM_UNLOAD]: (state, action) => ({ uri: null, name: null }),
-  [ITEM_ACTIVATE]: (state, action) => {
-    return { uri: action.uri, item: {}, notifications: [] };
-  },
+  [ITEM_LOAD]: (state, action) => ({ uri: action.uri }),
+  [ITEM_UNLOAD]: (state, action) => ({ uri: null, name: null,
+    item: null, notifications: [] }),
   [ITEM_SUCCESS]: (state, action) => {
     return {
       editable: NEW_ITEMS.hasOwnProperty(action.item.category),
@@ -45,7 +44,7 @@ const handlers = {
   },
   [ITEM_FAILURE]: (state, action) => {
     return {
-      item: {},
+      item: null,
       error: action.error,
       watcher: action.watcher
     };
@@ -63,7 +62,7 @@ const handlers = {
     return { item: item };
   },
   [ITEM_ADD]: (state, action) => ({ item: action.item, changing: true }),
-  [ITEM_ADD_SUCCESS]: (state, action) => ({ item: {}, changing: false }),
+  [ITEM_ADD_SUCCESS]: (state, action) => ({ item: null, changing: false }),
   [ITEM_NOTIFICATIONS_SUCCESS]: (state, action) => {
     return { notifications: action.result, notificationsWatcher: action.watcher };
   }

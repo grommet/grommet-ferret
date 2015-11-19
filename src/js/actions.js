@@ -30,7 +30,6 @@ export const DASHBOARD_SEARCH_SUCCESS = 'DASHBOARD_SEARCH_SUCCESS';
 // index page
 export const INDEX_NAV = 'INDEX_NAV';
 export const INDEX_LOAD = 'INDEX_LOAD';
-export const INDEX_ACTIVATE = 'INDEX_ACTIVATE';
 export const INDEX_SELECT = 'INDEX_SELECT';
 export const INDEX_QUERY = 'INDEX_QUERY';
 export const INDEX_MORE = 'INDEX_MORE';
@@ -38,7 +37,6 @@ export const INDEX_UNLOAD = 'INDEX_UNLOAD';
 
 // item page
 export const ITEM_LOAD = 'ITEM_LOAD';
-export const ITEM_ACTIVATE = 'ITEM_ACTIVATE';
 export const ITEM_UNLOAD = 'ITEM_UNLOAD';
 export const ITEM_NEW = 'ITEM_NEW';
 export const ITEM_ADD = 'ITEM_ADD';
@@ -191,7 +189,6 @@ export function indexNav(category, query) {
 
 export function indexLoad(category, index, selection) {
   return function (dispatch) {
-    dispatch({ type: INDEX_LOAD, category: category });
     // bring in any query from the location
     const loc = history.createLocation(document.location.pathname + document.location.search);
     let params = defaultParams(category, index);
@@ -203,7 +200,7 @@ export function indexLoad(category, index, selection) {
     if (selection) {
       params = { ...params, ...{referenceUri: selection } };
     }
-    dispatch(indexActivate(category, query));
+    dispatch({ type: INDEX_LOAD, category: category, query: query });
     let watcher = IndexApi.watchItems(params, (result) => {
       dispatch(indexSuccess(watcher, category, result));
     });
@@ -217,10 +214,6 @@ export function indexUnload(index) {
       dispatch({ type: INDEX_UNLOAD });
     }
   };
-}
-
-export function indexActivate(category, query) {
-  return { type: INDEX_ACTIVATE, category: category, query: query };
 }
 
 export function indexSelect(category, selection) {
@@ -292,7 +285,7 @@ function watchNotifications(dispatch, uri, activityUri) {
 
 export function itemLoad(uri) {
   return function (dispatch) {
-    dispatch(itemActivate(uri));
+    dispatch({ type: ITEM_LOAD, uri: uri });
     let watcher = IndexApi.watchItem(uri, (result) => {
       dispatch(itemSuccess(watcher, uri, result));
     }, (error) => {
@@ -308,10 +301,6 @@ export function itemUnload(item) {
     IndexApi.stopWatching(item.watcher);
     IndexApi.stopWatching(item.notificationsWatcher);
   };
-}
-
-export function itemActivate(uri) {
-  return { type: ITEM_ACTIVATE, uri: uri };
 }
 
 export function itemNew(category) {

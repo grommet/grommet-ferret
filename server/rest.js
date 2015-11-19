@@ -10,6 +10,8 @@ var generator = require('./generator');
 var filter = require('./filter');
 var map = require('./map');
 
+var RESPONSE_DELAY = 0;
+
 // Actions
 
 function filteredItems (items, queryParams) {
@@ -182,7 +184,9 @@ function respondToRequest (connection, request) {
     var serializedResponse = JSON.stringify(response);
     console.log(response.op.toUpperCase(), request.url,
       stringify(request.params), serializedResponse.length);
-    connection.ws.send(serializedResponse);
+    setTimeout(function () {
+      connection.ws.send(serializedResponse);
+    }, RESPONSE_DELAY);
   }
 
   // if ('error' === response.op) {
