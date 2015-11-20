@@ -87,7 +87,8 @@ const handlers = {
       categories: {
         [state.activeCategory]: {
           watcher: { $set: null },
-          result: { $set: null }
+          result: { $set: null },
+          query: { $set: null }
         }
       }
     });

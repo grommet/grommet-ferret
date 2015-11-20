@@ -37,7 +37,7 @@ function getItems (url, queryParams) {
   if (queryParams.referenceUri) {
     items.some(function(item, index) {
       if (queryParams.referenceUri === item.uri) {
-        startIndex = Math.max(index - 3, 0);
+        startIndex = Math.max(index - Math.floor(queryParams.count / 2), 0);
         return true;
       }
     });
