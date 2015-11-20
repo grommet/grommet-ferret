@@ -237,9 +237,8 @@ class ServerProfileForm extends Component {
       actions = <span><BusyIcon /> {this.props.processingMessage}</span>;
     } else {
       actions = (
-        <input type="submit" className="primary"
-          value={this.props.buttonLabel}
-          onClick={this._onSubmit} />
+        <Button type="submit" primary={true}
+          label={this.props.buttonLabel} onClick={this._onSubmit} />
       );
     }
 
@@ -252,13 +251,13 @@ class ServerProfileForm extends Component {
     }
 
     return (
-      <Form pad="medium">
+      <Form pad="medium" onSubmit={this._onSubmit}>
         <FormFields>
 
           <fieldset>
             <legend>General</legend>
             <FormField label="Name" htmlFor="name">
-              <input id="name" name="name" type="text"
+              <input id="name" name="name" type="text" autoFocus
                 value={serverProfile.name} onChange={this._onChange} />
             </FormField>
             <FormField label="Description" htmlFor="description">
@@ -298,7 +297,8 @@ class ServerProfileForm extends Component {
             <Tiles flush={true}>
               {connections}
             </Tiles>
-            <button onClick={this._onNewConnectionOpen}>Add Connection</button>
+            <Button label="Add Connection"
+              onClick={this._onNewConnectionOpen} />
           </fieldset>
 
           <fieldset>
@@ -362,7 +362,8 @@ class ServerProfileForm extends Component {
             <Tiles flush={false}>
               {volumes}
             </Tiles>
-            <button onClick={this._onNewVolumeOpen}>Add Volume</button>
+            <Button label="Add Volume"
+              onClick={this._onNewVolumeOpen} />
           </fieldset>
 
           <fieldset>
