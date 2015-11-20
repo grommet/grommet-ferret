@@ -5,7 +5,7 @@ import { INDEX_LOAD, INDEX_QUERY, INDEX_SUCCESS, INDEX_UNLOAD,
   INDEX_SELECT, ROUTE_CHANGED } from '../actions';
 
 const statusAttribute = {name: 'status', label: 'Status', size: 'small',
-  header: true, filter: ['Error', 'Warning', 'OK', 'Unknown']};
+  header: true, filter: ['Critical', 'Warning', 'OK', 'Unknown']};
 
 const activityCategoryMap = {alerts: 'Alert', tasks: 'Task'};
 

@@ -96,7 +96,7 @@ class Item extends Component {
 
     if (this.props.item.editable) {
       actions = (
-        <Menu inline={false}>
+        <Menu inline={false} label="menu">
           <Anchor onClick={this._onEdit}>Edit</Anchor>
           <Anchor onClick={this._onRemoveOpen}>Remove</Anchor>
         </Menu>

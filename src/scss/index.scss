@@ -8,8 +8,12 @@
 .title {
 
   @include media-query(lap-and-up) {
-    g {
-      transition: stroke $base-animation-duration ease-in-out;
+    .dashboard & .logo-icon {
+      @include animation('slide-logo 0.4s');
+
+      g {
+        transition: stroke-width $base-animation-duration ease-in-out;
+      }
     }
   }
 
@@ -20,21 +24,19 @@
   }
 
   &:hover {
-   .logo-icon g {
-      stroke: $brand-color;
-   }
+    .logo-icon g.paths {
+      stroke-width: 5px;
+    }
+  }
+}
 
-   svg.control-icon {
-     fill: $brand-color;
-     stroke: $brand-color;
-   }
+@include keyframes(slide-logo) {
+  0% {
+    transform: translateX(halve($inuit-base-spacing-unit));
   }
 
-  svg.control-icon {
-    position: absolute;
-    top: round($inuit-base-spacing-unit * 0.85);
-    left: - round($inuit-base-spacing-unit * 0.75);
-    transform: rotate(90deg);
+  100% {
+    transform: translateX(0);
   }
 }
 
