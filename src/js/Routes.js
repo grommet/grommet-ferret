@@ -7,6 +7,8 @@ import TBD from 'grommet/components/TBD';
 
 import Items from './components/Items';
 import Item from './components/Item';
+import Details from './components/Details';
+import ServerProfile from './components/server-profiles/ServerProfile';
 import ServerProfileAdd from './components/server-profiles/ServerProfileAdd';
 import ServerProfileEdit from './components/server-profiles/ServerProfileEdit';
 
@@ -17,21 +19,17 @@ var rootPath = "/"; //"/ferret/";
 
 const CATEGORIES = [
   'enclosures',
-  'server-hardware',
-  'server-profiles'
+  'server-hardware'
 ];
 
 const categoryRoutes = CATEGORIES.map((category) => {
   let result = {
     path: category, component: Items,
     childRoutes: [
+      { path: 'details/*', component: Details },
       { path: '*', component: Item }
     ]
   };
-  if (category === 'server-profiles') {
-    result.childRoutes.unshift({ path: 'edit/*', component: ServerProfileEdit });
-    result.childRoutes.unshift({ path: 'add', component: ServerProfileAdd });
-  }
   return result;
 });
 
@@ -56,6 +54,14 @@ module.exports = {
         { path: 'activity', component: Items,
           childRoutes: [
             { path: '*', component: Item }
+          ]
+        },
+        { path: 'server-profiles', component: Items,
+          childRoutes: [
+            { path: 'add', component: ServerProfileAdd },
+            { path: 'edit/*', component: ServerProfileEdit },
+            { path: 'details/*', component: Details },
+            { path: '*', component: ServerProfile }
           ]
         },
         ...categoryRoutes

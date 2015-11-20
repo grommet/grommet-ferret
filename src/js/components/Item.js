@@ -10,7 +10,6 @@ import Anchor from 'grommet/components/Anchor';
 import CloseIcon from 'grommet/components/icons/base/Close';
 import Article from 'grommet/components/Article';
 import StatusIcon from 'grommet/components/icons/Status';
-import Grobject from 'grommet/components/Object';
 import Notification from 'grommet/components/Notification';
 import RemoveConfirm from './RemoveConfirm';
 
@@ -67,8 +66,6 @@ class Item extends Component {
     let name;
     let removeConfirm;
     let notifications;
-    let actions = <span></span>; // span forces close to right side
-    let object;
 
     name = item.name || this.props.item.name;
 
@@ -84,7 +81,9 @@ class Item extends Component {
     if (this.props.item.notifications.items) {
       notifications = this.props.item.notifications.items.map((notification) => {
         return (
-          <Notification key={notification.uri} flush={false}
+          <Notification key={notification.uri}
+            flush={false}
+            pad={{vertical: 'large', horizontal: 'medium'}}
             status={notification.status}
             message={notification.name}
             state={notification.state}
@@ -93,22 +92,24 @@ class Item extends Component {
       });
     }
 
-
+    let actions;
     if (this.props.item.editable) {
-      actions = (
-        <Menu inline={false} label="menu">
-          <Anchor onClick={this._onEdit}>Edit</Anchor>
-          <Anchor onClick={this._onRemoveOpen}>Remove</Anchor>
-        </Menu>
-      );
+      actions = [
+        <Anchor key="edit" onClick={this._onEdit}>Edit</Anchor>,
+        <Anchor key="remove" onClick={this._onRemoveOpen}>Remove</Anchor>
+      ];
     }
-
-    object = <Grobject data={item} />;
+    let menu = (
+      <Menu inline={false} label="menu">
+        <Link to={this.props.detailsPath}>Details</Link>
+        {actions}
+      </Menu>
+    );
 
     return (
       <div>
         <Header large={true} justify="between" fixed={true} pad={{horizontal: "medium"}}>
-          {actions}
+          {menu}
           <Menu>
             <Link to={this.props.closePath}>
               <CloseIcon />
@@ -121,7 +122,7 @@ class Item extends Component {
             {name}
           </Header>
           {notifications}
-          {object}
+          {this.props.children}
         </Article>
         {removeConfirm}
       </div>
@@ -131,6 +132,8 @@ class Item extends Component {
 
 Item.propTypes = {
   category: PropTypes.string.isRequired,
+  closePath: PropTypes.string.isRequired,
+  detailsPath: PropTypes.string.isRequired,
   item: PropTypes.object,
   uri: PropTypes.string.isRequired,
   watcher: PropTypes.any
@@ -138,10 +141,12 @@ Item.propTypes = {
 
 let select = (state, props) => {
   const category = state.route.pathname.split('/')[1];
+  const uri = '/' + (props.uri || props.params.splat);
   return {
     category: category,
-    uri: '/' + props.params.splat,
+    uri: uri,
     closePath: '/' + category + document.location.search,
+    detailsPath: '/' + category + '/details' + uri + document.location.search,
     item: state.item
   };
 };
