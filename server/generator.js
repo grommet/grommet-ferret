@@ -201,7 +201,7 @@ function buildItem (categoryName, index, name, date) {
   };
 
   if (!category.noStatus) {
-    resource.status = distribute([['Warning', 7], ['Error', 19], 'OK']);
+    resource.status = distribute([['Warning', 7], ['Critical', 19], 'OK']);
   }
   // randomly reduce timestamp for the next item
   date.setHours(date.getHours() - random(20) + 1);
@@ -218,7 +218,7 @@ function buildItem (categoryName, index, name, date) {
           if (value.unique) {
             valueIndex = (value.start || 0) + index;
           } else {
-            valueIndex = ((index % 3) + 1);
+            valueIndex = (random(2) + 1);
           }
           resource._indexAttributes[attributeName] = value.prefix + valueIndex;
         }
@@ -286,7 +286,7 @@ function createActivity () {
         associatedResourceName: resource.name
       };
       alert.state = 'Cleared';
-      alert.status = distribute([['Error', 5], ['Warning', 3], 'OK']);
+      alert.status = distribute([['Critical', 5], ['Warning', 3], 'OK']);
     }
   });
 
@@ -300,11 +300,11 @@ function createActivity () {
       associatedResourceName: resource.name,
       parentTaskUri: null
     };
-    task.state = distribute([['Running', 13], ['Error', 9], ['Warning', 7], 'Completed']);
+    task.state = distribute([['Running', 13], ['Critical', 9], ['Warning', 7], 'Completed']);
     var taskStateMap = {
       'Completed': 'OK',
       'Warning': 'Warning',
-      'Error': 'Error'
+      'Critical': 'Critical'
     };
     task.status = (
       'Running' === task.state ? 'Unknown' : taskStateMap[task.state]

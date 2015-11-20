@@ -22,6 +22,7 @@ const initialState = {
     },
     {
       name: 'Active Alerts',
+      path: '/activity',
       type: 'circle',
       category: 'alerts',
       query: Query.create('state:Active'),

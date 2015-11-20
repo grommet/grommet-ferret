@@ -11,7 +11,6 @@ import Tile from 'grommet/components/Tile';
 import Header from 'grommet/components/Header';
 import Title from 'grommet/components/Title';
 import Search from 'grommet/components/Search';
-import NavIcon from 'grommet/components/icons/base/More';
 import Aggregate from 'grommet-index/components/Aggregate';
 import IndexHistory from 'grommet-index/components/History';
 import Logo from './Logo';
@@ -70,7 +69,7 @@ class Dashboard extends Component {
   }
 
   _onClickSegment(tile, query) {
-    this.props.dispatch(indexNav(tile.category, query));
+    this.props.dispatch(indexNav(tile.path, tile.category, query));
   }
 
   _onSearch(value) {
@@ -141,13 +140,14 @@ class Dashboard extends Component {
   _renderTile(tile, index) {
     const { graphicSize, legendPlacement } = this.props.dashboard;
     var header = null;
-    if (tile.route) {
+    if (! tile.history) {
+      var path = tile.path || '/' + tile.category;
       var queryParams = {};
       if (tile.query) {
         queryParams.q = tile.query.fullText;
       }
       header = (
-        <Link to={'/' + tile.category} query={queryParams}>
+        <Link to={path} query={queryParams}>
           {tile.name}
         </Link>
       );
@@ -200,7 +200,6 @@ class Dashboard extends Component {
           onMouseOut={this._onOutTitle}>
           <Title onClick={this._onClickTitle}>
             <Box responsive={false}>
-              <NavIcon />
               <Logo />
             </Box>
             <span>Ferret</span>
@@ -212,7 +211,7 @@ class Dashboard extends Component {
     }
 
     return (
-      <div ref="content">
+      <div ref="content" className="dashboard">
         <Header direction="row" justify="between" large={true} pad={{horizontal: 'medium'}}>
           {title}
           <Search ref="search" inline={true} className="flex"
