@@ -26,14 +26,14 @@ const NEW_ITEMS = {
 const initialState = {
   uri: null,
   changing: false,
-  item: null,
+  item: {},
   notifications: []
 };
 
 const handlers = {
   [ITEM_LOAD]: (state, action) => ({ uri: action.uri }),
   [ITEM_UNLOAD]: (state, action) => ({ uri: null, name: null,
-    item: null, notifications: [] }),
+    item: {}, notifications: [] }),
   [ITEM_SUCCESS]: (state, action) => {
     return {
       editable: NEW_ITEMS.hasOwnProperty(action.item.category),
@@ -44,7 +44,7 @@ const handlers = {
   },
   [ITEM_FAILURE]: (state, action) => {
     return {
-      item: null,
+      item: {},
       error: action.error,
       watcher: action.watcher
     };
@@ -62,7 +62,7 @@ const handlers = {
     return { item: item };
   },
   [ITEM_ADD]: (state, action) => ({ item: action.item, changing: true }),
-  [ITEM_ADD_SUCCESS]: (state, action) => ({ item: null, changing: false }),
+  [ITEM_ADD_SUCCESS]: (state, action) => ({ item: {}, changing: false }),
   [ITEM_NOTIFICATIONS_SUCCESS]: (state, action) => {
     return { notifications: action.result, notificationsWatcher: action.watcher };
   }
