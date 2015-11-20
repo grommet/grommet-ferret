@@ -1,7 +1,7 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 import { ITEM_LOAD, ITEM_SUCCESS, ITEM_FAILURE, ITEM_NEW, ITEM_ADD, ITEM_ADD_SUCCESS,
-  ITEM_NOTIFICATIONS_SUCCESS, ITEM_UNLOAD } from '../actions';
+  ITEM_NOTIFICATIONS_SUCCESS, ITEM_MAP_SUCCESS, ITEM_UNLOAD } from '../actions';
 
 const NEW_ITEMS = {
   'server-profiles': {
@@ -65,6 +65,9 @@ const handlers = {
   [ITEM_ADD_SUCCESS]: (state, action) => ({ item: {}, changing: false }),
   [ITEM_NOTIFICATIONS_SUCCESS]: (state, action) => {
     return { notifications: action.result, notificationsWatcher: action.watcher };
+  },
+  [ITEM_MAP_SUCCESS]: (state, action) => {
+    return { map: action.result, mapWatcher: action.watcher };
   }
 };
 
