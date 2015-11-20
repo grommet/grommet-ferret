@@ -32,7 +32,6 @@ export const INDEX_NAV = 'INDEX_NAV';
 export const INDEX_LOAD = 'INDEX_LOAD';
 export const INDEX_SELECT = 'INDEX_SELECT';
 export const INDEX_QUERY = 'INDEX_QUERY';
-export const INDEX_MORE = 'INDEX_MORE';
 export const INDEX_UNLOAD = 'INDEX_UNLOAD';
 
 // item page
@@ -232,6 +231,21 @@ export function indexMore(category, index) {
     let query = index.query;
     params = { ...params,
       ...{ query: query, count: (index.result.count + IndexApi.pageSize) } };
+    let watcher = IndexApi.watchItems(params, (result) => {
+      dispatch(indexSuccess(watcher, category, result));
+    });
+  };
+}
+
+export function indexMoreBefore(category, index) {
+  return function (dispatch) {
+    IndexApi.stopWatching(index.watcher);
+    let params = defaultParams(category, index);
+    let query = index.query;
+    params = { ...params,
+      ...{ query: query,
+        start: (Math.max(index.result.start -= IndexApi.pageSize)),
+        count: (index.result.count + IndexApi.pageSize) } };
     let watcher = IndexApi.watchItems(params, (result) => {
       dispatch(indexSuccess(watcher, category, result));
     });

@@ -3,7 +3,8 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
-import { indexLoad, indexUnload, indexMore, indexQuery, indexSelect, navActivate } from '../actions';
+import { indexLoad, indexUnload, indexMore, indexMoreBefore,
+  indexQuery, indexSelect, navActivate } from '../actions';
 import Split from 'grommet/components/Split';
 import Index from 'grommet-index/components/Index';
 import IndexPropTypes from 'grommet-index/utils/PropTypes';
@@ -18,6 +19,7 @@ class Items extends Component {
     this._onClickTitle = this._onClickTitle.bind(this);
     this._onSelect = this._onSelect.bind(this);
     this._onMore = this._onMore.bind(this);
+    this._onMoreBefore = this._onMoreBefore.bind(this);
     this._onQuery = this._onQuery.bind(this);
   }
 
@@ -32,6 +34,21 @@ class Items extends Component {
       this.props.dispatch(
         indexLoad(nextProps.category, nextProps.index, this.props.selection));
     }
+    // if (this.props.category !== nextProps.category ||
+    //   (nextProps.index && (
+    //     (nextProps.index.query && ! this.props.index.query) ||
+    //     (! nextProps.index.query && this.props.index.query) ||
+    //     (nextProps.index.query && this.props.index.query &&
+    //       this.props.index.query.fullText !== nextProps.index.query.fullText)))) {
+    //   this._scrollOnUpdate = true;
+    // }
+  }
+
+  componentDidUpdate() {
+    // if (this._scrollOnUpdate) {
+    //   this.refs.index.scrollToSelection();
+    //   this._scrollOnUpdate = false;
+    // }
   }
 
   componentWillUnmount() {
@@ -50,39 +67,25 @@ class Items extends Component {
     this.props.dispatch(indexMore(this.props.category, this.props.index));
   }
 
+  _onMoreBefore() {
+    this.props.dispatch(indexMoreBefore(this.props.category, this.props.index));
+  }
+
   _onQuery(query) {
     this.props.dispatch(indexQuery(this.props.category, this.props.index, query));
   }
 
-  _renderIndex(navControl, addControl) {
-    const { index: {label, attributes, query, result}, responsive, selection } = this.props;
+  render() {
+    const { nav: {active: navActive}, index, responsive, selection } = this.props;
+
     let view = this.props.index.view;
     let size;
-    if (attributes.length > 3 && 'single' === responsive) {
+    if (index.attributes.length > 3 && 'single' === responsive) {
       // switch to tiles so we don't squish in too much
       view = 'tiles';
       size = 'large';
     }
-    return (
-      <Index
-        label={label}
-        view={view}
-        attributes={attributes}
-        query={query}
-        result={result}
-        selection={selection}
-        size={size}
-        flush={false}
-        onSelect={this._onSelect}
-        onQuery={this._onQuery}
-        onMore={this._onMore}
-        addControl={addControl}
-        navControl={navControl} />
-    );
-  }
 
-  render() {
-    const { nav: {active: navActive}, index } = this.props;
     let navControl;
     if (! navActive) {
       navControl = (
@@ -97,13 +100,24 @@ class Items extends Component {
       addControl = <Link to={index.addRoute}><AddIcon /></Link>;
     }
 
-    let pane1 = this._renderIndex(navControl, addControl);
-    let pane2 = this.props.children;
-
     return (
       <Split flex="both">
-        {pane1}
-        {pane2}
+        <Index ref="index"
+          label={index.label}
+          view={view}
+          attributes={index.attributes}
+          query={index.query}
+          result={index.result}
+          selection={selection}
+          size={size}
+          flush={false}
+          onSelect={this._onSelect}
+          onQuery={this._onQuery}
+          onMore={this._onMore}
+          onMoreBefore={this._onMoreBefore}
+          addControl={addControl}
+          navControl={navControl} />
+        {this.props.children}
       </Split>
     );
   }

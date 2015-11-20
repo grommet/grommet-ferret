@@ -116,7 +116,7 @@ class Item extends Component {
           </Menu>
         </Header>
         <Article>
-          <Header tag="h1" pad={{horizontal: 'medium'}}>
+          <Header large={true} tag="h1" pad={{horizontal: 'medium'}}>
             <StatusIcon value={item.status} large={true} />
             {name}
           </Header>
