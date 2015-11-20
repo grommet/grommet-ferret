@@ -52,6 +52,8 @@ export const ITEM_ADD_SUCCESS = 'ITEM_ADD_SUCCESS';
 export const ITEM_ADD_FAILURE = 'ITEM_ADD_FAILURE';
 export const ITEM_NOTIFICATIONS_SUCCESS = 'ITEM_NOTIFICATIONS_SUCCESS';
 export const ITEM_NOTIFICATIONS_FAILURE = 'ITEM_NOTIFICATIONS_FAILURE';
+export const ITEM_MAP_SUCCESS = 'ITEM_MAP_SUCCESS';
+export const ITEM_MAP_FAILURE = 'ITEM_MAP_FAILURE';
 
 export function init(email, token) {
   return { type: INIT, email: email, token: token };
@@ -300,12 +302,20 @@ function watchNotifications(dispatch, uri, activityUri) {
 export function itemLoad(uri) {
   return function (dispatch) {
     dispatch({ type: ITEM_LOAD, uri: uri });
+
     let watcher = IndexApi.watchItem(uri, (result) => {
       dispatch(itemSuccess(watcher, uri, result));
     }, (error) => {
       dispatch(itemFailure(watcher, uri, error));
     });
+
     watchNotifications(dispatch, uri);
+
+    let mapWatcher = IndexApi.watchMap(uri, (result) => {
+      dispatch(itemMapSuccess(mapWatcher, uri, result));
+    }, (error) => {
+      dispatch(itemMapFailure(mapWatcher, uri, error));
+    });
   };
 }
 
@@ -415,4 +425,12 @@ export function itemNotificationsSuccess(watcher, uri, result) {
 
 export function itemNotificationsFailure(watcher, uri, result) {
   return { type: ITEM_NOTIFICATIONS_FAILURE, watcher: watcher, uri: uri, result: result };
+}
+
+export function itemMapSuccess(watcher, uri, result) {
+  return { type: ITEM_MAP_SUCCESS, watcher: watcher, uri: uri, result: result };
+}
+
+export function itemMapFailure(watcher, uri, result) {
+  return { type: ITEM_MAP_FAILURE, watcher: watcher, uri: uri, result: result };
 }

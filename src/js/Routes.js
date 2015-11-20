@@ -11,6 +11,7 @@ import Details from './components/Details';
 import ServerProfile from './components/server-profiles/ServerProfile';
 import ServerProfileAdd from './components/server-profiles/ServerProfileAdd';
 import ServerProfileEdit from './components/server-profiles/ServerProfileEdit';
+import Enclosure from './components/enclosures/Enclosure';
 
 var rootPath = "/"; //"/ferret/";
 //if (NODE_ENV === 'development') {
@@ -18,7 +19,6 @@ var rootPath = "/"; //"/ferret/";
 //}
 
 const CATEGORIES = [
-  'enclosures',
   'server-hardware'
 ];
 
@@ -62,6 +62,12 @@ module.exports = {
             { path: 'edit/*', component: ServerProfileEdit },
             { path: 'details/*', component: Details },
             { path: '*', component: ServerProfile }
+          ]
+        },
+        { path: 'enclosures', component: Items,
+          childRoutes: [
+            { path: 'details/*', component: Details },
+            { path: '*', component: Enclosure }
           ]
         },
         ...categoryRoutes

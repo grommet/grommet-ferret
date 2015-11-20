@@ -51,6 +51,12 @@ var Api = {
     return watcher;
   },
 
+  watchMap: function (uri, success, failure) {
+    var url = state.urlPrefix + '/rest/index/trees/aggregated' + uri;
+    var watcher = RestWatch.start(url, null, success, failure);
+    return watcher;
+  },
+
   stopWatching: function (watcher) {
     RestWatch.stop(watcher);
   },
