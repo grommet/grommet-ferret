@@ -42,4 +42,4 @@ rest.setup(server);
 
 server.listen(PORT);
 
-console.log('Server started, listening at: http://localhost:' + PORT + '...');
+console.log('Server started, listening at: http://<host>:' + PORT + '...');

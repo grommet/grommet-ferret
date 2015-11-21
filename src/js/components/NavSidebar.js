@@ -8,7 +8,7 @@ import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
 import Footer from 'grommet/components/Footer';
 import Title from 'grommet/components/Title';
-import Logo from './Logo';
+import Logo from './Logo'; // './HPELogo';
 import Menu from 'grommet/components/Menu';
 import Anchor from 'grommet/components/Anchor';
 import CloseIcon from 'grommet/components/icons/base/Close';
@@ -39,8 +39,8 @@ class NavSidebar extends Component {
       <Sidebar colorIndex="neutral-1" fixed={true} separator="right">
         <Header large={true} justify="between" pad={{horizontal: 'medium'}}>
           <Title onClick={this._onClose}>
-            <Logo />
-            <span>Ferret</span>
+            <Logo inverse={true} />
+            Ferret
           </Title>
           <Menu responsive={false}>
             <Anchor onClick={this._onClose}>

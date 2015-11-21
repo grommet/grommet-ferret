@@ -7,6 +7,17 @@
 // TODO: explore moving to grommet-core
 .title {
 
+  // For HPELogo
+  // .logo-icon {
+  //   width: 116px;
+  //
+  //   &--inverse {
+  //     .logo-icon__text {
+  //       fill: $background-color;
+  //     }
+  //   }
+  // }
+
   @include media-query(lap-and-up) {
     .dashboard & .logo-icon {
       @include animation('slide-logo 0.4s');
