@@ -9,7 +9,7 @@ import Split from 'grommet/components/Split';
 import Index from 'grommet-index/components/Index';
 import IndexPropTypes from 'grommet-index/utils/PropTypes';
 import Title from 'grommet/components/Title';
-import Logo from './Logo';
+import Logo from './Logo'; // './HPELogo';
 import AddIcon from 'grommet/components/icons/base/Add';
 
 class Items extends Component {

@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import { navActivate, dashboardLayout, dashboardLoad, dashboardSearch, dashboardUnload, indexNav, indexSelect } from '../actions';
-import Box from 'grommet/components/Box';
+// import Box from 'grommet/components/Box';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Header from 'grommet/components/Header';
@@ -13,7 +13,7 @@ import Title from 'grommet/components/Title';
 import Search from 'grommet/components/Search';
 import Aggregate from 'grommet-index/components/Aggregate';
 import IndexHistory from 'grommet-index/components/History';
-import Logo from './Logo';
+import Logo from './Logo'; // './HPELogo';
 import SessionMenu from './SessionMenu';
 
 class Dashboard extends Component {
@@ -21,8 +21,6 @@ class Dashboard extends Component {
   constructor() {
     super();
 
-    this._onOverTitle = this._onOverTitle.bind(this);
-    this._onOutTitle = this._onOutTitle.bind(this);
     this._onClickTitle = this._onClickTitle.bind(this);
     this._onCloseNav = this._onCloseNav.bind(this);
     this._onClickSegment = this._onClickSegment.bind(this);
@@ -50,14 +48,6 @@ class Dashboard extends Component {
   componentWillUnmount() {
     window.removeEventListener('resize', this._onResize);
     this.props.dispatch(dashboardUnload(this.props.dashboard.tiles));
-  }
-
-  _onOverTitle() {
-    //this.props.dispatch(navPeek(true))
-  }
-
-  _onOutTitle() {
-    //this.props.dispatch(navPeek(false))
   }
 
   _onClickTitle() {
@@ -196,15 +186,10 @@ class Dashboard extends Component {
     let session;
     if (! navActive) {
       title = (
-        <span title="Main Menu" onMouseOver={this._onOverTitle}
-          onMouseOut={this._onOutTitle}>
-          <Title onClick={this._onClickTitle}>
-            <Box responsive={false}>
-              <Logo />
-            </Box>
-            <span>Ferret</span>
-          </Title>
-        </span>
+        <Title onClick={this._onClickTitle}>
+          <Logo />
+          Ferret
+        </Title>
       );
 
       session = <SessionMenu dropAlign={{right: 'right'}} />;
