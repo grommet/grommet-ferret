@@ -1,3 +1,4 @@
+var argv = require('yargs').argv;
 var gulp = require('gulp');
 var path = require('path');
 //var nodemon = require('gulp-nodemon');
@@ -27,12 +28,6 @@ var opts = {
   },
   webpack: {
     resolve: {
-      // alias: { // TODO: remove, just for local dev
-      //   'grommet-index/scss': path.resolve(__dirname, '../grommet-index/src/scss'),
-      //   'grommet-index': path.resolve(__dirname, '../grommet-index/src/js'),
-      //   'grommet/scss': path.resolve(__dirname, '../grommet/src/scss'),
-      //   'grommet': path.resolve(__dirname, '../grommet/src/js')
-      // },
       root: [
         path.resolve(__dirname, 'src/js'),
         path.resolve(__dirname, 'src/scss'),
@@ -45,18 +40,22 @@ var opts = {
   devServerProxy: {
     "/rest/*": 'http://localhost:8010'
   },
-  websocketHost: 'localhost:8010'
-  //devPreprocess: ['start-backend']
+  websocketHost: 'localhost:8010',
+  alias: {
+    'grommet-index/scss': path.resolve(__dirname, '../grommet-index/src/scss'),
+    'grommet-index': path.resolve(__dirname, '../grommet-index/src/js'),
+    'grommet/scss': path.resolve(__dirname, '../grommet/src/scss'),
+    'grommet': path.resolve(__dirname, '../grommet/src/js')
+  },
+  devPreprocess: ['set-webpack-alias']
 };
 
-/*
-gulp.task('start-backend', function() {
-  nodemon({
-    watch: ["examples/indexer/server"],
-    script: path.resolve(__dirname, 'server/server')
-  });
+gulp.task('set-webpack-alias', function () {
+  if (opts.alias && argv.useAlias) {
+    console.log('Using local alias for development.');
+    opts.webpack.resolve.alias = opts.alias;
+  }
 });
-*/
 
 gulp.task('release:createTmp', function(done) {
   del.sync(['./tmp']);
