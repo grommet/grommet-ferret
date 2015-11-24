@@ -34,7 +34,8 @@
     "gulp-nodemon": "^2.0.3",
     "gulp-rsync": "0.0.5",
     "mkdirp": "^0.5.1",
-    "redux-devtools": "^2.1.5"
+    "redux-devtools": "^2.1.5",
+    "yargs": "^3.30.0"
   },
   "scripts": {
     "build": "gulp dist",
