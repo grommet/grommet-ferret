@@ -31,7 +31,6 @@ class Dashboard extends Component {
   }
 
   componentDidMount() {
-    this.refs.search.focus();
     window.addEventListener('resize', this._onResize);
     this._onResize();
     this.props.dispatch(dashboardLoad(this.props.dashboard.tiles));
@@ -186,7 +185,7 @@ class Dashboard extends Component {
     let session;
     if (! navActive) {
       title = (
-        <Title onClick={this._onClickTitle}>
+        <Title onClick={this._onClickTitle} a11yTitle="Open Ferret Menu">
           <Logo />
           Ferret
         </Title>
