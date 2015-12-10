@@ -1,6 +1,8 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
 var compression = require('compression');
+var Ddos = require('ddos');
+var ddos = new Ddos;
 var express = require('express');
 var http = require("http");
 var router = express.Router();
@@ -13,6 +15,8 @@ var path = require('path');
 var PORT = process.env.PORT || 8010;
 
 var app = express();
+
+app.use(ddos.express);
 
 app.use(compression());
 
