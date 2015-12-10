@@ -45,7 +45,7 @@ let createStoreHistory = () => {
       return unsubscribe;
     },
     createHref: history.createHref,
-    push: history.push
+    pushState: history.pushState
   };
 };
 
@@ -83,14 +83,14 @@ let sessionWatcher = () => {
     if (route.pathname === '/login' && session.token) {
       localStorage.email = session.email;
       localStorage.token = session.token;
-      history.push(Routes.path(postLoginPath));
+      history.pushState(null, Routes.path(postLoginPath));
     } else if (route.pathname !== Routes.path('/login') && ! session.token) {
       localStorage.removeItem('email');
       localStorage.removeItem('token');
       postLoginPath = route.pathname;
-      history.push(Routes.path('/login'));
+      history.pushState(null, Routes.path('/login'));
     } else if (route.pathname === '/') {
-      history.replace(Routes.path('/dashboard'));
+      history.replaceState(null, Routes.path('/dashboard'));
     }
   }
 };
