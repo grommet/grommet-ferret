@@ -10,6 +10,7 @@ import Index from 'grommet-index/components/Index';
 import IndexPropTypes from 'grommet-index/utils/PropTypes';
 import Title from 'grommet/components/Title';
 import Logo from './Logo'; // './HPELogo';
+import Anchor from 'grommet/components/Anchor';
 import AddIcon from 'grommet/components/icons/base/Add';
 
 class Items extends Component {
@@ -97,7 +98,7 @@ class Items extends Component {
 
     let addControl;
     if (index.addRoute) {
-      addControl = <Link to={index.addRoute}><AddIcon /></Link>;
+      addControl = <Link to={index.addRoute}><Anchor tag="span"><AddIcon /></Anchor></Link>;
     }
 
     return (
