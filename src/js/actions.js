@@ -196,6 +196,8 @@ export function indexLoad(category, index, selection) {
     let query = index.query;
     if (loc.query.q) {
       query = Query.create(loc.query.q);
+    }
+    if (query) {
       params = { ...params, ...{ query: query } };
     }
     if (selection) {
