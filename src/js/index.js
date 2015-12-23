@@ -7,7 +7,9 @@ import ReactDOM from 'react-dom';
 import Router from 'react-router';
 import Rest from 'grommet/utils/Rest';
 import RestWatch from './RestWatch';
-//var Locale = require('grommet/utils/Locale');
+import { getCurrentLocale, getLocaleData } from 'grommet/utils/Locale';
+import { addLocaleData } from 'react-intl';
+import en from 'react-intl/lib/locale-data/en';
 import Routes from './Routes';
 ////import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
 import { Provider } from 'react-redux';
@@ -51,10 +53,21 @@ let createStoreHistory = () => {
 
 let element = document.getElementById('content');
 
+let locale = getCurrentLocale();
+addLocaleData(en);
+
+let messages;
+try {
+  messages = require('../messages/' + locale);
+} catch (e) {
+  messages = require('../messages/en-US');
+}
+var localeData = getLocaleData(messages, locale);
+
 ReactDOM.render((
   <div>
     <Provider store={store}>
-      <IntlProvider locale="en">
+      <IntlProvider locale={localeData.locale} messages={localeData.messages}>
         <Router routes={Routes.routes} history={createStoreHistory()} />
       </IntlProvider>
     </Provider>
