@@ -2,7 +2,7 @@
 
 import { createStore, combineReducers, compose, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
-import DevTools from './DevTools';
+// import DevTools from './DevTools';
 
 // TODO: fix webpack loader to allow import * from './reducers'
 import session from './reducers/session';
@@ -14,5 +14,5 @@ import item from './reducers/item';
 
 export default compose(
   applyMiddleware(thunk),
-  DevTools.instrument()
+  // DevTools.instrument()
 )(createStore)(combineReducers({session, route, nav, dashboard, index, item}));

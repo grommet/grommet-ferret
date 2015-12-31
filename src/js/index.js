@@ -11,7 +11,7 @@ import { getCurrentLocale, getLocaleData } from 'grommet/utils/Locale';
 import { addLocaleData } from 'react-intl';
 import en from 'react-intl/lib/locale-data/en';
 import Routes from './Routes';
-import DevTools from './DevTools';
+// import DevTools from './DevTools';
 import { Provider } from 'react-redux';
 import { IntlProvider } from 'react-intl';
 
@@ -71,7 +71,9 @@ ReactDOM.render((
         <Router routes={Routes.routes} history={createStoreHistory()} />
       </IntlProvider>
     </Provider>
+    {/*}
     <DevTools store={store} />
+    {*/}
   </div>
 ), element);
 
