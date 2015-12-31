@@ -11,7 +11,7 @@ import { getCurrentLocale, getLocaleData } from 'grommet/utils/Locale';
 import { addLocaleData } from 'react-intl';
 import en from 'react-intl/lib/locale-data/en';
 import Routes from './Routes';
-////import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
+// import DevTools from './DevTools';
 import { Provider } from 'react-redux';
 import { IntlProvider } from 'react-intl';
 
@@ -72,9 +72,7 @@ ReactDOM.render((
       </IntlProvider>
     </Provider>
     {/*}
-    <DebugPanel top right bottom>
-      <DevTools store={store} monitor={LogMonitor} />
-    </DebugPanel>
+    <DevTools store={store} />
     {*/}
   </div>
 ), element);
