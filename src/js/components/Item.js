@@ -39,7 +39,7 @@ class Item extends Component {
       // We hold on to the last item for a bit to reduce content flashing
       // when the user clicks between items.
       clearTimeout(this._lastItemTimer);
-      this._lastItemTimer = setTimeout(() => {
+      this._lastItemTimer = setTimeout(function () {
         this.setState({lastItem: null});
       }.bind(this), 200);
     }

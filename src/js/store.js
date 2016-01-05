@@ -13,6 +13,6 @@ import index from './reducers/index';
 import item from './reducers/item';
 
 export default compose(
-  applyMiddleware(thunk),
+  applyMiddleware(thunk)
   // DevTools.instrument()
 )(createStore)(combineReducers({session, route, nav, dashboard, index, item}));

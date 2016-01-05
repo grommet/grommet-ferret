@@ -47,7 +47,8 @@ let createStoreHistory = () => {
       return unsubscribe;
     },
     createHref: history.createHref,
-    pushState: history.pushState
+    pushState: history.pushState,
+    push: history.push
   };
 };
 
