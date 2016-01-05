@@ -15,7 +15,7 @@
     "express-http-proxy": "^0.6.0",
     "grommet": "https://github.com/grommet/grommet/tarball/stable",
     "grommet-index": "https://github.com/grommet/grommet-index/tarball/stable",
-    "history": "~1.13.0",
+    "history": "^1.17.0",
     "json-server": "^0.5.5",
     "json-stringify-pretty-compact": "^1.0.1",
     "lodash": "^3.8.0",
