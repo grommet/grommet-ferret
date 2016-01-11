@@ -72,13 +72,13 @@ class Dashboard extends Component {
 
   _layout() {
     const { dispatch, dashboard: {tiles, legendPlacement} } = this.props;
-    var content = this.refs.content;
+    let content = this.refs.content;
     if (content) {
-      var rect = content.getBoundingClientRect();
-      var tilesOffset = ReactDOM.findDOMNode(this.refs.tiles).
+      let rect = content.getBoundingClientRect();
+      let tilesOffset = ReactDOM.findDOMNode(this.refs.tiles).
         getBoundingClientRect().top + document.body.scrollTop;
-      var wideTileCount = 0;
-      var normalTileCount = 0;
+      let wideTileCount = 0;
+      let normalTileCount = 0;
       // set wide chart count according to the space we have
       let dataPoints = Math.round(Math.max(4, rect.width / 48));
 
@@ -128,10 +128,10 @@ class Dashboard extends Component {
 
   _renderTile(tile, index) {
     const { graphicSize, legendPlacement } = this.props.dashboard;
-    var header = null;
+    let header = null;
     if (! tile.history) {
-      var path = tile.path || '/' + tile.category;
-      var queryParams = {};
+      let path = tile.path || '/' + tile.category;
+      let queryParams = {};
       if (tile.query) {
         queryParams.q = tile.query.fullText;
       }
@@ -147,15 +147,20 @@ class Dashboard extends Component {
       header = <Header tag="h2" justify="center">{header}</Header>;
     }
 
-    var contents = null;
+    let a11yProps = {
+      a11yTitleId: `dashboard_item_title_${index}`,
+      a11yDescId: `dashboard_item_desc_${index}`
+    };
+
+    let contents = null;
     if (tile.history) {
       contents = (
-        <IndexHistory attribute={tile.attribute} type={tile.type}
+        <IndexHistory {...a11yProps} attribute={tile.attribute} type={tile.type}
           series={tile.result} smooth={true} size={graphicSize} />
       );
     } else {
       contents = (
-        <Aggregate type={tile.type}
+        <Aggregate {...a11yProps} type={tile.type}
           attribute={tile.attribute}
           query={tile.query}
           legend={{placement: legendPlacement}}
