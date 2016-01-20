@@ -4,6 +4,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { logout } from '../actions';
 import Menu from 'grommet/components/Menu';
+import Anchor from 'grommet/components/Anchor';
 import Gravatar from 'react-gravatar';
 import Drop from 'grommet/utils/Drop';
 
@@ -15,7 +16,6 @@ class SessionMenu extends Component {
   }
 
   _onLogout(event) {
-    console.log('click callback');
     event.preventDefault();
     this.props.dispatch(logout());
   }
@@ -25,7 +25,7 @@ class SessionMenu extends Component {
     var icon = <Gravatar email={email || ''} default="mm"/>;
     return (
       <Menu icon={icon} dropAlign={dropAlign} a11yTitle="Open Session Menu">
-        <a tabIndex="0" href="#" onClick={this._onLogout}>Logout</a>
+        <Anchor href="#" onClick={this._onLogout}>Logout</Anchor>
       </Menu>
     );
   }
