@@ -190,7 +190,7 @@ class Dashboard extends Component {
     let session;
     if (! navActive) {
       title = (
-        <Title onClick={this._onClickTitle} a11yTitle="Open Ferret Menu">
+        <Title onClick={this._onClickTitle} a11yTitle="Open Menu">
           <Logo />
           Ferret
         </Title>

@@ -38,7 +38,7 @@ class NavSidebar extends Component {
     return (
       <Sidebar colorIndex="neutral-1" fixed={true} separator="right">
         <Header large={true} justify="between" pad={{horizontal: 'medium'}}>
-          <Title onClick={this._onClose}>
+          <Title onClick={this._onClose} a11yTitle="Close Menu">
             <Logo inverse={true} />
             Ferret
           </Title>
