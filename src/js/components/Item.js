@@ -101,7 +101,7 @@ class Item extends Component {
     }
     let menu = (
       <Menu inline={false} label="menu">
-        <Link to={this.props.detailsPath}>Details</Link>
+        <Link to={this.props.detailsPath}><Anchor tag="span">Details</Anchor></Link>
         {actions}
       </Menu>
     );
