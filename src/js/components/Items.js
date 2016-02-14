@@ -22,6 +22,7 @@ class Items extends Component {
     this._onMore = this._onMore.bind(this);
     this._onMoreBefore = this._onMoreBefore.bind(this);
     this._onQuery = this._onQuery.bind(this);
+    this._onFilter = this._onFilter.bind(this);
   }
 
   componentDidMount() {
@@ -73,7 +74,13 @@ class Items extends Component {
   }
 
   _onQuery(query) {
-    this.props.dispatch(indexQuery(this.props.category, this.props.index, query));
+    const { index, category } = this.props;
+    this.props.dispatch(indexQuery(category, index, query, index.filter));
+  }
+
+  _onFilter(filter) {
+    const { index, category } = this.props;
+    this.props.dispatch(indexQuery(category, index, index.query, filter));
   }
 
   render() {
@@ -114,6 +121,7 @@ class Items extends Component {
           flush={false}
           onSelect={this._onSelect}
           onQuery={this._onQuery}
+          onFilter={this._onFilter}
           onMore={this._onMore}
           onMoreBefore={this._onMoreBefore}
           addControl={addControl}
