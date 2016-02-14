@@ -156,11 +156,13 @@ class Dashboard extends Component {
     if (tile.history) {
       contents = (
         <IndexHistory {...a11yProps} attribute={tile.attribute} type={tile.type}
-          series={tile.result} smooth={true} size={graphicSize} />
+          name={tile.name} series={tile.result} smooth={true} size={graphicSize}
+        />
       );
     } else {
       contents = (
         <Aggregate {...a11yProps} type={tile.type}
+          name={tile.name}
           attribute={tile.attribute}
           query={tile.query}
           legend={{placement: legendPlacement}}
