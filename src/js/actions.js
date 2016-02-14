@@ -256,13 +256,19 @@ export function indexMoreBefore(category, index) {
   };
 }
 
-export function indexQuery(category, index, query) {
+export function indexQuery(category, index, query, filter) {
   return function (dispatch) {
-    history.pushState(null, document.location.pathname, {q: query.text});
+    let historyState = {
+      ...filter
+    };
+    if (query) {
+      historyState.q = query.text;
+    }
+    history.pushState(null, document.location.pathname, historyState);
     IndexApi.stopWatching(index.watcher);
-    dispatch({ type: INDEX_QUERY, category: category, query: query });
+    dispatch({ type: INDEX_QUERY, category, query, filter });
     let params = defaultParams(category, index);
-    params = { ...params, ...{ query: query } };
+    params = { ...params, ...{ query }, ...{ filter } };
     // TODO: Need to get the query into the store, similar to how indexLoad does
     let watcher = IndexApi.watchItems(params, (result) => {
       dispatch(indexSuccess(watcher, category, result));

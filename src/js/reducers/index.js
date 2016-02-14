@@ -98,7 +98,8 @@ const handlers = {
         [state.activeCategory]: {
           watcher: { $set: null },
           result: { $set: null },
-          query: { $set: null }
+          query: { $set: null },
+          filter: { $set: null }
         }
       }
     });
@@ -108,7 +109,8 @@ const handlers = {
     return update(state, {
       categories: {
         [action.category]: {
-          query: { $set: action.query }
+          query: { $set: action.query },
+          filter: { $set: action.filter }
         }
       }
     });
