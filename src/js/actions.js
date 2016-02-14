@@ -183,8 +183,8 @@ function defaultParams(category, index) {
 }
 
 export function indexNav(path, category, query) {
-  history.pushState(null, (path || '/' + category) + '?q=' + encodeURIComponent(query.fullText));
-  //history.pushState(null, '/' + category, {q: query.fullText});
+  history.pushState(null, (path || '/' + category) + '?q=' + encodeURIComponent(query.text));
+  //history.pushState(null, '/' + category, {q: query.text});
   return { type: INDEX_NAV, category: category, query: query };
 }
 
@@ -258,7 +258,7 @@ export function indexMoreBefore(category, index) {
 
 export function indexQuery(category, index, query) {
   return function (dispatch) {
-    history.pushState(null, document.location.pathname, {q: query.fullText});
+    history.pushState(null, document.location.pathname, {q: query.text});
     IndexApi.stopWatching(index.watcher);
     dispatch({ type: INDEX_QUERY, category: category, query: query });
     let params = defaultParams(category, index);

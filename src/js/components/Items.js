@@ -40,7 +40,7 @@ class Items extends Component {
     //     (nextProps.index.query && ! this.props.index.query) ||
     //     (! nextProps.index.query && this.props.index.query) ||
     //     (nextProps.index.query && this.props.index.query &&
-    //       this.props.index.query.fullText !== nextProps.index.query.fullText)))) {
+    //       this.props.index.query.text !== nextProps.index.query.text)))) {
     //   this._scrollOnUpdate = true;
     // }
   }
