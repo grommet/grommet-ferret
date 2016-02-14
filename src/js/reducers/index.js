@@ -4,8 +4,18 @@ import update from 'react/lib/update';
 import { INDEX_LOAD, INDEX_QUERY, INDEX_SUCCESS, INDEX_UNLOAD,
   INDEX_SELECT, ROUTE_CHANGED } from '../actions';
 
+const filter = {
+  all: true,
+  values: [
+    { label: 'Critical', value: 'critical' },
+    { label: 'Warning', value: 'warning' },
+    { label: 'OK', value: 'ok' },
+    { label: 'Disabled', value: 'disabled' }
+  ]
+};
+
 const statusAttribute = {name: 'status', label: 'Status', size: 'small',
-  header: true, filter: ['Critical', 'Warning', 'OK', 'Unknown']};
+  header: true, filter};
 
 const activityCategoryMap = {alerts: 'Alert', tasks: 'Task'};
 
