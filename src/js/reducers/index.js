@@ -15,7 +15,7 @@ const filter = {
 };
 
 const statusAttribute = {name: 'status', label: 'Status', size: 'small',
-  header: true, filter};
+  header: true, status: true, filter};
 
 const activityCategoryMap = {alerts: 'Alert', tasks: 'Task'};
 
