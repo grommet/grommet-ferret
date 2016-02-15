@@ -4,6 +4,8 @@ import Rest from 'grommet/utils/Rest';
 import history from './RouteHistory';
 import Query from 'grommet-index/utils/Query';
 import IndexApi from './Api';
+import _omit from 'lodash/object/omit';
+import _isEmpty from 'lodash/lang/isEmpty';
 
 // session
 export const INIT = 'INIT';
@@ -259,6 +261,7 @@ export function indexMoreBefore(category, index) {
 
 export function indexQuery(category, index, query, filter) {
   return function (dispatch) {
+    filter = _omit(filter, _isEmpty);
     let historyState = {
       ...filter
     };
