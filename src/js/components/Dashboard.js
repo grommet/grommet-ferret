@@ -166,7 +166,7 @@ class Dashboard extends Component {
           attribute={tile.attribute}
           query={tile.query}
           legend={{placement: legendPlacement}}
-          series={tile.result}
+          values={tile.result}
           size={graphicSize}
           onClick={function (query) {
             this._onClickSegment(tile, query);
