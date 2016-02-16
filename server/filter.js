@@ -402,7 +402,7 @@ function sortItems(items, sort) {
 
 var Filter = {
   filterUserQuery: filterUserQuery, // (items, userQuery)
-  filterQuery: filterQuery, // (items, query)
+  filterQuery: filterQuery, // (items, query, filter)
   sort: sortItems // (items, sort)
 };
 
