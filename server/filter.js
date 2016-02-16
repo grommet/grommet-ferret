@@ -344,12 +344,23 @@ function parseQuery (query) {
   return expression;
 }
 
-function filterQuery(items, query) {
-  var expression = parseQuery(query);
-  var result = items.filter(function(item) {
-    return expression.matches(item);
-  });
-  return result;
+function filterQuery(items, query, filter) {
+  if (filter) {
+    items = items.filter(function(item) {
+      for (var prop in filter) {
+        return filter[prop].indexOf(item[prop]) > -1;
+      }
+    });
+  }
+
+  if (query) {
+    var expression = parseQuery(query);
+    items = items.filter(function(item) {
+      return expression.matches(item);
+    });
+  }
+
+  return items;
 }
 
 // http://my.opera.com/GreyWyvern/blog/show.dml/1671288
