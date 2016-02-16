@@ -7,10 +7,10 @@ import { INDEX_LOAD, INDEX_QUERY, INDEX_SUCCESS, INDEX_UNLOAD,
 const filter = {
   all: true,
   values: [
-    { label: 'Critical', value: 'critical' },
-    { label: 'Warning', value: 'warning' },
-    { label: 'OK', value: 'ok' },
-    { label: 'Disabled', value: 'disabled' }
+    { label: 'Critical', value: 'Critical' },
+    { label: 'Warning', value: 'Warning' },
+    { label: 'OK', value: 'OK' },
+    { label: 'Disabled', value: 'Disabled' }
   ]
 };
 
