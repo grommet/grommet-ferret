@@ -157,6 +157,7 @@ class Dashboard extends Component {
       contents = (
         <IndexHistory {...a11yProps} type={tile.type} name={tile.attribute}
           series={tile.result} smooth={true} size={graphicSize}
+          legend={tile.legend}
         />
       );
     } else {
