@@ -18,7 +18,7 @@ function filteredItems (items, queryParams) {
   if (queryParams.userQuery) {
     items = filter.filterUserQuery(items, queryParams.userQuery);
   }
-  if (queryParams.query || queryParams.filter && !_.isEmpty(queryParams.filter)) {
+  if (queryParams.query || queryParams.filter) {
     items = filter.filterQuery(items, queryParams.query, queryParams.filter);
   }
   return items;

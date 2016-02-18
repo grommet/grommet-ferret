@@ -345,7 +345,7 @@ function parseQuery (query) {
 }
 
 function filterQuery(items, query, filter) {
-  if (filter) {
+  if (!_.isEmpty(filter)) {
     items = items.filter(function(item) {
       for (var prop in filter) {
         return filter[prop].indexOf(item[prop]) > -1;
