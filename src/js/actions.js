@@ -185,9 +185,12 @@ function defaultParams(category, index) {
 }
 
 export function indexNav(path, category, query) {
-  history.pushState(null, (path || '/' + category) + '?q=' + encodeURIComponent(query.text));
-  //history.pushState(null, '/' + category, {q: query.text});
-  return { type: INDEX_NAV, category: category, query: query };
+  const queryKey = Object.keys(query);
+  if (queryKey.length === 1) {
+    const filter = queryKey[0];
+    history.pushState(null, (path || `/${category}`) + `?${filter}=${encodeURIComponent(query[filter])}`);
+  }
+  return { type: INDEX_NAV, category, query };
 }
 
 export function indexLoad(category, index, selection) {
