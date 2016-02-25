@@ -85,8 +85,11 @@ const handlers = {
       (! action.query || state.activeCategory !== action.category)) {
       changes.categories[state.activeCategory] = {query: { $set: null }};
     }
-    if (action.query) {
-      changes.categories[action.category] = {query: { $set: action.query }};
+    if (action.query || action.filter) {
+      changes.categories[action.category] = {
+        query: { $set: action.query },
+        filter: { $set: action.filter }
+      };
     }
     return update(state, changes);
   },

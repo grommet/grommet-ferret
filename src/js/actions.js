@@ -199,16 +199,24 @@ export function indexLoad(category, index, selection) {
     const loc = history.createLocation(document.location.pathname + document.location.search);
     let params = defaultParams(category, index);
     let query = index.query;
+    let status = loc.query.status;
+    if (status && !Array.isArray(status)) {
+      status = [status];
+    }
+    let filter = status ? { status: status } : index.filter;
     if (loc.query.q) {
       query = new Query(loc.query.q);
     }
     if (query) {
-      params = { ...params, ...{ query: query } };
+      params = { ...params, ...{ query } };
+    }
+    if (filter) {
+      params = { ...params, ...{ filter } };
     }
     if (selection) {
       params = { ...params, ...{referenceUri: selection } };
     }
-    dispatch({ type: INDEX_LOAD, category: category, query: query });
+    dispatch({ type: INDEX_LOAD, category, query, filter });
     let watcher = IndexApi.watchItems(params, (result) => {
       dispatch(indexSuccess(watcher, category, result));
     });
