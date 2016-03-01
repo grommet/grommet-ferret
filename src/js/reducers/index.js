@@ -64,11 +64,23 @@ const initialState = {
         {name: 'created', label: 'Time',
           timestamp: true, size: 'medium', secondary: true},
         {name: 'state', label: 'State', size: 'medium', secondary: true,
-          filter: [
-            'Active', 'Cleared', 'Running', 'Completed'
-          ]},
+          filter: {
+            all: true,
+            values: [
+              { label: 'Active', value: 'Active' },
+              { label: 'Cleared', value: 'Cleared' },
+              { label: 'Running', value: 'Running' },
+              { label: 'Completed', value: 'Completed' }
+            ]
+          }},
         {name: 'category', label: 'Category', secondary: true,
-          filter: ['Alerts', 'Tasks'],
+          filter: {
+            all: true,
+            values: [
+              { label: 'Alerts', value: 'Alerts' },
+              { label: 'Tasks', value: 'Tasks' }
+            ]
+          },
           render: function (item) {
             return activityCategoryMap[item.category] || '';
           }}
