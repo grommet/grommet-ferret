@@ -77,8 +77,8 @@ const initialState = {
           filter: {
             all: true,
             values: [
-              { label: 'Alerts', value: 'Alerts' },
-              { label: 'Tasks', value: 'Tasks' }
+              { label: 'Alerts', value: 'alerts' },
+              { label: 'Tasks', value: 'tasks' }
             ]
           },
           render: function (item) {
