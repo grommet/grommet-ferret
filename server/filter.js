@@ -348,8 +348,11 @@ function filterQuery(items, query, filter) {
   if (!_.isEmpty(filter)) {
     items = items.filter(function(item) {
       for (var prop in filter) {
-        return filter[prop].indexOf(item[prop]) > -1;
+        if (filter[prop].indexOf(item[prop]) === -1) {
+          return false;
+        }
       }
+      return true;
     });
   }
 
