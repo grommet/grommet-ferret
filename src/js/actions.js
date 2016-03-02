@@ -197,26 +197,32 @@ export function indexLoad(category, index, selection) {
   return function (dispatch) {
     // bring in any query from the location
     const loc = history.createLocation(document.location.pathname + document.location.search);
+    const queryFilters = _omit(loc.query, 'q');
+    let filters = {};
     let params = defaultParams(category, index);
     let query = index.query;
-    let status = loc.query.status;
-    if (status && !Array.isArray(status)) {
-      status = [status];
+
+    for (var filter in queryFilters) {
+      let value = queryFilters[filter];
+      if (!Array.isArray(value)) {
+        value = [value];
+      }
+      filters = { ...filters, [filter]: value };
     }
-    let filter = status ? { status: status } : index.filter;
+
     if (loc.query.q) {
       query = new Query(loc.query.q);
     }
     if (query) {
       params = { ...params, ...{ query } };
     }
-    if (filter) {
-      params = { ...params, ...{ filter } };
+    if (filters) {
+      params = { ...params, ...{ filter: filters } };
     }
     if (selection) {
       params = { ...params, ...{referenceUri: selection } };
     }
-    dispatch({ type: INDEX_LOAD, category, query, filter });
+    dispatch({ type: INDEX_LOAD, category, query, filter: filters });
     let watcher = IndexApi.watchItems(params, (result) => {
       dispatch(indexSuccess(watcher, category, result));
     });
