@@ -18,8 +18,7 @@ const initialState = {
       category: 'server-profiles',
       attribute: 'state',
       interval: 'days',
-      count: 8,
-      legend: {position: 'overlay'}
+      count: 8
     },
     {
       name: 'Active Alerts',
