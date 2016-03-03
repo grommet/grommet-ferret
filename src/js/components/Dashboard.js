@@ -133,7 +133,7 @@ class Dashboard extends Component {
       let path = tile.path || '/' + tile.category;
       let queryParams = {};
       if (tile.query) {
-        queryParams.q = tile.query.text;
+        queryParams.q = tile.query.toString();
       }
       header = (
         <Link to={path} query={queryParams}>

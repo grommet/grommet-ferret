@@ -10,7 +10,7 @@ var state = {
 function normalizeParams(params) {
   var result = merge({}, params);
   if (result.query && (typeof result.query === 'object')) {
-    result.query = result.query.text;
+    result.query = result.query.toString();
   }
   return result;
 }
