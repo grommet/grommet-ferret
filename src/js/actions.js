@@ -4,6 +4,8 @@ import Rest from 'grommet/utils/Rest';
 import history from './RouteHistory';
 import Query from 'grommet-index/utils/Query';
 import IndexApi from './Api';
+import _omit from 'lodash/object/omit';
+import _isEmpty from 'lodash/lang/isEmpty';
 
 // session
 export const INIT = 'INIT';
@@ -183,27 +185,45 @@ function defaultParams(category, index) {
 }
 
 export function indexNav(path, category, query) {
-  history.pushState(null, (path || '/' + category) + '?q=' + encodeURIComponent(query.fullText));
-  //history.pushState(null, '/' + category, {q: query.fullText});
-  return { type: INDEX_NAV, category: category, query: query };
+  let queryString = '';
+  for (let name in query) {
+    queryString += (queryString.length === 0 ? '?' : '&');
+    queryString += `${name}=${encodeURIComponent(query[name])}`;
+  }
+  history.pushState(null, (path || `/${category}`) + queryString);
+  return { type: INDEX_NAV, category, query };
 }
 
 export function indexLoad(category, index, selection) {
   return function (dispatch) {
     // bring in any query from the location
     const loc = history.createLocation(document.location.pathname + document.location.search);
+    const queryFilters = _omit(loc.query, 'q');
+    let filters = !_isEmpty(queryFilters) ? {} : index.filters;
     let params = defaultParams(category, index);
     let query = index.query;
+
+    for (let filter in queryFilters) {
+      let value = queryFilters[filter];
+      if (!Array.isArray(value)) {
+        value = [value];
+      }
+      filters = { ...filters, [filter]: value };
+    }
+
     if (loc.query.q) {
-      query = Query.create(loc.query.q);
+      query = new Query(loc.query.q);
     }
     if (query) {
-      params = { ...params, ...{ query: query } };
+      params = { ...params, ...{ query } };
+    }
+    if (filters) {
+      params = { ...params, ...{ filters } };
     }
     if (selection) {
       params = { ...params, ...{referenceUri: selection } };
     }
-    dispatch({ type: INDEX_LOAD, category: category, query: query });
+    dispatch({ type: INDEX_LOAD, category, query, filters });
     let watcher = IndexApi.watchItems(params, (result) => {
       dispatch(indexSuccess(watcher, category, result));
     });
@@ -233,8 +253,9 @@ export function indexMore(category, index) {
     IndexApi.stopWatching(index.watcher);
     let params = defaultParams(category, index);
     let query = index.query;
-    params = { ...params,
-      ...{ query: query, count: (index.result.count + IndexApi.pageSize) } };
+    let filters = index.filters;
+    params = { ...params, ...{ query, filters,
+      count: (index.result.count + IndexApi.pageSize) } };
     let watcher = IndexApi.watchItems(params, (result) => {
       dispatch(indexSuccess(watcher, category, result));
     });
@@ -246,8 +267,8 @@ export function indexMoreBefore(category, index) {
     IndexApi.stopWatching(index.watcher);
     let params = defaultParams(category, index);
     let query = index.query;
-    params = { ...params,
-      ...{ query: query,
+    let filters = index.filters;
+    params = { ...params, ...{ query, filters,
         start: (Math.max(index.result.start -= IndexApi.pageSize)),
         count: (index.result.count + IndexApi.pageSize) } };
     let watcher = IndexApi.watchItems(params, (result) => {
@@ -256,13 +277,20 @@ export function indexMoreBefore(category, index) {
   };
 }
 
-export function indexQuery(category, index, query) {
+export function indexQuery(category, index, query, filters) {
   return function (dispatch) {
-    history.pushState(null, document.location.pathname, {q: query.fullText});
+    filters = _omit(filters, _isEmpty);
+    let historyState = {
+      ...filters
+    };
+    if (query) {
+      historyState.q = query.text;
+    }
+    history.pushState(null, document.location.pathname, historyState);
     IndexApi.stopWatching(index.watcher);
-    dispatch({ type: INDEX_QUERY, category: category, query: query });
+    dispatch({ type: INDEX_QUERY, category, query, filters });
     let params = defaultParams(category, index);
-    params = { ...params, ...{ query: query } };
+    params = { ...params, ...{ query }, ...{ filters } };
     // TODO: Need to get the query into the store, similar to how indexLoad does
     let watcher = IndexApi.watchItems(params, (result) => {
       dispatch(indexSuccess(watcher, category, result));

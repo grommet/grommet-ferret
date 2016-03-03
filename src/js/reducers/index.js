@@ -4,8 +4,18 @@ import update from 'react/lib/update';
 import { INDEX_LOAD, INDEX_QUERY, INDEX_SUCCESS, INDEX_UNLOAD,
   INDEX_SELECT, ROUTE_CHANGED } from '../actions';
 
+const statusFilter = {
+  all: true,
+  values: [
+    { label: 'Critical', value: 'Critical' },
+    { label: 'Warning', value: 'Warning' },
+    { label: 'OK', value: 'OK' },
+    { label: 'Disabled', value: 'Disabled' }
+  ]
+};
+
 const statusAttribute = {name: 'status', label: 'Status', size: 'small',
-  header: true, filter: ['Critical', 'Warning', 'OK', 'Unknown']};
+  header: true, status: true, filter: statusFilter};
 
 const activityCategoryMap = {alerts: 'Alert', tasks: 'Task'};
 
@@ -54,11 +64,23 @@ const initialState = {
         {name: 'created', label: 'Time',
           timestamp: true, size: 'medium', secondary: true},
         {name: 'state', label: 'State', size: 'medium', secondary: true,
-          filter: [
-            'Active', 'Cleared', 'Running', 'Completed'
-          ]},
+          filter: {
+            all: true,
+            values: [
+              { label: 'Active', value: 'Active' },
+              { label: 'Cleared', value: 'Cleared' },
+              { label: 'Running', value: 'Running' },
+              { label: 'Completed', value: 'Completed' }
+            ]
+          }},
         {name: 'category', label: 'Category', secondary: true,
-          filter: ['Alerts', 'Tasks'],
+          filter: {
+            all: true,
+            values: [
+              { label: 'Alerts', value: 'alerts' },
+              { label: 'Tasks', value: 'tasks' }
+            ]
+          },
           render: function (item) {
             return activityCategoryMap[item.category] || '';
           }}
@@ -75,8 +97,11 @@ const handlers = {
       (! action.query || state.activeCategory !== action.category)) {
       changes.categories[state.activeCategory] = {query: { $set: null }};
     }
-    if (action.query) {
-      changes.categories[action.category] = {query: { $set: action.query }};
+    if (action.query || action.filters) {
+      changes.categories[action.category] = {
+        query: { $set: action.query },
+        filters: { $set: action.filters }
+      };
     }
     return update(state, changes);
   },
@@ -88,7 +113,8 @@ const handlers = {
         [state.activeCategory]: {
           watcher: { $set: null },
           result: { $set: null },
-          query: { $set: null }
+          query: { $set: null },
+          filters: { $set: null }
         }
       }
     });
@@ -98,7 +124,8 @@ const handlers = {
     return update(state, {
       categories: {
         [action.category]: {
-          query: { $set: action.query }
+          query: { $set: action.query },
+          filters: { $set: action.filters }
         }
       }
     });
