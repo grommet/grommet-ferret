@@ -199,7 +199,7 @@ export function indexLoad(category, index, selection) {
     // bring in any query from the location
     const loc = history.createLocation(document.location.pathname + document.location.search);
     const queryFilters = _omit(loc.query, 'q');
-    let filters = {};
+    let filters = !_isEmpty(queryFilters) ? {} : index.filter;
     let params = defaultParams(category, index);
     let query = index.query;
 
