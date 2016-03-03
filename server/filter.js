@@ -344,7 +344,7 @@ function parseQuery (query) {
   return expression;
 }
 
-function filterQuery(items, query, filter) {
+function filterFilter(items, filter) {
   if (!_.isEmpty(filter)) {
     items = items.filter(function(item) {
       for (var prop in filter) {
@@ -355,14 +355,16 @@ function filterQuery(items, query, filter) {
       return true;
     });
   }
+  return items;
+}
 
+function filterQuery(items, query) {
   if (query) {
     var expression = parseQuery(query);
     items = items.filter(function(item) {
       return expression.matches(item);
     });
   }
-
   return items;
 }
 
@@ -416,7 +418,8 @@ function sortItems(items, sort) {
 
 var Filter = {
   filterUserQuery: filterUserQuery, // (items, userQuery)
-  filterQuery: filterQuery, // (items, query, filter)
+  filterFilter: filterFilter, // (items, filter)
+  filterQuery: filterQuery, // (items, query)
   sort: sortItems // (items, sort)
 };
 

@@ -18,8 +18,11 @@ function filteredItems (items, queryParams) {
   if (queryParams.userQuery) {
     items = filter.filterUserQuery(items, queryParams.userQuery);
   }
-  if (queryParams.query || queryParams.filter) {
-    items = filter.filterQuery(items, queryParams.query, queryParams.filter);
+  if (queryParams.filter) {
+    items = filter.filterFilter(items, queryParams.filter);
+  }
+  if (queryParams.query) {
+    items = filter.filterQuery(items, queryParams.query);
   }
   return items;
 }
