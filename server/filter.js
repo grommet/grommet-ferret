@@ -344,12 +344,12 @@ function parseQuery (query) {
   return expression;
 }
 
-function filterFilter(items, filter) {
-  if (!_.isEmpty(filter)) {
+function filterFilter(items, filters) {
+  if (!_.isEmpty(filters)) {
     items = items.filter(function(item) {
-      for (var prop in filter) {
+      for (var prop in filters) {
         var value = item[prop] || item.attributes[prop];
-        if (filter[prop].indexOf(value) === -1) {
+        if (filters[prop].indexOf(value) === -1) {
           return false;
         }
       }
@@ -419,7 +419,7 @@ function sortItems(items, sort) {
 
 var Filter = {
   filterUserQuery: filterUserQuery, // (items, userQuery)
-  filterFilter: filterFilter, // (items, filter)
+  filterFilter: filterFilter, // (items, filters)
   filterQuery: filterQuery, // (items, query)
   sort: sortItems // (items, sort)
 };

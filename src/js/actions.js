@@ -199,7 +199,7 @@ export function indexLoad(category, index, selection) {
     // bring in any query from the location
     const loc = history.createLocation(document.location.pathname + document.location.search);
     const queryFilters = _omit(loc.query, 'q');
-    let filters = !_isEmpty(queryFilters) ? {} : index.filter;
+    let filters = !_isEmpty(queryFilters) ? {} : index.filters;
     let params = defaultParams(category, index);
     let query = index.query;
 
@@ -218,12 +218,12 @@ export function indexLoad(category, index, selection) {
       params = { ...params, ...{ query } };
     }
     if (filters) {
-      params = { ...params, ...{ filter: filters } };
+      params = { ...params, ...{ filters } };
     }
     if (selection) {
       params = { ...params, ...{referenceUri: selection } };
     }
-    dispatch({ type: INDEX_LOAD, category, query, filter: filters });
+    dispatch({ type: INDEX_LOAD, category, query, filters });
     let watcher = IndexApi.watchItems(params, (result) => {
       dispatch(indexSuccess(watcher, category, result));
     });
@@ -253,8 +253,8 @@ export function indexMore(category, index) {
     IndexApi.stopWatching(index.watcher);
     let params = defaultParams(category, index);
     let query = index.query;
-    let filter = index.filter;
-    params = { ...params, ...{ query, filter,
+    let filters = index.filters;
+    params = { ...params, ...{ query, filters,
       count: (index.result.count + IndexApi.pageSize) } };
     let watcher = IndexApi.watchItems(params, (result) => {
       dispatch(indexSuccess(watcher, category, result));
@@ -267,8 +267,8 @@ export function indexMoreBefore(category, index) {
     IndexApi.stopWatching(index.watcher);
     let params = defaultParams(category, index);
     let query = index.query;
-    let filter = index.filter;
-    params = { ...params, ...{ query, filter,
+    let filters = index.filters;
+    params = { ...params, ...{ query, filters,
         start: (Math.max(index.result.start -= IndexApi.pageSize)),
         count: (index.result.count + IndexApi.pageSize) } };
     let watcher = IndexApi.watchItems(params, (result) => {
@@ -277,20 +277,20 @@ export function indexMoreBefore(category, index) {
   };
 }
 
-export function indexQuery(category, index, query, filter) {
+export function indexQuery(category, index, query, filters) {
   return function (dispatch) {
-    filter = _omit(filter, _isEmpty);
+    filters = _omit(filters, _isEmpty);
     let historyState = {
-      ...filter
+      ...filters
     };
     if (query) {
       historyState.q = query.text;
     }
     history.pushState(null, document.location.pathname, historyState);
     IndexApi.stopWatching(index.watcher);
-    dispatch({ type: INDEX_QUERY, category, query, filter });
+    dispatch({ type: INDEX_QUERY, category, query, filters });
     let params = defaultParams(category, index);
-    params = { ...params, ...{ query }, ...{ filter } };
+    params = { ...params, ...{ query }, ...{ filters } };
     // TODO: Need to get the query into the store, similar to how indexLoad does
     let watcher = IndexApi.watchItems(params, (result) => {
       dispatch(indexSuccess(watcher, category, result));

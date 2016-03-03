@@ -75,12 +75,12 @@ class Items extends Component {
 
   _onQuery(query) {
     const { index, category } = this.props;
-    this.props.dispatch(indexQuery(category, index, query, index.filter));
+    this.props.dispatch(indexQuery(category, index, query, index.filters));
   }
 
-  _onFilter(filter) {
+  _onFilter(filters) {
     const { index, category } = this.props;
-    this.props.dispatch(indexQuery(category, index, index.query, filter));
+    this.props.dispatch(indexQuery(category, index, index.query, filters));
   }
 
   render() {
@@ -115,7 +115,7 @@ class Items extends Component {
           view={view}
           attributes={index.attributes}
           query={index.query}
-          filter={index.filter}
+          filter={index.filters}
           result={index.result}
           selection={selection}
           size={size}
