@@ -4,7 +4,7 @@ import update from 'react/lib/update';
 import { INDEX_LOAD, INDEX_QUERY, INDEX_SUCCESS, INDEX_UNLOAD,
   INDEX_SELECT, ROUTE_CHANGED } from '../actions';
 
-const filter = {
+const statusFilter = {
   all: true,
   values: [
     { label: 'Critical', value: 'Critical' },
@@ -15,7 +15,7 @@ const filter = {
 };
 
 const statusAttribute = {name: 'status', label: 'Status', size: 'small',
-  header: true, status: true, filter};
+  header: true, status: true, filter: statusFilter};
 
 const activityCategoryMap = {alerts: 'Alert', tasks: 'Task'};
 
