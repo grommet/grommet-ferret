@@ -344,12 +344,29 @@ function parseQuery (query) {
   return expression;
 }
 
+function filterFilter(items, filters) {
+  if (!_.isEmpty(filters)) {
+    items = items.filter(function(item) {
+      for (var prop in filters) {
+        var value = item[prop] || item.attributes[prop];
+        if (filters[prop].indexOf(value) === -1) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+  return items;
+}
+
 function filterQuery(items, query) {
-  var expression = parseQuery(query);
-  var result = items.filter(function(item) {
-    return expression.matches(item);
-  });
-  return result;
+  if (query) {
+    var expression = parseQuery(query);
+    items = items.filter(function(item) {
+      return expression.matches(item);
+    });
+  }
+  return items;
 }
 
 // http://my.opera.com/GreyWyvern/blog/show.dml/1671288
@@ -402,6 +419,7 @@ function sortItems(items, sort) {
 
 var Filter = {
   filterUserQuery: filterUserQuery, // (items, userQuery)
+  filterFilter: filterFilter, // (items, filters)
   filterQuery: filterQuery, // (items, query)
   sort: sortItems // (items, sort)
 };

@@ -133,7 +133,7 @@ class Dashboard extends Component {
       let path = tile.path || '/' + tile.category;
       let queryParams = {};
       if (tile.query) {
-        queryParams.q = tile.query.fullText;
+        queryParams.q = tile.query.toString();
       }
       header = (
         <Link to={path} query={queryParams}>
@@ -155,16 +155,18 @@ class Dashboard extends Component {
     let contents = null;
     if (tile.history) {
       contents = (
-        <IndexHistory {...a11yProps} attribute={tile.attribute} type={tile.type}
-          series={tile.result} smooth={true} size={graphicSize} />
+        <IndexHistory {...a11yProps} type={tile.type} name={tile.attribute}
+          series={tile.result} smooth={true} size={graphicSize}
+          legend={tile.legend}
+        />
       );
     } else {
       contents = (
         <Aggregate {...a11yProps} type={tile.type}
-          attribute={tile.attribute}
+          name={tile.attribute}
           query={tile.query}
           legend={{placement: legendPlacement}}
-          series={tile.result}
+          values={tile.result}
           size={graphicSize}
           onClick={function (query) {
             this._onClickSegment(tile, query);

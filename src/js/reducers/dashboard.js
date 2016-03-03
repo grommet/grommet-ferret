@@ -25,7 +25,7 @@ const initialState = {
       path: '/activity',
       type: 'circle',
       category: 'alerts',
-      query: Query.create('state:Active'),
+      query: new Query('state:Active'),
       attribute: 'status'
     },
     {
