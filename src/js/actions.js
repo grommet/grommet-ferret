@@ -185,11 +185,12 @@ function defaultParams(category, index) {
 }
 
 export function indexNav(path, category, query) {
-  const queryKey = Object.keys(query);
-  if (queryKey.length === 1) {
-    const filter = queryKey[0];
-    history.pushState(null, (path || `/${category}`) + `?${filter}=${encodeURIComponent(query[filter])}`);
+  let queryString = '';
+  for (let name in query) {
+    queryString += (queryString.length === 0 ? '?' : '&');
+    queryString += `${name}=${encodeURIComponent(query[name])}`;
   }
+  history.pushState(null, (path || `/${category}`) + queryString);
   return { type: INDEX_NAV, category, query };
 }
 
@@ -202,7 +203,7 @@ export function indexLoad(category, index, selection) {
     let params = defaultParams(category, index);
     let query = index.query;
 
-    for (var filter in queryFilters) {
+    for (let filter in queryFilters) {
       let value = queryFilters[filter];
       if (!Array.isArray(value)) {
         value = [value];
