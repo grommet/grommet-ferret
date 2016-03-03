@@ -348,7 +348,8 @@ function filterFilter(items, filter) {
   if (!_.isEmpty(filter)) {
     items = items.filter(function(item) {
       for (var prop in filter) {
-        if (filter[prop].indexOf(item[prop]) === -1) {
+        var value = item[prop] || item.attributes[prop];
+        if (filter[prop].indexOf(value) === -1) {
           return false;
         }
       }
