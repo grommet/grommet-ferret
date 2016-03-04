@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import { navActivate, dashboardLayout, dashboardLoad, dashboardSearch, dashboardUnload, indexNav, indexSelect } from '../actions';
-// import Box from 'grommet/components/Box';
+import Box from 'grommet/components/Box';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Header from 'grommet/components/Header';
@@ -205,10 +205,12 @@ class Dashboard extends Component {
       <div ref="content" className="dashboard">
         <Header direction="row" justify="between" large={true} pad={{horizontal: 'medium'}}>
           {title}
-          <Search ref="search" inline={true} className="flex"
-            placeHolder="Search"
-            defaultValue={searchText} onChange={this._onSearch}
-            suggestions={searchSuggestions} />
+          <Box direction="row" pad={!navActive ? {horizontal: 'medium'} : 'none'} className="flex">
+            <Search ref="search" inline={true}
+              placeHolder="Search" fill={true}
+              defaultValue={searchText} onChange={this._onSearch}
+              suggestions={searchSuggestions} />
+          </Box>
           {session}
         </Header>
         <Tiles ref="tiles" fill={true} flush={false}>
