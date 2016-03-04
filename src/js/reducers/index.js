@@ -39,7 +39,16 @@ const initialState = {
       attributes: [
         statusAttribute,
         {name: 'name', label: 'Name', header: true},
-        {name: 'model', label: 'Model', secondary: true}
+        {name: 'model', label: 'Model', secondary: true,
+          filter: {
+            all: true,
+            values: [
+              { label: 'bl460c gen1', value: 'bl460c gen1' },
+              { label: 'bl460c gen2', value: 'bl460c gen2' },
+              { label: 'bl460c gen3', value: 'bl460c gen3' }
+            ]
+          }
+        }
       ]
     },
     'server-profiles': {
