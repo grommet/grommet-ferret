@@ -43,9 +43,8 @@ class NavSidebar extends Component {
             Ferret
           </Title>
           <Menu responsive={false}>
-            <Button type="icon" onClick={this._onClose}>
-              <CloseIcon a11yTitle="Close Menu" />
-            </Button>
+            <Button plain={true} a11yTitle="Close Menu"
+              onClick={this._onClose} icon={<CloseIcon />} />
           </Menu>
         </Header>
         <Menu primary={true}>
