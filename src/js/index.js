@@ -9,7 +9,7 @@ import Rest from 'grommet/utils/Rest';
 import RestWatch from './RestWatch';
 import { getCurrentLocale, getLocaleData } from 'grommet/utils/Locale';
 import { addLocaleData } from 'react-intl';
-import en from 'react-intl/lib/locale-data/en';
+import en from 'react-intl/locale-data/en';
 import Routes from './Routes';
 // import DevTools from './DevTools';
 import { Provider } from 'react-redux';
