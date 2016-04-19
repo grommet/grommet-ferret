@@ -131,6 +131,7 @@ var RestWatch = {
         if (state.wsReady) {
           this._sendMessage('stop', request.id);
         }
+        return false;
       } else {
         return true;
       }

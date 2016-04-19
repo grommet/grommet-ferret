@@ -33,6 +33,7 @@
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-react": "^6.3.13",
     "del": "^2.0.2",
+    "grommet-toolbox": "^0.1.14",
     "gulp": "^3.9.0",
     "gulp-git": "^1.2.3",
     "gulp-nodemon": "^2.0.3",
