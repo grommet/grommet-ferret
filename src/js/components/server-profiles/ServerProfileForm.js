@@ -14,7 +14,7 @@ import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Header from 'grommet/components/Header';
 import Button from 'grommet/components/Button';
-import CloseIcon from 'grommet/components/icons/Clear';
+import CloseIcon from 'grommet/components/icons/base/Close';
 import Rest from 'grommet/utils/Rest';
 import ServerProfileConnectionAdd from './ServerProfileConnectionAdd';
 import ServerProfileVolumeAdd from './ServerProfileVolumeAdd';
