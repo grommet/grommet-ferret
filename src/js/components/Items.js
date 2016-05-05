@@ -109,7 +109,7 @@ class Items extends Component {
     }
 
     return (
-      <Split flex="both">
+      <Split flex="both" separator={true}>
         <Index ref="index"
           label={index.label}
           view={view}
