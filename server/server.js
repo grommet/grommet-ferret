@@ -26,8 +26,6 @@ app.use(morgan('tiny'));
 
 app.use(bodyParser.json());
 
-var path = require('path');
-
 app.use('/rest', rest.router);
 app.use('/', express.static(path.join(__dirname, '/../dist')));
 app.get('/*', function (req, res) {
