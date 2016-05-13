@@ -204,7 +204,9 @@ class Dashboard extends Component {
       <div ref="content" className="dashboard">
         <Header direction="row" justify="between" large={true}
           pad={{horizontal: 'medium', between: 'small'}}>
-          {title}
+          <div> {/* Wrap title in div to prevent it from getting truncated */}
+            {title}
+          </div>
           <Search ref="search" inline={true}
             placeHolder="Search" fill={true}
             defaultValue={searchText} onChange={this._onSearch}
