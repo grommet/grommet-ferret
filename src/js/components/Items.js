@@ -116,7 +116,7 @@ class Items extends Component {
           attributes={index.attributes}
           query={index.query}
           filter={index.filters}
-          result={index.result}
+          data={index.result}
           selection={selection}
           size={size}
           flush={false}
