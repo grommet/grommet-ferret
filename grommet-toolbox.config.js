@@ -26,15 +26,6 @@ export default {
         path.resolve(__dirname, 'src/scss'),
         path.resolve(__dirname, 'node_modules')
       ]
-    },
-    module: {
-      loaders: [
-        {
-          test: /\.jsx?$/,
-          loader: 'babel-loader',
-          include: /node_modules\/react-gravatar/
-        }
-      ]
     }
   },
   devServerPort: 8001,
