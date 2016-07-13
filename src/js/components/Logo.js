@@ -2,7 +2,7 @@
 
 import React, { Component, PropTypes } from 'react';
 
-const CLASS_ROOT = 'logo-icon';
+const CLASS_ROOT = 'grommetux-logo-icon';
 
 class FerretLogo extends Component {
 
