@@ -1,114 +1,95 @@
-// (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
+// (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
+import 'whatwg-fetch';
+import { polyfill as promisePolyfill } from 'es6-promise';
+promisePolyfill();
 
-import 'index.scss';
+import '../scss/index.scss';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Router from 'react-router';
-import Rest from 'grommet/utils/Rest';
-import RestWatch from './RestWatch';
-import { getCurrentLocale, getLocaleData } from 'grommet/utils/Locale';
-import { addLocaleData } from 'react-intl';
-import en from 'react-intl/locale-data/en';
-import Routes from './Routes';
-// import DevTools from './DevTools';
 import { Provider } from 'react-redux';
 import { IntlProvider } from 'react-intl';
-
+import { addLocaleData } from 'react-intl';
+import en from 'react-intl/locale-data/en';
+import { getCurrentLocale, getLocaleData } from 'grommet/utils/Locale';
+import { Router, browserHistory as history } from 'react-router';
+import { routes } from './Routes';
+import { configure as apiConfigure } from './actions/Api';
+import { sessionInitialize } from './actions/session';
 import store from './store';
-import history from './RouteHistory';
-import { init, routeChanged, loginSuccess } from './actions';
+import { routeChanged } from './actions/route';
 
-// The port number needs to align with devServerProxy and websocketHost in gulpfile.js
-let hostName = NODE_ENV === 'development' ? 'localhost:8010' : window.location.host;
+let wsProtocol = 'ws';
+if (window.location.protocol === 'https:') {
+  wsProtocol = 'wss';
+}
 
-RestWatch.initialize('ws://' + hostName + '/rest/ws');
-
-Rest.setHeaders({
-  'Accept': 'application/json',
-  'X-API-Version': 200
+// The port number needs to align with devServerProxy and websocketHost in
+// grommet-toolbox.config.js
+let hostName = NODE_ENV === 'development' ?
+  'localhost:8101' : window.location.host;
+apiConfigure({
+  webSocketUrl: `${wsProtocol}://${hostName}/ws`
 });
 
-// From a comment in https://github.com/rackt/redux/issues/637
-// this factory returns a history implementation which reads the current state
-// from the redux store and delegates push state to a different history.
-let createStoreHistory = () => {
-  return {
-    listen: (callback) => {
-      // subscribe to the redux store. when `route` changes, notify the listener
-      let notify = () => {
-        const route = store.getState().route;
-        if (route) {
-          callback(route);
-        }
-      };
-      const unsubscribe = store.subscribe(notify);
-
-      return unsubscribe;
-    },
-    createHref: history.createHref,
-    pushState: history.pushState,
-    push: history.push
-  };
-};
-
-let element = document.getElementById('content');
+// // From a comment in https://github.com/rackt/redux/issues/637
+// // this factory returns a history implementation which reads the current
+// // state
+// // from the redux store and delegates push state to a different history.
+// let createStoreHistory = () => {
+//   return {
+//     listen: (callback) => {
+//       // subscribe to the redux store. when `route` changes,
+//       // notify the listener
+//       let notify = () => {
+//         const route = store.getState().route;
+//         if (route.location) {
+//           callback(route.location);
+//         }
+//       };
+//       const unsubscribe = store.subscribe(notify);
+//
+//       return unsubscribe;
+//     },
+//     createHref: history.createHref,
+//     push: history.push
+//   };
+// };
 
 let locale = getCurrentLocale();
 addLocaleData(en);
 
 let messages;
 try {
+  // rtl driven by hardcoding languages for now
+  if ('he' === locale || 'ar' === locale.slice(0, 2)) {
+    document.documentElement.classList.add("rtl");
+  } else {
+    document.documentElement.classList.remove("rtl");
+  }
   messages = require('../messages/' + locale);
 } catch (e) {
   messages = require('../messages/en-US');
 }
 var localeData = getLocaleData(messages, locale);
 
+let element = document.getElementById('content');
+
 ReactDOM.render((
-  <div>
-    <Provider store={store}>
-      <IntlProvider locale={localeData.locale} messages={localeData.messages}>
-        <Router routes={Routes.routes} history={createStoreHistory()} />
-      </IntlProvider>
-    </Provider>
-    {/*}
-    <DevTools store={store} />
-    {*/}
-  </div>
+  <Provider store={store}>
+    <IntlProvider locale={localeData.locale} messages={localeData.messages}>
+      <Router routes={routes} history={history} />
+    </IntlProvider>
+  </Provider>
 ), element);
 
 document.body.classList.remove('loading');
 
-let localStorage = window.localStorage;
-// init from localStorage
-store.dispatch(init(localStorage.email, localStorage.token));
-// simulate initial login
-store.dispatch(loginSuccess('nobody@grommet.io', 'simulated'));
-
-let postLoginPath = '/dashboard';
-
-// check for session
-let sessionWatcher = () => {
-  const {route, session} = store.getState();
-  if (route) {
-    if (route.pathname === '/login' && session.token) {
-      localStorage.email = session.email;
-      localStorage.token = session.token;
-      history.pushState(null, Routes.path(postLoginPath));
-    } else if (route.pathname !== Routes.path('/login') && ! session.token) {
-      localStorage.removeItem('email');
-      localStorage.removeItem('token');
-      postLoginPath = route.pathname;
-      history.pushState(null, Routes.path('/login'));
-    } else if (route.pathname === '/') {
-      history.replaceState(null, Routes.path('/dashboard'));
-    }
-  }
-};
-store.subscribe(sessionWatcher);
+// initializeSession();
+store.dispatch(sessionInitialize(window.location.pathname));
 
 // listen for history changes and initiate routeChanged actions for them
 history.listen(function (location) {
-  store.dispatch(routeChanged(location, Routes.prefix));
+  const publish = store.getState().session.publishRoute;
+  store.dispatch(routeChanged(location, publish));
 });

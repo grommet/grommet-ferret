@@ -1,77 +1,49 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import Ferret from './components/Ferret';
+import Phoenix from './components/Phoenix';
 import Login from './components/Login';
-import Dashboard from './components/Dashboard';
-import TBD from 'grommet/components/TBD';
+import ResetPassword from './components/ResetPassword';
+import Status from './components/Status';
+import SettingsEdit from './components/settings/SettingsEdit';
+import Dashboard from './components/dashboard/Dashboard';
+import Utilization from './components/Utilization';
+import VirtualMachineIndex from
+  './components/virtualMachine/VirtualMachineIndex';
+import VirtualMachineAdd from './components/virtualMachine/VirtualMachineAdd';
+import VirtualMachineEdit from './components/virtualMachine/VirtualMachineEdit';
+import VirtualMachineShow from './components/virtualMachine/VirtualMachineShow';
+import ActivityIndex from './components/activity/ActivityIndex';
+import SizeIndex from './components/size/SizeIndex';
+import SizeAdd from './components/size/SizeAdd';
+import SizeEdit from './components/size/SizeEdit';
+import ImageIndex from './components/image/ImageIndex';
+import ImageAdd from './components/image/ImageAdd';
+import ImageEdit from './components/image/ImageEdit';
+import Software from './components/settings/Software';
+// import TBD from 'grommet/components/TBD';
 
-import Items from './components/Items';
-import Item from './components/Item';
-import Details from './components/Details';
-import ServerProfile from './components/server-profiles/ServerProfile';
-import ServerProfileAdd from './components/server-profiles/ServerProfileAdd';
-import ServerProfileEdit from './components/server-profiles/ServerProfileEdit';
-import Enclosure from './components/enclosures/Enclosure';
-
-var rootPath = "/"; //"/ferret/";
-//if (NODE_ENV === 'development') {
-//  rootPath = "/"; // webpack-dev-server
-//}
-
-const CATEGORIES = [
-  'server-hardware'
-];
-
-const categoryRoutes = CATEGORIES.map((category) => {
-  let result = {
-    path: category, component: Items,
+export let routes = [
+  { path: '/', component: Phoenix, indexRoute: { component: Status },
     childRoutes: [
-      { path: 'details/*', component: Details },
-      { path: '*', component: Item }
+      { path: 'login', component: Login },
+      { path: 'reset-password', component: ResetPassword },
+      { path: 'status', component: Status },
+      { path: 'dashboard', component: Dashboard },
+      { path: 'utilization', component: Utilization },
+      { path: 'virtual-machines/add', component: VirtualMachineAdd },
+      { path: 'virtual-machines/edit/*', component: VirtualMachineEdit },
+      { path: 'virtual-machines/*', component: VirtualMachineShow },
+      { path: 'virtual-machines', component: VirtualMachineIndex },
+      { path: 'images/add', component: ImageAdd },
+      { path: 'images/edit/*', component: ImageEdit },
+      { path: 'images', component: ImageIndex },
+      { path: 'virtual-machine-sizes/add', component: SizeAdd },
+      { path: 'virtual-machine-sizes/edit/*', component: SizeEdit },
+      { path: 'virtual-machine-sizes', component: SizeIndex },
+      { path: 'activity', component: ActivityIndex },
+      { path: 'settings/edit', component: SettingsEdit },
+      { path: 'settings/software', component: Software },
+      { path: 'settings/update', component: Software }
     ]
-  };
-  return result;
-});
-
-module.exports = {
-
-  prefix: rootPath.slice(0, -1),
-
-  path: (path) => (rootPath + path.slice(1)),
-
-  routes: [
-    { path: rootPath, component: Ferret,
-      // TODO: crashes react-router, wait for fix
-      //indexRoute: {
-      //  onEnter: function (nextState, replaceState) {
-      //    replaceState(null, '/dashboard')
-      //  }},
-      childRoutes: [
-        { path: 'login', component: Login },
-        { path: 'dashboard', component: Dashboard },
-        { path: 'reports', component: TBD },
-        { path: 'settings', component: TBD },
-        { path: 'activity', component: Items,
-          childRoutes: [
-            { path: '*', component: Item }
-          ]
-        },
-        { path: 'server-profiles', component: Items,
-          childRoutes: [
-            { path: 'add', component: ServerProfileAdd },
-            { path: 'edit/*', component: ServerProfileEdit },
-            { path: 'details/*', component: Details },
-            { path: '*', component: ServerProfile }
-          ]
-        },
-        { path: 'enclosures', component: Items,
-          childRoutes: [
-            { path: 'details/*', component: Details },
-            { path: '*', component: Enclosure }
-          ]
-        },
-        ...categoryRoutes
-      ]
-    }
-  ]
-};
+  }
+];

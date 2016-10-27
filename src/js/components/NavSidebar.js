@@ -1,18 +1,18 @@
-// (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
+// (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
-import { navActivate } from '../actions';
+import { navActivate } from '../actions/actions';
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
 import Footer from 'grommet/components/Footer';
 import Title from 'grommet/components/Title';
-import Logo from './Logo'; // './HPELogo';
+import Logo from './Logo';
 import Menu from 'grommet/components/Menu';
 import Button from 'grommet/components/Button';
 import CloseIcon from 'grommet/components/icons/base/Close';
 import SessionMenu from './SessionMenu';
+import Anchor from 'grommet/components/Anchor';
 
 class NavSidebar extends Component {
 
@@ -26,32 +26,29 @@ class NavSidebar extends Component {
   }
 
   render() {
-    const { nav: {items} } = this.props;
-    var links = items.map(function (page) {
+    const { nav: { items }, instanceName } = this.props;
+    var links = items.map((page) => {
       return (
-        <Link key={page.label} to={page.path} activeClassName="active">
-          {page.label}
-        </Link>
+        <Anchor key={page.label} path={page.path} label={page.label} />
       );
-    }, this);
+    });
 
     return (
-      <Sidebar colorIndex="neutral-1" fixed={true} separator="right">
-        <Header large={true} justify="between" pad={{horizontal: 'medium'}}>
+      <Sidebar colorIndex="neutral-1" fixed={true}>
+        <Header size="large" justify="between" pad={{horizontal: 'medium'}}>
           <Title onClick={this._onClose} a11yTitle="Close Menu">
-            <Logo inverse={true} />
-            Ferret
+            <Logo />
+            <span>{instanceName}</span>
           </Title>
-          <Menu responsive={false}>
-            <Button plain={true} a11yTitle="Close Menu"
-              onClick={this._onClose} icon={<CloseIcon />} />
-          </Menu>
+          <Button icon={<CloseIcon />} onClick={this._onClose} plain={true}
+            a11yTitle="Close Menu" />
         </Header>
         <Menu primary={true}>
           {links}
         </Menu>
-        <Footer pad="medium">
-          <SessionMenu dropAlign={{bottom: 'bottom'}} />
+        <Footer pad={{horizontal: 'medium', vertical: 'small'}}>
+          <SessionMenu dropAlign={{bottom: 'bottom'}}
+            colorIndex="neutral-1-a" />
         </Footer>
       </Sidebar>
     );
@@ -67,11 +64,13 @@ NavSidebar.propTypes = {
     }))
   }),
   onClose: PropTypes.func,
-  path: PropTypes.string
+  productName: PropTypes.string,
+  router: PropTypes.object
 };
 
-// We don't use the path explicitly, but we rely on this connection to
-// trigger resetting the active Link state.
-let select = (state) => ({ nav: state.nav, path: state.route.pathname });
+let select = (state) => ({
+  instanceName: state.settings.settings.name,
+  nav: state.nav
+});
 
 export default connect(select)(NavSidebar);

@@ -1,17 +1,15 @@
-import yargs from 'yargs';
-const argv = yargs.argv;
+import { argv }  from 'yargs';
 import gulp from 'gulp';
-import grommetToolbox, {getOptions} from 'grommet-toolbox';
+import grommetToolbox, { getOptions } from 'grommet-toolbox';
 import git from 'gulp-git';
 import del from 'del';
 import mkdirp from 'mkdirp';
 
-const opts = getOptions();
+const options = getOptions();
 
 gulp.task('set-webpack-alias', () => {
-  if (opts.alias && argv.useAlias) {
-    console.log('Using local alias for development.');
-    opts.webpack.resolve.alias = opts.alias;
+  if (options.alias && argv.useAlias) {
+    options.webpack.resolve.alias = options.alias;
   }
 });
 

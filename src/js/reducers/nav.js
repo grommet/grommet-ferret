@@ -1,28 +1,54 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import { NAV_PEEK, NAV_ACTIVATE, NAV_RESPONSIVE, LOGOUT, ROUTE_CHANGED } from '../actions';
+import { SESSION_INIT, SESSION_LOGIN_SUCCESS,
+  NAV_PEEK, NAV_ACTIVATE, NAV_RESPONSIVE,
+  ROUTE_CHANGED } from '../actions/actions';
 
 const initialState = {
-  active: false,
+  active: true, // start with nav active
   responsive: 'multiple',
   peek: false,
   items: [
-    {path: '/dashboard', label: 'Dashboard'},
+    {path: '/dashboard', label: 'Dashboard',
+      excludeRole: 'virtualization user'},
+    {path: '/virtual-machines', label: 'Virtual Machines'},
     {path: '/activity', label: 'Activity'},
-    {path: '/enclosures', label: 'Enclosures',
-      indexCategory: 'enclosures', resourceRoute: 'enclosure'},
-    {path: '/server-hardware', label: 'Server Hardware',
-      indexCategory: 'server-hardware', resourceRoute: 'server hardware'},
-    {path: '/server-profiles', label: 'Server Profiles',
-      indexCategory: 'server-profiles', resourceRoute: 'server profile'},
-    {path: '/reports', label: 'Reports'},
-    {path: '/settings', label: 'Settings'}
+    {path: '/utilization', label: 'Utilization'},
+    {path: '/images', label: 'Images', excludeRole: 'virtualization user'},
+    {path: '/virtual-machine-sizes', label: 'Sizes',
+      excludeRole: 'virtualization user'},
+    {path: '/settings/edit', label: 'Settings',
+      excludeRole: 'virtualization user'}
   ]
 };
 
 const handlers = {
+  [SESSION_INIT]: (state, action) => {
+    let result = {};
+    if (action.role) {
+      result.items = initialState.items.filter((item) => {
+        return item.excludeRole !== action.role;
+      });
+    }
+    return result;
+  },
+
+  [SESSION_LOGIN_SUCCESS]: (state, action) => {
+    let result = {};
+    if (action.role) {
+      result.items = initialState.items.filter((item) => {
+        return item.excludeRole !== action.role;
+      });
+    }
+    return result;
+  },
+
   [NAV_PEEK]: (_, action) => ({peek: action.peek}),
-  [NAV_ACTIVATE]: (_, action) => ({active: action.active, activateOnMultiple: null}),
+
+  [NAV_ACTIVATE]: (_, action) => (
+    {active: action.active, activateOnMultiple: null}
+  ),
+
   [NAV_RESPONSIVE]: (state, action)  => {
     let result = {responsive: action.responsive};
     if ('single' === action.responsive && state.active) {
@@ -33,9 +59,10 @@ const handlers = {
     }
     return result;
   },
-  [LOGOUT]: (_, action) => ({active: false}),
+
   [ROUTE_CHANGED]: (state, action) => {
-    return ('single' === state.responsive && state.active) ? { active: false } : {};
+    return ('single' === state.responsive && state.active) ?
+      { active: false } : {};
   }
 };
 

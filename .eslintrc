@@ -1,15 +1,19 @@
 ---
 parser: babel-eslint
 
+parserOptions:
+  ecmaFeatures:
+    experimentalObjectRestSpread: true
+    jsx: true
+  sourceType: "module"
+
 plugins:
   - react
-
-ecmaFeatures:
-  jsx: true
 
 env:
   browser: true
   node: true
+  es6: true
 
 globals:
   __DEV__: true
@@ -34,12 +38,11 @@ rules:
   no-unused-expressions: 2
   eol-last: 2
   dot-notation: 2
-  consistent-return: 2
   no-unused-vars: [2, args: none]
   semi: [2, "always"]
+  max-len: 2
 
   # DISABLED
-  max-len: 0
   #change soon back to max-len: [1, 80]
   no-underscore-dangle: 0
   new-cap: 0
@@ -59,6 +62,7 @@ rules:
   block-scoped-var: 0
   quotes: 0
   jsx-quotes: 0
+  consistent-return: 0
 
   # REACT DISABLED
   react/display-name: 0
@@ -79,7 +83,6 @@ rules:
   react/jsx-uses-vars: 1
   react/no-unknown-property: 1
   react/react-in-jsx-scope: 1
-  react/require-extension: 1
   react/self-closing-comp: 1
   react/sort-comp: 1
-  react/wrap-multilines: 1
+  react/jsx-wrap-multilines: 1

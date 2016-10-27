@@ -1,4 +1,4 @@
-# Grommet Example App: ferret
+# Grommet Example App: Ferret
 
 ## Demo
 [Live demo](http://ferret.grommet.io/) of an example application using grommet and grommet-index.

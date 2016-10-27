@@ -1,0 +1,27 @@
+{
+  "name": "Ferret",
+  "version": "1.0",
+  "node-main": "./ferret/server/server.js",
+  "main": "./ferret/dist/main.html",
+  "description": "Virtual Machine Vending.",
+  "window": {
+    "title": "Ferret",
+    "show_in_taskbar": true,
+    "width": 1024,
+    "toolbar": true,
+    "visible": true,
+    "height": 768,
+    "mac_icon": "",
+    "exe_icon": "./ferret/dist/img/shortcut-icon.png",
+    "kiosk": false,
+    "frame": true,
+    "fullscreen": false,
+    "always-on-top": false,
+    "show": true,
+    "resizable": true,
+    "as_desktop": false,
+    "icon": "./ferret/dist/img/mobile-app-icon.png",
+    "kiosk_emulation": false,
+    "transparent": false
+    }
+}

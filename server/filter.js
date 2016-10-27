@@ -4,6 +4,17 @@ var _ = require('lodash');
 var TRACE_PARSING = false;
 var TRACE_MATCHING = false;
 
+// don't convert timestamps, MAC addresses, or WWNs to attribute:value
+// This pattern matches the name: ^[^\d:'"\s]{2}[^:'"\s]+
+// We allow for the value to be optionally be quoted. So, we repeat the name
+// pattern three times, once for single quoted value, once for double quoted
+// value, and lastly with no quotes.
+// We don't build this programmatically for better performance.
+var ATTRIBUTE_REGEXP =
+  /^[^\d:'"\s]{1}[^:'"\s]*:'[^']+'|^[^\d:'"\s]{1}[^:'"\s]*:"[^"]+"|^[^\d:'"\s]{1}[^:'"\s]*:[^'"\s]+/;
+// allow for text to contain quotes
+var TEXT_REGEXP = /^[^'"\s]+|^'[^']+'|^"[^"]+"/;
+
 var TIMESTAMP_REGEXP = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
 
 // TODO: This won't work in deployment context, use locally for now
@@ -19,7 +30,7 @@ var StringConvert = {
   }
 };
 
-function filterUserQuery(items, userQuery) {
+function filterUserQuery (items, userQuery) {
   // handle quoted strings, e.g. 'a b' c "d e"
   var regexp = /'([^']+)'|"([^"]+)"|(\w+)/g;
   var matches;
@@ -81,7 +92,7 @@ function AttributeTerm (text) {
           return false;
         }
       }
-    }, this);
+    }.bind(this));
     if (result && TRACE_MATCHING && item.uri) {
       console.log('!!! ATTRIBUTE', result, item.uri, this._not ? 'NOT' : '', this._name, this._value);
     }
@@ -289,7 +300,7 @@ function parseNot (text, expression) {
 
 function parseAttribute (text, expression) {
   var result = 0;
-  var matches = text.match(/^\w+:'[^']+'|^\w+:"[^"]+"|^\w+:[^'"\s]+/);
+  var matches = text.match(ATTRIBUTE_REGEXP);
   if (matches) {
     traceParsing('--attribute--');
     // attribute:value
@@ -302,7 +313,7 @@ function parseAttribute (text, expression) {
 
 function parseText (text, expression) {
   var result = 0;
-  var matches = text.match(/^[^'"\s]+|^'[^']+'|^"[^"]+"/);
+  var matches = text.match(TEXT_REGEXP);
   if (matches) {
     traceParsing('--text--');
     result = matches[0].length;
@@ -344,47 +355,60 @@ function parseQuery (query) {
   return expression;
 }
 
-function filterFilter(items, filters) {
-  if (!_.isEmpty(filters)) {
-    items = items.filter(function(item) {
-      for (var prop in filters) {
-        var value = item[prop] || item.attributes[prop];
-        if (filters[prop].indexOf(value) === -1) {
-          return false;
-        }
-      }
-      return true;
-    });
-  }
-  return items;
+function filterQuery (items, query) {
+  var expression = parseQuery(query);
+  var result = items.filter(function(item) {
+    return expression.matches(item);
+  });
+  return result;
 }
 
-function filterQuery(items, query) {
-  if (query) {
-    var expression = parseQuery(query);
-    items = items.filter(function(item) {
-      return expression.matches(item);
+function filterFilter (items, filterParam) {
+  // convert filter to something more useful for comparison
+  var filter = {};
+  (typeof filterParam === 'string' ? [filterParam] : filterParam)
+    .forEach(function(term) {
+      var parts = term.split(':');
+      if (! filter[parts[0]]) {
+        filter[parts[0]] = [];
+      }
+      filter[parts[0]].push(parts[1].toLowerCase());
     });
-  }
-  return items;
+  var result = items.filter(function(item) {
+    var match = false;
+    for (var name in filter) {
+      match = filter[name].some(function(value) {
+        return (item[name].toLowerCase() === value);
+      });
+      if (! match) {
+        break;
+      }
+    }
+    return match;
+  });
+  return result;
 }
 
 // http://my.opera.com/GreyWyvern/blog/show.dml/1671288
 // Do not attempt to change '==' to '===' in the following
 // method. Avoid type comparison is done on purpose.
-function alphanum(a, b) {
+function alphanum (a, b) {
   function chunkify(t) {
     var tz = [],
       x = 0,
       y = -1,
       n = 0, i, j;
-    while (t && (i = (j = t.charAt(x++)).charCodeAt(0))) {
-      var m = (i == 46 || (i >= 48 && i <= 57));
-      if (m !== n) {
-        tz[++y] = "";
-        n = m;
+    try {
+      while (t && (i = (j = t.charAt(x++)).charCodeAt(0))) {
+        var m = (i == 46 || (i >= 48 && i <= 57));
+        if (m !== n) {
+          tz[++y] = "";
+          n = m;
+        }
+        tz[y] += j;
       }
-      tz[y] += j;
+    } catch (e) {
+      console.log('!!! chunkify exception', t, e);
     }
     return tz;
   }
@@ -406,21 +430,36 @@ function alphanum(a, b) {
   return aa.length - bb.length;
 }
 
-function sortItems(items, sort) {
+function attributeValue (item, attribute) {
+  return (item.hasOwnProperty('attributes') &&
+    item.attributes.hasOwnProperty(attribute)) ? item.attributes[attribute] :
+    item[attribute];
+}
+
+function sortItems (items, sort) {
   var parts = sort.split(':');
   var attribute = parts[0];
   var ascending = ('asc' === parts[1]);
   items.sort(function(m1, m2) {
     var first = (ascending ? m1 : m2);
     var second = (ascending ? m2 : m1);
-    return alphanum(first[attribute], second[attribute]);
+    var firstValue = attributeValue(first, attribute);
+    var secondValue = attributeValue(second, attribute);
+    if (typeof firstValue === 'number' && typeof secondValue === 'number') {
+      return firstValue - secondValue;
+    } else if (typeof firstValue === 'string' && typeof secondValue === 'string') {
+      return alphanum(firstValue.toLowerCase(), secondValue.toLowerCase());
+    } else {
+      console.log('!!! Invalid sort types for', attribute, firstValue, secondValue);
+      return 0;
+    }
   });
 }
 
 var Filter = {
   filterUserQuery: filterUserQuery, // (items, userQuery)
-  filterFilter: filterFilter, // (items, filters)
   filterQuery: filterQuery, // (items, query)
+  filterFilter: filterFilter, // (items, filter)
   sort: sortItems // (items, sort)
 };
 
