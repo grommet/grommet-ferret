@@ -15,6 +15,20 @@ var _associations = {};
 // auth: {category: {attributes: [], view: ''}}
 var _preferences = {};
 
+var _status = {};
+
+var _settings = {};
+
+var _certifcates = {};
+
+var _update = {};
+
+var _backup = {};
+
+var _support = {};
+
+var _sessions = {};
+
 function categoryId(categoryName) {
   var result;
   if (Array.isArray(categoryName)) {
@@ -45,12 +59,14 @@ var Data = {
         }
       }
     }
-    if (!raw) {
+    if (result && !raw) {
       // add _indexAttributes
       result = result.map(function(item) {
-        item = _.extend({
-          attributes: item._indexAttributes || {}
-        }, item);
+        if (item._indexAttributes) {
+          item = _.extend({
+            attributes: item._indexAttributes || {}
+          }, item);
+        }
         delete item._indexAttributes;
         delete item._resourceAttributes;
         return item;
@@ -59,11 +75,13 @@ var Data = {
     return result;
   },
 
-  getResource: function(uri) {
+  getResource: function(uri, raw) {
     // move _resourceAttributes to top
     var resource = _resources[uri];
-    if (resource) {
-      resource = _.extend(resource._resourceAttributes || {}, resource);
+    if (resource && !raw) {
+      if (resource._resourceAttributes) {
+        resource = _.extend({}, resource._resourceAttributes || {}, resource);
+      }
       delete resource._resourceAttributes;
       delete resource._indexAttributes;
     }
@@ -146,6 +164,62 @@ var Data = {
       _preferences[auth] = {};
     }
     _preferences[auth][id] = data;
+  },
+
+  getStatus: function () {
+    return _status;
+  },
+
+  setStatus: function (status) {
+    _status = status;
+  },
+
+  getSettings: function () {
+    return _settings;
+  },
+
+  setSettings: function (settings) {
+    _settings = settings;
+  },
+
+  getCertificate: function(address) {
+    return _certifcates[address];
+  },
+
+  setCertificate: function(address, data) {
+    _certifcates[address] = data;
+  },
+
+  getUpdate: function () {
+    return _update;
+  },
+
+  setUpdate: function (update) {
+    _update = update;
+  },
+
+  getBackup: function () {
+    return _backup;
+  },
+
+  setBackup: function (backup) {
+    _backup = backup;
+  },
+
+  getSupport: function () {
+    return _support;
+  },
+
+  setSupport: function (support) {
+    _support = support;
+  },
+
+  getSession: function (token) {
+    return _sessions[token];
+  },
+
+  addSession: function (token, data) {
+    _sessions[token] = data;
   }
 
 };

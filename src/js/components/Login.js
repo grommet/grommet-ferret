@@ -1,78 +1,75 @@
-// (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
+// (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { login } from '../actions';
+import { sessionLogin } from '../actions/session';
 import Split from 'grommet/components/Split';
-import Section from 'grommet/components/Section';
 import Sidebar from 'grommet/components/Sidebar';
 import LoginForm from 'grommet/components/LoginForm';
+import Footer from 'grommet/components/Footer';
 import Logo from './Logo';
+import Promo from './Promo';
 
-class IndexerLogin extends Component {
+class Login extends Component {
 
-  constructor() {
-    super();
+  constructor (props) {
+    super(props);
     this._onSubmit = this._onSubmit.bind(this);
-    this._onResponsive = this._onResponsive.bind(this);
-    this.state = {responsive: 'multiple'};
+    this._setDocumentTitle(props);
+    this.state = { busy: false };
   }
 
-  _onSubmit(fields) {
-    this.props.dispatch(login(fields.username, fields.password));
+  componentWillReceiveProps (nextProps) {
+    this._setDocumentTitle(nextProps);
+    if (this.state.busy) {
+      this.setState({ busy: false });
+    }
   }
 
-  _onResponsive(responsive) {
-    this.setState({responsive: responsive});
+  _setDocumentTitle (props) {
+    document.title = `Login - ${props.productName || ''}`;
   }
 
-  render() {
+  _onSubmit (fields) {
+    this.setState({ busy: true });
+    this.props.dispatch(sessionLogin('', fields.username, fields.password));
+  }
+
+  render () {
     const { session } = this.props;
 
-    var image;
-    if ('multiple' === this.state.responsive) {
-      image = <Section full={true} pad="none" texture="url(img/grafitti.jpg)" />;
-    }
-
     var loginError = session.error;
-    var errors = [];
-    if (loginError) {
-      var message;
-      var resolution;
-      message = loginError.message;
-      if (loginError.resolution) {
-        resolution = loginError.resolution;
-      }
-      errors.push(message);
-      errors.push(resolution);
-    }
 
     return (
-      <Split flex="left" separator={true} onResponsive={this._onResponsive}>
-        {image}
-        <Sidebar justify="center" align="center" pad="medium" size="large">
-          <LoginForm
-            logo={<Logo size="large" />}
-            title="Ferret"
-            onSubmit={this._onSubmit}
-            errors={errors} />
+      <Split flex="left" separator={true}>
+        <Promo />
+        <Sidebar justify="between" align="center" pad="none" size="large">
+          <span />
+          <LoginForm align="start"
+            logo={<Logo size="large" busy={this.state.busy} />}
+            title={this.props.productName}
+            onSubmit={this.state.busy ? null : this._onSubmit}
+            errors={[loginError]}
+            usernameType="text" />
+          <Footer direction="row" size="small"
+            pad={{horizontal: 'medium', vertical: 'small', between: 'small'}}>
+            <span className="secondary">&copy; 2016 Grommet Labs</span>
+          </Footer>
         </Sidebar>
       </Split>
     );
   }
 }
 
-IndexerLogin.propTypes = {
+Login.propTypes = {
   session: PropTypes.shape({
-    email: PropTypes.string,
-    error: PropTypes.shape({
-      message: PropTypes.string,
-      resolution: PropTypes.string
-    }),
-    token: PropTypes.string
+    error: PropTypes.string
   })
 };
 
-let select = (state) => ({session: state.session});
+let select = (state) => ({
+  productName: state.settings.productName.short,
+  session: state.session
+});
 
-export default connect(select)(IndexerLogin);
+export default connect(select)(Login);
