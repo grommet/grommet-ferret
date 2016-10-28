@@ -1,6 +1,6 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-import Phoenix from './components/Phoenix';
+import Ferret from './components/Ferret';
 import Login from './components/Login';
 import ResetPassword from './components/ResetPassword';
 import Status from './components/Status';
@@ -23,7 +23,7 @@ import Software from './components/settings/Software';
 // import TBD from 'grommet/components/TBD';
 
 export let routes = [
-  { path: '/', component: Phoenix, indexRoute: { component: Status },
+  { path: '/', component: Ferret, indexRoute: { component: Status },
     childRoutes: [
       { path: 'login', component: Login },
       { path: 'reset-password', component: ResetPassword },

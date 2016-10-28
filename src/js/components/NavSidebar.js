@@ -37,7 +37,7 @@ class NavSidebar extends Component {
       <Sidebar colorIndex="neutral-1" fixed={true}>
         <Header size="large" justify="between" pad={{horizontal: 'medium'}}>
           <Title onClick={this._onClose} a11yTitle="Close Menu">
-            <Logo />
+            <Logo colorIndex='light-1' />
             <span>{instanceName}</span>
           </Title>
           <Button icon={<CloseIcon />} onClick={this._onClose} plain={true}
