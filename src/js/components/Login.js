@@ -3,6 +3,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { sessionLogin } from '../actions/session';
+import { navEnable } from '../actions/nav';
 import Split from 'grommet/components/Split';
 import Sidebar from 'grommet/components/Sidebar';
 import LoginForm from 'grommet/components/LoginForm';
@@ -19,11 +20,19 @@ class Login extends Component {
     this.state = { busy: false };
   }
 
+  componentDidMount () {
+    this.props.dispatch(navEnable(false));
+  }
+
   componentWillReceiveProps (nextProps) {
     this._setDocumentTitle(nextProps);
     if (this.state.busy) {
       this.setState({ busy: false });
     }
+  }
+
+  componentWillUnmount () {
+    this.props.dispatch(navEnable(true));
   }
 
   _setDocumentTitle (props) {

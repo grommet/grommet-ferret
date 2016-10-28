@@ -3,6 +3,7 @@
 // nav
 export const NAV_PEEK = 'NAV_PEEK';
 export const NAV_ACTIVATE = 'NAV_ACTIVATE';
+export const NAV_ENABLE = 'NAV_ENABLE';
 export const NAV_RESPONSIVE = 'NAV_RESPONSIVE';
 
 export function navPeek (peek) {
@@ -11,6 +12,10 @@ export function navPeek (peek) {
 
 export function navActivate (active) {
   return { type: NAV_ACTIVATE, active: active };
+}
+
+export function navEnable (enabled) {
+  return { type: NAV_ENABLE, enabled: enabled };
 }
 
 export function navResponsive (responsive) {

@@ -45,7 +45,7 @@ export function sessionLogin (host, userName, password) {
     .then(session => {
       try {
         localStorage.userName = session.userName;
-        localStorage.token = session.token;
+        localStorage.token = token;
         localStorage.role = session.roles[0];
       } catch (e) {
         alert(
@@ -53,7 +53,7 @@ export function sessionLogin (host, userName, password) {
           "browsing mode."
         );
       }
-      dispatch(sessionLoginSuccess(host, session.userName, session.token,
+      dispatch(sessionLoginSuccess(host, session.userName, token,
         session.roles[0], session.needPasswordReset));
       if (session.needPasswordReset) {
         history.push('/reset-password');

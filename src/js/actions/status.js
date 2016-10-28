@@ -2,6 +2,7 @@
 
 import { browserHistory as history } from 'react-router';
 import { getStatus, pollingInterval } from './Api';
+import { navEnable } from './nav';
 
 // status
 export const STATUS_INITIALIZED = 'STATUS_INITIALIZED';
@@ -9,6 +10,7 @@ export const STATUS_PROGRESS = 'STATUS_PROGRESS';
 
 export function loadStatus (path, token) {
   return function (dispatch) {
+    history.push('/status');
     // Check and wait for appliance to be done initializing or updating
     var initTimer = setInterval(() => {
       getStatus()
@@ -21,6 +23,7 @@ export function loadStatus (path, token) {
           } else if ('initialized' === status.state) {
             history.push('/settings/edit');
           } else {
+            dispatch(navEnable('/status' !== path));
             history.push(path || '/dashboard');
           }
         } else {

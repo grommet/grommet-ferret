@@ -2,6 +2,7 @@
 
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { navEnable } from '../actions/nav';
 import Article from 'grommet/components/Article';
 import Section from 'grommet/components/Section';
 import Header from 'grommet/components/Header';
@@ -16,6 +17,14 @@ import Logo from './Logo';
 import SessionMenu from './SessionMenu';
 
 class Status extends Component {
+
+  componentDidMount () {
+    this.props.dispatch(navEnable(false));
+  }
+
+  componentWillUnmount () {
+    this.props.dispatch(navEnable(true));
+  }
 
   render () {
     const { status } = this.props;
@@ -50,7 +59,7 @@ class Status extends Component {
     return (
       <Article>
         <Section full={true} align="start"
-          colorIndex="dark" texture="url(img/phoenix_background-2.jpg)"
+          colorIndex="dark" texture="url(img/ferret_background.png)"
           pad="large" justify="center">
           <Header float={true} justify="between" pad={{horizontal: 'medium'}}>
             <span />
@@ -85,6 +94,6 @@ Status.propTypes = {
   })
 };
 
-let select = (state) => ({status: state.status});
+let select = (state) => ({ status: state.status });
 
 export default connect(select)(Status);

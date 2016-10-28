@@ -26,7 +26,7 @@ class Promo extends Component {
     return (
       <Article scrollStep={true} controls={true}>
         <Section full={true}
-          colorIndex="dark" texture="url(img/phoenix_background-2.jpg)"
+          colorIndex="dark" texture="url(img/ferret_background.png)"
           pad="large" justify="center" align="center">
           <Heading tag="h1"><strong>{productName}</strong></Heading>
           <Paragraph>Shape the future of your hyperconverged infrastucture

@@ -3,8 +3,9 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { loadSettings, updateSettings, settingsResponsive,
-  loadBackup, createBackup, loadSoftware, // loadSupport
-  navActivate } from '../../actions/actions';
+  loadBackup, createBackup, loadSoftware // loadSupport
+  } from '../../actions/actions';
+import { navEnable, navActivate } from '../../actions/nav';
 import Split from 'grommet/components/Split';
 import Article from 'grommet/components/Article';
 import List from 'grommet/components/List';
@@ -83,6 +84,11 @@ class SettingsEdit extends Component {
 
   componentWillReceiveProps (nextProps) {
     this._setDocumentTitle(nextProps);
+    nextProps.dispatch(navEnable('done' === nextProps.state));
+  }
+
+  componentWillUnmount () {
+    this.props.dispatch(navEnable(true));
   }
 
   _setDocumentTitle (props) {

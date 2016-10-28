@@ -12,7 +12,7 @@ const TEXTS = {
   initializing: {
     label: 'Your ' + PRODUCT_NAME + ' is almost ready ...',
     message: 'Initializing your infrastructure...',
-    colorIndex: 'grey-2',
+    colorIndex: 'light-2',
     busy: true,
     callToAction: null
   },
@@ -29,28 +29,28 @@ const TEXTS = {
   settingUp: {
     label: 'Setting up your ' + PRODUCT_NAME + ' ...',
     message: 'Configuring your infrastructure...',
-    colorIndex: 'grey-2',
+    colorIndex: 'light-2',
     busy: true,
     callToAction: null
   },
   updating: {
     label: 'Updating your ' + PRODUCT_NAME + ' ...',
     message: 'Updating software ...',
-    colorIndex: 'grey-2',
+    colorIndex: 'light-2',
     busy: true,
     callToAction: null
   },
   restoring: {
     label: 'Restoring your ' + PRODUCT_NAME + ' ...',
     message: 'Uploading backup image...',
-    colorIndex: 'grey-2',
+    colorIndex: 'light-2',
     busy: true,
     callToAction: null
   },
   restarting: {
     label: 'Restarting your ' + PRODUCT_NAME + ' ...',
     message: 'This shouldn\'t take too long ...',
-    colorIndex: 'grey-2',
+    colorIndex: 'light-2',
     busy: true,
     callToAction: null
   },

@@ -20,15 +20,14 @@ class Ferret extends Component {
 
   render() {
     const {
-      nav: {active: navActive, responsive}, status, session
+      nav: {active: navActive, enabled: navEnabled, responsive}
     } = this.props;
-    const enableNav = (navActive && 'ready' === status.state &&
-      session.token && ! session.needPasswordReset);
+    const includeNav = (navActive && navEnabled);
     let nav;
-    if (enableNav) {
+    if (includeNav) {
       nav = <NavSidebar />;
     }
-    const priority = (enableNav && 'single' === responsive ? 'left' : 'right');
+    const priority = (includeNav && 'single' === responsive ? 'left' : 'right');
 
     return (
       <App centered={false}>
