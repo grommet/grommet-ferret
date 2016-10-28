@@ -153,6 +153,5 @@ const handlers = {
 export default function imageReducer (state = initialState, action) {
   let handler = handlers[action.type];
   if (!handler) return state;
-  console.log('!!! imageReducer', action.type);
   return { ...state, ...handler(state, action) };
 };
