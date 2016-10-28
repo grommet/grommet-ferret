@@ -4,7 +4,7 @@ To run build the NWJS binary version of this application, execute the following 
 
   1. Create a build directory, such as `c:\build`
 
-  2. Checkout the Phoenix source into the `c:\build` directory
+  2. Checkout the Ferret source into the `c:\build` directory
 
   3. Rename the base source directory from `grommet-ferret` to `ferret`
 

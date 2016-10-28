@@ -7,7 +7,7 @@ import App from 'grommet/components/App';
 import Split from 'grommet/components/Split';
 import NavSidebar from './NavSidebar';
 
-class Phoenix extends Component {
+class Ferret extends Component {
 
   constructor () {
     super();
@@ -48,4 +48,4 @@ let select = (state) => ({
   status: state.status
 });
 
-export default connect(select)(Phoenix);
+export default connect(select)(Ferret);
