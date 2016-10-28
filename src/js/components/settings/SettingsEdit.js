@@ -80,11 +80,11 @@ class SettingsEdit extends Component {
     // Since we are simulating the Atlas support dump process, we need to
     // leave the support state alone here.
     // this.props.dispatch(loadSupport());
+    this.props.dispatch(navEnable('done' === this.props.state));
   }
 
   componentWillReceiveProps (nextProps) {
     this._setDocumentTitle(nextProps);
-    nextProps.dispatch(navEnable('done' === nextProps.state));
   }
 
   componentWillUnmount () {
