@@ -9,14 +9,16 @@
 
 const RECONNECT_TIMEOUT = 5000; // 5s
 const POLL_TIMEOUT = 5000; // 5s
+const PING_TIMEOUT = 30000; // 30s
 
 let _state = {
   getFunction: undefined,
   initialized: false,
   nextRequestId: 1,
+  pingTimer: undefined,
+  pollTimer: undefined,
   requests: [], // {message: , context: }
   socketUrl: undefined,
-  timer: undefined,
   ws: undefined,
   wsReady: false
 };
@@ -28,7 +30,7 @@ function _wsAvailable () {
 }
 
 function _sendMessage (op, id, uri) {
-  _state.ws.send(JSON.stringify({ op: op, id: id, uri: uri }));
+  _state.ws.send(JSON.stringify({ op, id, uri }));
 }
 
 function _onOpen () {
@@ -38,7 +40,10 @@ function _onOpen () {
     _sendMessage('start', request.id, request.uri);
   });
   // stop polling
-  clearInterval(_state.timer);
+  clearInterval(_state.pollTimer);
+  // start pinging
+  clearInterval(_state.pingTimer);
+  _state.pingTimer = setInterval(_ping, PING_TIMEOUT);
 }
 
 function _onError (error) {
@@ -65,7 +70,8 @@ function _onClose () {
   _state.ws = null;
   _state.wsReady = false;
   _state.initialized = false;
-  _state.timer = setTimeout(initialize, RECONNECT_TIMEOUT);
+  clearInterval(_state.pingTimer);
+  _state.pollTimer = setTimeout(initialize, RECONNECT_TIMEOUT);
 }
 
 // Polling
@@ -84,6 +90,12 @@ function _poll () {
   _state.requests.forEach(_getRequest);
 }
 
+// Pinging
+
+function _ping () {
+  _sendMessage('ping');
+}
+
 // External Interface
 
 export function initialize (socketUrl, getFunction) {
@@ -99,8 +111,8 @@ export function initialize (socketUrl, getFunction) {
       }
     } else {
       // no web sockets, fall back to polling
-      clearInterval(_state.timer);
-      _state.timer = setInterval(_poll, POLL_TIMEOUT);
+      clearInterval(_state.pollTimer);
+      _state.pollTimer = setInterval(_poll, POLL_TIMEOUT);
     }
     _state.getFunction = _state.getFunction || getFunction;
     _state.initialized = true;
@@ -123,8 +135,8 @@ export function watch (uri, success, error) {
     // The web socket isn't ready yet, and might never be.
     // Proceed in polling mode until the web socket is ready.
     _getRequest(request);
-    if (! _state.timer) {
-      _state.timer = setInterval(_poll, POLL_TIMEOUT);
+    if (! _state.pollTimer) {
+      _state.pollTimer = setInterval(_poll, POLL_TIMEOUT);
     }
   }
   // console.log('!!! watch', request.id, uri);
@@ -143,10 +155,10 @@ export function disregard (requestId) {
 
 export function refresh () {
   // get the current result for all requests and reset polling
-  clearInterval(_state.timer);
-  _state.timer = undefined;
+  clearInterval(_state.pollTimer);
+  _state.pollTimer = undefined;
   if (! _state.wsReady) {
     _poll();
-    _state.timer = setInterval(_poll, POLL_TIMEOUT);
+    _state.pollTimer = setInterval(_poll, POLL_TIMEOUT);
   }
 }

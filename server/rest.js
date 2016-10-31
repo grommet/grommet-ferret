@@ -236,6 +236,11 @@ function onMessage (connection, request) {
     connection.requests = connection.requests.filter(function (req) {
       return (req.id !== request.id);
     });
+  } else if ('ping' === request.op) {
+    var serializedResponse = JSON.stringify({ op: 'ping' });
+    setTimeout(function () {
+      connection.ws.send(serializedResponse);
+    }, RESPONSE_DELAY);
   } else {
     if (connection.ws) {
       connection.ws.send({error: 'unknown op ' + request.op});
