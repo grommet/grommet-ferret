@@ -23,7 +23,7 @@ export function loadStatus (path, token) {
           } else if ('initialized' === status.state) {
             history.push('/settings/edit');
           } else {
-            dispatch(navEnable('/status' !== path));
+            dispatch(navEnable('/' !== path));
             history.push(path || '/dashboard');
           }
         } else {
