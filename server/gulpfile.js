@@ -24,6 +24,9 @@ gulp.task('sync', function() {
 
 gulp.task('dev', function() {
   nodemon({
-    script: 'server.js'
+    script: 'server.js',
+    execMap: {
+      js: "babel-node"
+    }
   });
 });

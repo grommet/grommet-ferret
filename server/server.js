@@ -1,6 +1,6 @@
 // (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
 
-var compression = require('compression');
+import compression from 'compression';
 var Ddos = require('ddos');
 // increase ddos burst to avoid false positives with this app
 var ddos = new Ddos({ burst: 80 });
