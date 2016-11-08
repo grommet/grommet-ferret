@@ -641,11 +641,11 @@ router.post('/update', (req, res) => {
   });
 
   // delay just a bit to simulate the appliance task starting later
-  setTimeout(function () {
+  setTimeout(() => {
 
     // Update involves updating this appliance and each node.
     // Create tasks for each of these in the right sequence.
-    const applianceTask = createTask('appliances',
+    let applianceTask = createTask('appliances',
       'Update hyperconverged management', resource, req);
     applianceTask.parentTaskUri = task.uri;
 

@@ -2,7 +2,6 @@
 
 var gulp = require('gulp');
 var rsync = require('gulp-rsync');
-// var nodemon = require('gulp-nodemon');
 
 gulp.task('sync', function() {
   gulp.src('.')

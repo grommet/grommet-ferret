@@ -61,7 +61,7 @@ function start () {
       };
       let data = '';
 
-      var creq = https.request(options, (cres) => {
+      const creq = https.request(options, (cres) => {
         cres.setEncoding('utf8');
         cres.on('data', (chunk) => {
           data += chunk;
