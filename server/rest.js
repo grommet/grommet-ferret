@@ -1,48 +1,55 @@
 // (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
 
-var _ = require('lodash');
-var express = require('express');
-var router = express.Router();
-var ws = require("ws");
-var stringify = require("json-stringify-pretty-compact");
-var data = require('./data');
-var generator = require('./generator');
-var filter = require('./filter');
-var map = require('./map');
-var ldap = require('./ldap');
+import express from 'express';
+let router = express.Router();
+import ws from "ws";
+import stringify from "json-stringify-pretty-compact";
+import {
+  addResource, addSession, deleteResource,
+  getBackup, getCertificate, getItems, getPreferences, getResource,
+  getSession, getSettings, getStatus, getSupport, getUpdate,
+  setBackup, setCertificate, setPreferences, setSettings, setStatus,
+  setSupport, setUpdate, updateResource
+} from './data';
+import { addUtilization, generate } from './generator';
+import {
+  filterFilter, filterQuery, filterUserQuery, sortItems
+} from './filter';
+import { buildMap } from './map';
+import ldap from './ldap';
 
-var RESPONSE_DELAY = 0;
-var TASK_UPDATE_INTERVAL = 1000;
+const RESPONSE_DELAY = 0;
+const TASK_UPDATE_INTERVAL = 1000;
 
-var latestGruToken = undefined;
+let latestGruToken = undefined;
 
 // Actions
 
 function filteredItems (items, queryParams) {
   if (queryParams.userQuery) {
-    items = filter.filterUserQuery(items, queryParams.userQuery);
+    items = filterUserQuery(items, queryParams.userQuery);
   }
   if (queryParams.query) {
-    items = filter.filterQuery(items, queryParams.query);
+    items = filterQuery(items, queryParams.query);
   }
   if (queryParams.filter) {
-    items = filter.filterFilter(items, queryParams.filter);
+    items = filterFilter(items, queryParams.filter);
   }
   return items;
 }
 
-function getItems (url, queryParams) {
-  var items = data.getItems(queryParams.category) || [];
-  var unfilteredTotal = items.length;
+function getIndex (url, queryParams) {
+  let items = getItems(queryParams.category) || [];
+  const unfilteredTotal = items.length;
   items = filteredItems(items, queryParams);
 
   if (queryParams.sort) {
-    filter.sort(items, queryParams.sort);
+    sortItems(items, queryParams.sort);
   }
 
-  var startIndex = +queryParams.start; // coerce to be a number
+  let startIndex = +queryParams.start; // coerce to be a number
   if (queryParams.referenceUri) {
-    items.some(function(item, index) {
+    items.some((item, index) => {
       if (queryParams.referenceUri === item.uri) {
         startIndex = Math.max(index - Math.floor(queryParams.count / 2), 0);
         return true;
@@ -52,7 +59,7 @@ function getItems (url, queryParams) {
   }
 
   // prune for start+count
-  var total = items.length;
+  const total = items.length;
   items = items.slice(startIndex, startIndex + queryParams.count);
 
   return {
@@ -66,8 +73,8 @@ function getItems (url, queryParams) {
 }
 
 function updateAggregateCounts (counts, resource, value, intervals) {
-  var count = null;
-  for (var i = 0; i < counts.length; i++) {
+  let count = null;
+  for (let i = 0; i < counts.length; i++) {
     if (value === counts[i].value) {
       count = counts[i];
       break;
@@ -77,14 +84,14 @@ function updateAggregateCounts (counts, resource, value, intervals) {
   if (!count) {
     count = {value: value, count: 0};
     if (intervals) {
-      count.intervals = _.map(intervals, _.clone);
+      count.intervals = intervals.map(interval => ({ ...interval }));
     }
     counts.push(count);
   }
   count.count += 1;
 
   if (count.intervals) {
-    count.intervals.forEach(function(interval) {
+    count.intervals.forEach(interval => {
       if (! interval.count) {
         interval.count = 0;
       }
@@ -97,39 +104,39 @@ function updateAggregateCounts (counts, resource, value, intervals) {
 }
 
 function getAggregate (url, queryParams) {
-  var items = data.getItems(queryParams.category) || [];
+  let items = getItems(queryParams.category) || [];
   items = filteredItems(items, queryParams);
 
-  var attributes;
+  let attributes;
   if (Array.isArray(queryParams.attribute)) {
     attributes = queryParams.attribute;
   } else {
     attributes = [queryParams.attribute];
   }
-  var result = attributes.map(function(attribute) {
+  const result = attributes.map(function(attribute) {
     return {
       attribute: attribute,
       counts: []
     };
   });
 
-  var intervals = null;
+  let intervals = null;
   if (queryParams.interval) {
     intervals = [];
-    var stop =  new Date();
+    let stop =  new Date();
     stop.setHours(23, 59, 59, 999);
-    for (var i = 0; i < queryParams.count; i++) {
-      var start = new Date(stop.getTime() + 1);
+    for (let i = 0; i < queryParams.count; i++) {
+      let start = new Date(stop.getTime() + 1);
       start.setDate(start.getDate() - 1);
       intervals.push({start: start.toISOString(), stop: stop.toISOString()});
       stop = new Date(start.getTime() - 1);
     }
   }
 
-  items.some(function(resource) {
-    result.forEach(function(attributeResult) {
+  items.some(resource => {
+    result.forEach(attributeResult => {
 
-      var value;
+      let value;
       if (resource.hasOwnProperty(attributeResult.attribute)) {
         value = resource[attributeResult.attribute];
       } else if (resource.attributes &&
@@ -149,38 +156,38 @@ function getAggregate (url, queryParams) {
 
 // WebSocket interaction
 
-var socketServer;
-var connections = [];
+let socketServer;
+let connections = [];
 
 function closeConnection (connection) {
   if (connection.ws) {
     connection.ws.close();
     connection.ws = null;
-    var index = connections.indexOf(connection);
+    const index = connections.indexOf(connection);
     connections.splice(index, 1);
   }
 }
 
-var MAP_REGEXP = /^\/rest\/index\/trees\/aggregated(.+)$/;
+const MAP_REGEXP = /^\/rest\/index\/trees\/aggregated(.+)$/;
 
 function respondToRequest (connection, request) {
-  var response = {op: 'update', id: request.id};
+  let response = {op: 'update', id: request.id};
 
   try {
     if ('/rest/index/resources' === request.uri) {
-      response.result = getItems(request.uri, request.params);
+      response.result = getIndex(request.uri, request.params);
     } else if ('/rest/index/resources/aggregated' === request.uri) {
       response.result = getAggregate(request.uri, request.params);
     } else if (MAP_REGEXP.test(request.uri)) {
       var uri = MAP_REGEXP.exec(request.uri)[1];
-      response.result = map.build(uri);
+      response.result = buildMap(uri);
     } else {
-      var resource = data.getResource(request.uri);
+      let resource = getResource(request.uri);
       if (resource) {
         response.result = resource;
       } else {
         response.op = 'error';
-        response.result = 'unknown uri ' + request.uri;
+        response.result = `unknown uri ${request.uri}`;
       }
     }
   } catch (e) {
@@ -190,7 +197,7 @@ function respondToRequest (connection, request) {
   }
 
   if (connection.ws) {
-    var serializedResponse = JSON.stringify(response);
+    const serializedResponse = JSON.stringify(response);
     console.log(response.op.toUpperCase(), request.uri,
       stringify(request.params), serializedResponse.length);
     setTimeout(function () {
@@ -204,10 +211,10 @@ function respondToRequest (connection, request) {
 }
 
 function parseQuery(string) {
-  var params = string.split('&');
-  var result = {};
-  params.forEach(function (param) {
-    var parts = param.split('=');
+  const params = string.split('&');
+  let result = {};
+  params.forEach(param => {
+    const parts = param.split('=');
     // if we already have this parameter, it must be an array
     if (result[parts[0]]) {
       if (! Array.isArray(result[parts[0]])) {
@@ -224,7 +231,7 @@ function parseQuery(string) {
 function onMessage (connection, request) {
   if ('start' === request.op) {
     // Split out query parameters
-    var parts = request.uri.split('?');
+    const parts = request.uri.split('?');
     request.uri = parts[0];
     request.params = parseQuery(parts[1] || '');
     console.log('WATCH', request.uri, request.id, request.params);
@@ -237,20 +244,20 @@ function onMessage (connection, request) {
       return (req.id !== request.id);
     });
   } else if ('ping' === request.op) {
-    var serializedResponse = JSON.stringify({ op: 'ping' });
+    const serializedResponse = JSON.stringify({ op: 'ping' });
     setTimeout(function () {
       connection.ws.send(serializedResponse);
     }, RESPONSE_DELAY);
   } else {
     if (connection.ws) {
-      connection.ws.send({error: 'unknown op ' + request.op});
+      connection.ws.send({error: `unknown op ${request.op}`});
       closeConnection(connection);
     }
   }
 }
 
 function onConnection (ws) {
-  var connection = {
+  const connection = {
     ws: ws,
     requests: []
   };
@@ -266,16 +273,16 @@ function onConnection (ws) {
 }
 
 function initializeSocket (server, prefix) {
-  var path = prefix + "ws";
+  const path = `${prefix}ws`;
   socketServer = new ws.Server({server: server, path: path});
-  console.log('Listening for web socket connections at ' + path);
+  console.log(`Listening for web socket connections at ${path}`);
   socketServer.on("connection", onConnection);
 }
 
 function requestMatches (request, events) {
   // If the request category(ies) or the request url match the change, respond
-  var category;
-  var uri;
+  let category;
+  let uri;
   if (request.params && request.params.category) {
     category = request.params.category;
   } else {
@@ -293,7 +300,7 @@ function requestMatches (request, events) {
 }
 
 function onResourceChange (resource, task) {
-  var events = [];
+  let events = [];
   if (resource) {
     events.push({category: resource.category, uri: resource.uri});
   }
@@ -312,7 +319,7 @@ function onResourceChange (resource, task) {
 // REST interaction
 
 router.get('/status', function(req, res) {
-  var status = data.getStatus();
+  const status = getStatus();
   if (status) {
     res.json(status);
   } else {
@@ -321,7 +328,7 @@ router.get('/status', function(req, res) {
 });
 
 router.put('/status', function(req, res) {
-  data.setStatus(req.body);
+  setStatus(req.body);
   res.json(null);
 });
 
@@ -337,14 +344,14 @@ function roleForUserName (userName) {
   }
 }
 
-router.post('/login-sessions', function(req, res) {
+router.post('/login-sessions', (req, res) => {
   if (! req.body.userName || ! req.body.password ||
     'error' === req.body.userName ||
     ('Gru' === req.body.userName && 'freeze ray' !== req.body.password)) {
     res.status(401, "Invalid username or password.").send();
   } else {
-    var token = req.body.userName + '-' + (new Date()).getTime().toString(10);
-    data.addSession(token, {
+    const token = `${req.body.userName}-${(new Date()).getTime().toString(10)}`;
+    addSession(token, {
       userName: req.body.userName,
       role: roleForUserName(req.body.userName),
       roles: [roleForUserName(req.body.userName)]
@@ -352,8 +359,8 @@ router.post('/login-sessions', function(req, res) {
     if ('Gru' === req.body.userName) {
       latestGruToken = token;
     }
-    var preferences = data.getPreferences(req.body.userName);
-    var settings = data.getSettings();
+    const preferences = getPreferences(req.body.userName);
+    const settings = getSettings();
     res.json({
       sessionID: token,
       needPasswordReset: (! settings.network && ! preferences)
@@ -361,18 +368,18 @@ router.post('/login-sessions', function(req, res) {
   }
 });
 
-router.delete('/login-sessions', function(req, res) {
+router.delete('/login-sessions', (req, res) => {
   res.json(null);
 });
 
-router.post('/reset-password', function(req, res) {
-  data.setPreferences(req.body.userName, 'users', {needPasswordReset: false});
+router.post('/reset-password', (req, res) => {
+  setPreferences(req.body.userName, 'users', {needPasswordReset: false});
   res.json(null);
 });
 
-router.get('/sessions', function(req, res) {
-  var token = req.headers.auth;
-  var session = data.getSession(token);
+router.get('/sessions', (req, res) => {
+  const token = req.headers.auth;
+  const session = getSession(token);
   if (session) {
     res.json(session);
   } else {
@@ -380,9 +387,9 @@ router.get('/sessions', function(req, res) {
   }
 });
 
-router.get('/authz/role', function(req, res) {
-  var token = req.headers.auth;
-  var session = data.getSession(token);
+router.get('/authz/role', (req, res) => {
+  const token = req.headers.auth;
+  const session = getSession(token);
   if (session) {
     res.json(session);
   } else {
@@ -390,8 +397,8 @@ router.get('/authz/role', function(req, res) {
   }
 });
 
-router.get('/preferences/index', function(req, res) {
-  var preferences = data.getPreferences(req.headers.auth, req.query.category);
+router.get('/preferences/index', (req, res) => {
+  const preferences = getPreferences(req.headers.auth, req.query.category);
   if (! preferences) {
     res.status(404).send();
   } else {
@@ -399,8 +406,8 @@ router.get('/preferences/index', function(req, res) {
   }
 });
 
-router.get('/settings', function(req, res) {
-  var settings = data.getSettings();
+router.get('/settings', (req, res) => {
+  const settings = getSettings();
   if (settings) {
     res.json(settings);
   } else {
@@ -408,9 +415,9 @@ router.get('/settings', function(req, res) {
   }
 });
 
-router.put('/settings', function(req, res) {
-  var resource = data.getResource('/rest/appliances/1');
-  var settings = req.body;
+router.put('/settings', (req, res) => {
+  const resource = getResource('/rest/appliances/1');
+  let settings = req.body;
   settings.state = 'done';
   settings.modified = (new Date()).toISOString();
   // don't persist credentials
@@ -430,22 +437,22 @@ router.put('/settings', function(req, res) {
   // don't persist errors
   delete settings.errors;
 
-  data.setSettings(settings);
+  setSettings(settings);
   if (settings.hypervisor && settings.hypervisor.certifcate) {
-    data.setCertificate(settings.hypervisor.address,
+    setCertificate(settings.hypervisor.address,
       settings.hypervisor.certificate);
   }
   if (settings.directory && settings.directory.certifcate) {
-    data.setCertificate(settings.directory.address,
+    setCertificate(settings.directory.address,
       settings.directory.certificate);
   }
-  var task = createTask('appliances', 'Update', resource, req);
+  let task = createTask('appliances', 'Update', resource, req);
 
   res.json({
     taskUri: task.uri
   });
 
-  runTask(task, null, function () {
+  runTask(task, null, () => {
 
     // simulate an error if the name has "error" in it
     if (settings.name.match(/invalid/)) {
@@ -491,16 +498,16 @@ router.put('/settings', function(req, res) {
           }
         ]
       };
-      data.setSettings(settings);
+      setSettings(settings);
     }
 
-    data.setStatus({state: 'ready'});
+    setStatus({state: 'ready'});
   });
 });
 
-router.get('/certificate', function(req, res) {
-  var address = req.query.address;
-  var certificate = data.getCertificate(address);
+router.get('/certificate', (req, res) => {
+  const address = req.query.address;
+  let certificate = getCertificate(address);
   if (certificate) {
     res.json({
       result: 'trusted',
@@ -508,7 +515,7 @@ router.get('/certificate', function(req, res) {
     });
   } else {
     // simulate delay
-    setTimeout(function () {
+    setTimeout(() => {
       certificate = {
         name: 'Hewlett Packard Enterprise Class 3 Certificate (simulated)',
         issuedBy: 'Hewlett Packard Enterprise',
@@ -522,9 +529,9 @@ router.get('/certificate', function(req, res) {
   }
 });
 
-router.post('/connection', function(req, res) {
+router.post('/connection', (req, res) => {
   // simulate delay
-  setTimeout(function () {
+  setTimeout(() => {
     if ('error' === req.body.userName || ! req.body.userName ||
       ! req.body.password) {
       res.status(400).json({
@@ -536,33 +543,33 @@ router.post('/connection', function(req, res) {
   }, TASK_UPDATE_INTERVAL);
 });
 
-router.get('/directory/search', function(req, res) {
-  ldap(req.query, function (result) {
+router.get('/directory/search', (req, res) => {
+  ldap(req.query, (result) => {
     res.json(result);
-  }, function (error) {
+  }, (error) => {
     res.status(500).send();
   });
 });
 
 // for now, this is the path for performing a restore operation
-router.post('/settings', function(req, res) {
-  var resource = data.getResource('/rest/appliances/1');
-  var file = req.files.file;
-  var settings = JSON.parse(file.data.toString('utf-8', 0, file.size));
-  data.setSettings(settings);
-  var task = createTask('appliances', 'Restore', resource, req);
+router.post('/settings', (req, res) => {
+  const resource = getResource('/rest/appliances/1');
+  const file = req.files.file;
+  const settings = JSON.parse(file.data.toString('utf-8', 0, file.size));
+  setSettings(settings);
+  let task = createTask('appliances', 'Restore', resource, req);
 
   res.json({
     taskUri: task.uri
   });
 
-  runTask(task, null, function () {
-    data.setStatus({state: 'ready'});
+  runTask(task, null, () => {
+    setStatus({state: 'ready'});
   });
 });
 
-router.get('/update', function(req, res) {
-  var update = data.getUpdate();
+router.get('/update', (req, res) => {
+  var update = getUpdate();
   if (update) {
     res.json(update);
   } else {
@@ -570,10 +577,10 @@ router.get('/update', function(req, res) {
   }
 });
 
-router.post('/update/upload', function(req, res) {
-  var resource = data.getResource('/rest/appliances/1');
-  var file = req.files.file;
-  var task = createTask('appliances', 'Upload software', resource, req);
+router.post('/update/upload', (req, res) => {
+  const resource = getResource('/rest/appliances/1');
+  const file = req.files.file;
+  let task = createTask('appliances', 'Upload software', resource, req);
   // we start this task at 50% to account for the time taken uploading
   task.percentComplete = 50;
 
@@ -581,11 +588,12 @@ router.post('/update/upload', function(req, res) {
     taskUri: task.uri
   });
 
-  runTask(task, resource, function () {
+  runTask(task, resource, () => {
     // simulate file contents
-    var settings = data.getSettings();
-    var version = (Math.round(parseFloat(settings.version, 10) * 10) + 1) / 10;
-    var update = {
+    const settings = getSettings();
+    const version =
+      (Math.round(parseFloat(settings.version, 10) * 10) + 1) / 10;
+    let update = {
       version: version,
       file: {name: file.name},
       hypervisor: {version: 5.1},
@@ -610,23 +618,23 @@ router.post('/update/upload', function(req, res) {
       }];
     }
 
-    data.setUpdate(update);
+    setUpdate(update);
   });
 });
 
-router.post('/update', function(req, res) {
-  var update = data.getUpdate();
-  var resource = data.getResource('/rest/appliances/1');
+router.post('/update', (req, res) => {
+  const update = getUpdate();
+  const resource = getResource('/rest/appliances/1');
   // simulate update
-  data.setStatus({state: 'updating', percent: 0});
-  var settings = data.getSettings();
-  var task = createTask('appliances', 'Update software', resource, req);
-  var taskSteps = 2 + settings.nodes.length;
+  setStatus({state: 'updating', percent: 0});
+  let settings = getSettings();
+  let task = createTask('appliances', 'Update software', resource, req);
+  let taskSteps = 2 + settings.nodes.length;
   task.percentComplete = 0;
 
   delete update.errors;
   update.runningTaskUri = task.uri;
-  data.setUpdate(update);
+  setUpdate(update);
 
   res.json({
     taskUri: task.uri
@@ -637,22 +645,22 @@ router.post('/update', function(req, res) {
 
     // Update involves updating this appliance and each node.
     // Create tasks for each of these in the right sequence.
-    var applianceTask = createTask('appliances',
+    const applianceTask = createTask('appliances',
       'Update hyperconverged management', resource, req);
     applianceTask.parentTaskUri = task.uri;
 
     // First, update this appliance.
-    var index = 0;
-    var timer = setInterval(function () {
+    let index = 0;
+    let timer = setInterval(() => {
       index += 1;
       if (index < 10) {
-        data.setStatus({state: 'updating',
+        setStatus({state: 'updating',
           percent: Math.floor((index / 10) * 100)});
         applianceTask.percentComplete = Math.floor((index / 10) * 100);
       } else {
         settings.version = update.version;
-        data.setSettings(settings);
-        data.setStatus({state: 'ready'});
+        setSettings(settings);
+        setStatus({state: 'ready'});
         clearInterval(timer);
 
         // update the applianceTask that also tracks this.
@@ -663,14 +671,14 @@ router.post('/update', function(req, res) {
         task.percentComplete = Math.floor((1 / taskSteps) * 100);
 
         // done with appliance update, do each node one by one
-        var nodeTasks = settings.nodes.map(function (node, index) {
-          var nodeTask = createTask('appliances', 'Update ' + node.name,
+        const nodeTasks = settings.nodes.map((node, index) => {
+          let nodeTask = createTask('appliances', `Update ${node.name}`,
             resource, req);
           nodeTask.parentTaskUri = task.uri;
           nodeTask.nodeIndex = index; // This is a cheat to get the name below
           return nodeTask;
         });
-        runTasks(nodeTasks, function (nodeTask) {
+        runTasks(nodeTasks, (nodeTask) => {
           task.percentComplete =
             Math.floor(((2 + nodeTask.nodeIndex) / taskSteps) * 100);
           const node = settings.nodes[nodeTask.nodeIndex];
@@ -686,13 +694,13 @@ router.post('/update', function(req, res) {
             }
             update.errors.push({
               status: 'Critical',
-              message: 'Simulated failure on ' + node.name + '.',
+              message: `Simulated failure on ${node.name}.`,
               resolution: 'Try again',
               action: 'update'
             });
-            data.setUpdate(update);
+            setUpdate(update);
           }
-        }, function () {
+        }, () => {
           if (update.file.name.match(/error/)) {
             task.status = 'Critical';
             task.state = 'Error';
@@ -710,9 +718,9 @@ router.post('/update', function(req, res) {
               action: 'update'
             });
             delete update.runningTaskUri;
-            data.setUpdate(update);
+            setUpdate(update);
           } else {
-            data.setUpdate({});
+            setUpdate({});
             task.status = 'OK';
             task.state = 'Completed';
           }
@@ -725,12 +733,12 @@ router.post('/update', function(req, res) {
   }, 10);
 });
 
-router.delete('/update', function(req, res) {
-  data.setUpdate({});
+router.delete('/update', (req, res) => {
+  setUpdate({});
   res.status(200).send();
 });
 
-router.post('/restart', function(req, res) {
+router.post('/restart', (req, res) => {
   // In a real product, this would create a task and preserve data.
   // In this prototype, restarting means the same as 'factory reset'
   // First, respond that we've got it.
@@ -739,24 +747,24 @@ router.post('/restart', function(req, res) {
   process.exit(0);
 });
 
-router.post('/backup', function(req, res) {
-  var resource = data.getResource('/rest/appliances/1');
-  data.setBackup({}); // clear prior one
-  var task = createTask('appliances', 'Backup', resource, req);
+router.post('/backup', (req, res) => {
+  const resource = getResource('/rest/appliances/1');
+  setBackup({}); // clear prior one
+  let task = createTask('appliances', 'Backup', resource, req);
 
   res.json({
     taskUri: task.uri
   });
 
-  runTask(task, null, function () {
-    data.setBackup({
-      file: '/rest/backup/' + (new Date()).getTime().toString(10)
+  runTask(task, null, () => {
+    setBackup({
+      file: `/rest/backup/${(new Date()).getTime().toString(10)}`
     });
   });
 });
 
-router.get('/backup', function(req, res) {
-  var backup = data.getBackup();
+router.get('/backup', (req, res) => {
+  const backup = getBackup();
   if (backup) {
     res.json(backup);
   } else {
@@ -764,31 +772,31 @@ router.get('/backup', function(req, res) {
   }
 });
 
-router.delete('/backup', function(req, res) {
-  data.setBackup({});
+router.delete('/backup', (req, res) => {
+  setBackup({});
   res.status(200).send();
 });
 
 // How support dumps should work:
 
-router.post('/support', function(req, res) {
-  var resource = data.getResource('/rest/appliances/1');
-  data.setSupport({}); // clear prior one
-  var task = createTask('appliances', 'Create support dump', resource, req);
+router.post('/support', (req, res) => {
+  const resource = getResource('/rest/appliances/1');
+  setSupport({}); // clear prior one
+  let task = createTask('appliances', 'Create support dump', resource, req);
 
   res.json({
     taskUri: task.uri
   });
 
-  runTask(task, null, function () {
-    data.setSupport({
-      file: '/rest/support/' + (new Date()).getTime().toString(10)
+  runTask(task, null, () => {
+    setSupport({
+      file: `/rest/support/${(new Date()).getTime().toString(10)}`
     });
   });
 });
 
-router.get('/support', function(req, res) {
-  var support = data.getSupport();
+router.get('/support', (req, res) => {
+  const support = getSupport();
   if (support) {
     res.json(support);
   } else {
@@ -796,16 +804,16 @@ router.get('/support', function(req, res) {
   }
 });
 
-router.delete('/support', function(req, res) {
-  data.setSupport({});
+router.delete('/support', (req, res) => {
+  setSupport({});
   res.status(200).send();
 });
 
 // How Atlas server does suppprt dumps:
 
-router.post('/support-dumps', function(req, res) {
-  // var resource = data.getResource('/rest/appliances/1');
-  setTimeout(function () {
+router.post('/support-dumps', (req, res) => {
+  // var resource = getResource('/rest/appliances/1');
+  setTimeout(() => {
     res.json({
       supportDumpFile: '/rest/support-dumps/' +
         'phoenix-vm-nithya-CI-2016_02_19-10_15_42.795139.sdmp'
@@ -813,24 +821,26 @@ router.post('/support-dumps', function(req, res) {
   }, TASK_UPDATE_INTERVAL * 9); // The UI times out at 10s
 });
 
-router.post('/images', function(req, res) {
+router.post('/images', (req, res) => {
   // Simulate taking a while to upload the image
-  setTimeout(function () {
-    var categoryName = 'images';
-    var file = req.files.file;
-    var now = new Date();
+  setTimeout(() => {
+    const categoryName = 'images';
+    const file = req.files.file;
+    const now = new Date();
 
-    var resource = _.extend({
+    const resource = {
       category: categoryName,
-      uri: '/rest/' + categoryName + '/' + now.getTime(),
+      uri: `/rest/${categoryName}/${now.getTime()}`,
       status: 'Unknown',
       state: 'Offline',
       created: now.toISOString(),
-      modified: now.toISOString()
-    }, req.body, {fileName: file.name});
-    data.addResource(categoryName, resource);
+      modified: now.toISOString(),
+      ...req.body,
+      fileName: file.name
+    };
+    addResource(categoryName, resource);
 
-    var task = createTask(categoryName, 'Add', resource, req);
+    let task = createTask(categoryName, 'Add', resource, req);
     // we start at 50% complete since the upload took the first 50%
     task.percentComplete = 50;
 
@@ -838,7 +848,7 @@ router.post('/images', function(req, res) {
       taskUri: task.uri
     });
 
-    runTask(task, resource, function () {
+    runTask(task, resource, () => {
       resource.status = "Disabled";
       resource.state = "Offline";
 
@@ -859,7 +869,7 @@ router.post('/images', function(req, res) {
 //   // Simulate taking a while to upload the image
 //   setTimeout(function () {
 //     var categoryName = req.params.categoryName;
-//     var resource = data.getResource('/rest' + req.url);
+//     var resource = getResource('/rest' + req.url);
 //     var updatedResource = req.body;
 //     var now = new Date();
 //     updatedResource.modified = now.toISOString();
@@ -878,7 +888,7 @@ router.post('/images', function(req, res) {
 //           recommendedActions: "Don't use the term 'error' in the name."
 //         }];
 //       } else {
-//         data.updateResource(categoryName, updatedResource);
+//         updateResource(categoryName, updatedResource);
 //       }
 //     });
 //
@@ -896,7 +906,7 @@ router.post('/images', function(req, res) {
 //       created: now.toISOString(),
 //       modified: now.toISOString()
 //     }, req.body, {fileName: file.name});
-//     data.addResource(categoryName, resource);
+//     addResource(categoryName, resource);
 //
 //     var task = createTask(categoryName, 'Add', resource, req);
 //     // we start at 50% complete since the upload took the first 50%
@@ -925,29 +935,29 @@ router.post('/images', function(req, res) {
 
 // Linked navigation
 
-router.post('/route', function(req, res) {
-  var token = req.headers.auth;
+router.post('/route', (req, res) => {
+  const token = req.headers.auth;
   if (token === latestGruToken) {
-    var resource = data.getResource('/rest/route/1');
-    var categoryName = 'route';
+    let resource = getResource('/rest/route/1');
+    const categoryName = 'route';
     if (! resource) {
       resource = {
         category: categoryName,
         uri: '/rest/route/1',
         pathname: req.body.pathname
       };
-      data.addResource(categoryName, resource);
+      addResource(categoryName, resource);
     } else {
       resource.pathname = req.body.pathname;
-      data.updateResource(categoryName, resource);
+      updateResource(categoryName, resource);
     }
     res.status(200).json({});
     onResourceChange(resource);
   }
 });
 
-router.get('/route/1', function(req, res) {
-  var resource = data.getResource('/rest/route/1');
+router.get('/route/1', (req, res) => {
+  const resource = getResource('/rest/route/1');
   if (resource) {
     res.json(resource);
   } else {
@@ -957,25 +967,25 @@ router.get('/route/1', function(req, res) {
 
 // index
 
-router.get('/index/resources', function(req, res) {
-  var result = getItems('/rest' + req.url, req.query);
+router.get('/index/resources', (req, res) => {
+  const result = getIndex(`/rest${req.url}`, req.query);
   res.json(result);
 });
 
-router.get('/index/resources/aggregated', function(req, res) {
-  var result = getAggregate('/rest' + req.url, req.query);
+router.get('/index/resources/aggregated', (req, res) => {
+  const result = getAggregate(`/rest${req.url}`, req.query);
   res.json(result);
 });
 
-router.get(/^\/index\/search-suggestions/, function(req, res) {
-  var items = data.getItems(req.query.category || null);
+router.get(/^\/index\/search-suggestions/, (req, res) => {
+  let items = getItems(req.query.category || null);
   items = filteredItems(items, req.query);
 
-  var startIndex = +req.query.start; // coerce to be a number
+  const startIndex = +req.query.start; // coerce to be a number
   // prune for start+count
   items = items.slice(startIndex, startIndex + req.query.count);
 
-  res.json(items.map(function(item) {
+  res.json(items.map((item) => {
     return {
       name: item.name,
       category: item.category,
@@ -984,18 +994,18 @@ router.get(/^\/index\/search-suggestions/, function(req, res) {
   }));
 });
 
-router.get(/^\/index\/trees\/aggregated(.+)$/, function(req, res) {
-  var uri = req.params[0];
-  res.json(map.build(uri));
+router.get(/^\/index\/trees\/aggregated(.+)$/, (req, res) => {
+  const uri = req.params[0];
+  res.json(buildMap(uri));
 });
 
-router.get(/^\/index\/trees(.+)$/, function(req, res) {
+router.get(/^\/index\/trees(.+)$/, (req, res) => {
   //var uri = req.params[0];
   res.status(501).send();
 });
 
-router.get('/:categoryName/*', function(req, res) {
-  var resource = data.getResource('/rest' + req.url);
+router.get('/:categoryName/*', (req, res) => {
+  var resource = getResource(`/rest${req.url}`);
   if (resource) {
     res.json(resource);
   } else {
@@ -1003,16 +1013,16 @@ router.get('/:categoryName/*', function(req, res) {
   }
 });
 
-var taskIndex = 1;
+let taskIndex = 1;
 
 function createTask (categoryName, action, resource, req) {
-  var now = new Date();
-  var token = req.headers.auth;
-  var session = data.getSession(token) || {userName: 'System'};
+  const now = new Date();
+  const token = req.headers.auth;
+  const session = getSession(token) || {userName: 'System'};
 
-  var task = {
+  const task = {
     category: 'tasks',
-    uri: '/rest/tasks/' + now.getTime() + '-' + taskIndex,
+    uri: `/rest/tasks/${now.getTime()}-${taskIndex}`,
     name: action,
     status: 'Unknown',
     state: 'Running',
@@ -1026,7 +1036,7 @@ function createTask (categoryName, action, resource, req) {
     created: now.toISOString(),
     modified: now.toISOString()
   };
-  data.addResource('tasks', task);
+  addResource('tasks', task);
   taskIndex += 1;
 
   return task;
@@ -1037,7 +1047,7 @@ function runTask (task, resource, handler) {
   if (! task.percentComplete) {
     task.percentComplete = 0;
   }
-  var timer = setInterval(function() {
+  let timer = setInterval(() => {
     task.percentComplete += 10;
     task.modified = (new Date()).toISOString();
     if (task.percentComplete >= 100) {
@@ -1056,15 +1066,15 @@ function runTask (task, resource, handler) {
     onResourceChange(undefined, task);
   }, TASK_UPDATE_INTERVAL);
 
-  setTimeout(function () {
+  setTimeout(() => {
     onResourceChange(resource, task);
   }, 1);
 }
 
 function runTasks (tasks, perTaskHandler, handler) {
-  var task = tasks.shift();
+  let task = tasks.shift();
   if (task) {
-    runTask(task, null, function () {
+    runTask(task, null, () => {
       if (perTaskHandler) {
         perTaskHandler(task);
       }
@@ -1075,108 +1085,109 @@ function runTasks (tasks, perTaskHandler, handler) {
   }
 }
 
-router.post('/:categoryName', function(req, res) {
-  var categoryName = req.params.categoryName;
-  var now = new Date();
+router.post('/:categoryName', (req, res) => {
+  const categoryName = req.params.categoryName;
+  const now = new Date();
 
-  var resource = _.extend({
+  const resource = {
     category: categoryName,
-    uri: '/rest/' + categoryName + '/' + now.getTime(),
+    uri: `/rest/${categoryName}/${now.getTime()}`,
     status: 'Unknown',
     state: 'Offline',
     created: now.toISOString(),
-    modified: now.toISOString()
-  }, req.body);
+    modified: now.toISOString(),
+    ...req.body
+  };
   if ('virtual-machines' === categoryName) {
-    generator.addUtilization(resource);
+    addUtilization(resource);
   }
-  data.addResource(categoryName, resource);
+  addResource(categoryName, resource);
 
-  var task = createTask(categoryName, 'Add', resource, req);
+  let task = createTask(categoryName, 'Add', resource, req);
 
   res.json({
     taskUri: task.uri
   });
 
-  runTask(task, resource, function () {
+  runTask(task, resource, () => {
     resource.status = "Disabled";
     resource.state = "Offline";
   });
 });
 
-router.post('/:categoryName/*/on', function(req, res) {
-  var categoryName = req.params.categoryName;
-  var resource = data.getResource('/rest' +
+router.post('/:categoryName/*/on', (req, res) => {
+  const categoryName = req.params.categoryName;
+  let resource = getResource('/rest' +
     req.url.slice(0, req.url.length - 3), true);
   resource.modified = (new Date()).toISOString();
-  var task = createTask(categoryName, 'Power on', resource, req);
+  let task = createTask(categoryName, 'Power on', resource, req);
 
   res.json({
     taskUri: task.uri
   });
 
-  runTask(task, resource, function () {
+  runTask(task, resource, () => {
     resource.status = "OK";
     resource.state =  "Online";
-    generator.addUtilization(resource);
+    addUtilization(resource);
   });
 });
 
-router.post('/:categoryName/*/off', function(req, res) {
-  var categoryName = req.params.categoryName;
-  var resource = data.getResource('/rest' +
+router.post('/:categoryName/*/off', (req, res) => {
+  const categoryName = req.params.categoryName;
+  let resource = getResource('/rest' +
     req.url.slice(0, req.url.length - 4), true);
   resource.modified = (new Date()).toISOString();
-  var task = createTask(categoryName, 'Power off', resource, req);
+  let task = createTask(categoryName, 'Power off', resource, req);
 
   res.json({
     taskUri: task.uri
   });
 
-  runTask(task, resource, function () {
+  runTask(task, resource, () => {
     resource.status = "Disabled";
     resource.state = "Offline";
-    generator.addUtilization(resource);
+    addUtilization(resource);
   });
 });
 
-router.post('/:categoryName/*/restart', function(req, res) {
-  var categoryName = req.params.categoryName;
-  var resource = data.getResource('/rest' +
+router.post('/:categoryName/*/restart', (req, res) => {
+  const categoryName = req.params.categoryName;
+  let resource = getResource('/rest' +
     req.url.slice(0, req.url.length - 8), true);
   resource.modified = (new Date()).toISOString();
-  var task = createTask(categoryName, 'Restart', resource, req);
+  let task = createTask(categoryName, 'Restart', resource, req);
 
   res.json({
     taskUri: task.uri
   });
 
-  runTask(task, resource, function () {
+  runTask(task, resource, () => {
     resource.status = "OK";
     resource.state =  "Online";
-    generator.addUtilization(resource);
+    addUtilization(resource);
   });
 });
 
-router.put('/:categoryName/*', function(req, res) {
-  var categoryName = req.params.categoryName;
-  var resource = data.getResource('/rest' + req.url);
-  var updatedResource = req.body;
-  var now = new Date();
+router.put('/:categoryName/*', (req, res) => {
+  const categoryName = req.params.categoryName;
+  const resource = getResource(`/rest${req.url}`);
+  let updatedResource = req.body;
+  const now = new Date();
   updatedResource.modified = now.toISOString();
 
   if ('alerts' === categoryName || 'tasks' === categoryName) {
-    data.updateResource(categoryName, updatedResource);
+    updateResource(categoryName, updatedResource);
     res.status(200).json({});
     onResourceChange(updatedResource);
   } else {
-    var task = createTask(categoryName, 'Update', resource, req);
+    let task = createTask(categoryName, 'Update', resource, req);
 
     res.json({
       taskUri: task.uri
     });
 
-    runTask(task, resource, function () {
+    runTask(task, resource, () => {
       if (updatedResource.name.match(/error/i)) {
         task.status = "Critical";
         task.state = "Error";
@@ -1185,34 +1196,34 @@ router.put('/:categoryName/*', function(req, res) {
           recommendedActions: "Don't use the term 'error' in the name."
         }];
       } else {
-        data.updateResource(categoryName, updatedResource);
+        updateResource(categoryName, updatedResource);
       }
     });
   }
 });
 
-router.delete('/:categoryName/*', function(req, res) {
-  var categoryName = req.params.categoryName;
-  var resource = data.getResource('/rest' + req.url);
+router.delete('/:categoryName/*', (req, res) => {
+  const categoryName = req.params.categoryName;
+  const resource = getResource(`/rest${req.url}`);
 
-  var task = createTask(categoryName, 'Remove', resource, req);
+  let task = createTask(categoryName, 'Remove', resource, req);
 
   res.json({
     taskUri: task.uri
   });
 
   // We run the delete task with no resource
-  runTask(task, { category: categoryName }, function () {
-    data.deleteResource(categoryName, '/rest' + req.url);
+  runTask(task, { category: categoryName }, () => {
+    deleteResource(categoryName, `/rest${req.url}`);
     // Delete associated alerts and tasks, except this task
-    var params = {
+    const params = {
       category: ['alerts', 'tasks'], start: 0, count: 100,
-      query: "associatedResourceUri:" + '/rest' + req.url
+      query: `associatedResourceUri:/rest${req.url}`
     };
-    var items = getItems(null, params).items;
-    items.forEach(function (item) {
+    const items = getIndex(null, params).items;
+    items.forEach((item) => {
       if (item.uri !== task.uri) {
-        data.deleteResource(item.category, item.uri);
+        deleteResource(item.category, item.uri);
       }
     });
   });
@@ -1220,8 +1231,8 @@ router.delete('/:categoryName/*', function(req, res) {
 
 module.exports = {
   router: router,
-  setup: function (server, prefix) {
-    generator.generate();
+  setup: (server, prefix) => {
+    generate();
     initializeSocket(server, prefix);
     // generator.listen(onResourceChange);
   }

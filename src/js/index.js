@@ -32,30 +32,6 @@ apiConfigure({
   webSocketUrl: `${wsProtocol}://${hostName}/ws`
 });
 
-// // From a comment in https://github.com/rackt/redux/issues/637
-// // this factory returns a history implementation which reads the current
-// // state
-// // from the redux store and delegates push state to a different history.
-// let createStoreHistory = () => {
-//   return {
-//     listen: (callback) => {
-//       // subscribe to the redux store. when `route` changes,
-//       // notify the listener
-//       let notify = () => {
-//         const route = store.getState().route;
-//         if (route.location) {
-//           callback(route.location);
-//         }
-//       };
-//       const unsubscribe = store.subscribe(notify);
-//
-//       return unsubscribe;
-//     },
-//     createHref: history.createHref,
-//     push: history.push
-//   };
-// };
-
 let locale = getCurrentLocale();
 addLocaleData(en);
 
@@ -73,6 +49,8 @@ try {
 }
 var localeData = getLocaleData(messages, locale);
 
+store.dispatch(sessionInitialize(window.location.pathname));
+
 let element = document.getElementById('content');
 
 ReactDOM.render((
@@ -84,9 +62,6 @@ ReactDOM.render((
 ), element);
 
 document.body.classList.remove('loading');
-
-// initializeSession();
-store.dispatch(sessionInitialize(window.location.pathname));
 
 // listen for history changes and initiate routeChanged actions for them
 history.listen(function (location) {

@@ -1,11 +1,11 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-var ldap = require('ldapjs');
+import ldap from 'ldapjs';
 
-var client;
-var timer;
+let client;
+let timer;
 
-function search (params, success, error) {
+export function search (params, success, error) {
 
   if (! client) {
     client = ldap.createClient({
@@ -15,15 +15,15 @@ function search (params, success, error) {
     });
   }
 
-  var options = {
+  let options = {
     scope: 'sub',
     filter: "(cn=*" + params.searchText + "*)",
     attributes: ['cn'],
     sizeLimit: 10
   };
 
-  client.search(params.baseDn, options, function (ldapErr, ldapRes) {
-    var entries = [];
+  client.search(params.baseDn, options, (ldapErr, ldapRes) => {
+    let entries = [];
     if (ldapErr) {
       console.log('client error:', ldapErr);
       if (client) {
@@ -32,18 +32,18 @@ function search (params, success, error) {
       }
       error(ldapErr);
     } else {
-      ldapRes.on('searchEntry', function (entry) {
+      ldapRes.on('searchEntry', (entry) => {
         //console.log('entry: ', JSON.stringify(entry.object));
         entries.push(entry.object);
       });
-      ldapRes.on('searchReference', function( referral) {
+      ldapRes.on('searchReference', (referral) => {
         //console.log('referral: ', referral.uris.join());
       });
-      ldapRes.on('error', function (err) {
+      ldapRes.on('error', (err) => {
         console.log('error:', err.message, ' have ', entries.length);
         success(entries);
       });
-      ldapRes.on('end', function (result) {
+      ldapRes.on('end', (result) => {
         console.log('status: ', result.status, ' have ', entries.length);
         success(entries);
       });
@@ -52,7 +52,7 @@ function search (params, success, error) {
 
   // If we're idle for more than 30 seconds. Clean up and start fresh.
   clearTimeout(timer);
-  timer = setTimeout(function () {
+  timer = setTimeout(() => {
     //console.log('client cleanup');
     if (client) {
       client.unbind();
@@ -60,5 +60,3 @@ function search (params, success, error) {
     }
   }, 30000);
 }
-
-module.exports = search;

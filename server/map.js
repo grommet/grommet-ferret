@@ -1,16 +1,16 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-var data = require('./data');
+import { getAssociations, getResource } from './data';
 
-var REDUCE_LIMIT = 20;
+const REDUCE_LIMIT = 20;
 
 function addResource(uri, result, associationContext) {
-  var resource = data.getResource(uri);
+  let resource = getResource(uri);
   if (! result.categories.hasOwnProperty(resource.category)) {
     result.categories[resource.category] = [];
   }
   // don't add if we already have it
-  var exists = result.categories[resource.category].some(function (item) {
+  const exists = result.categories[resource.category].some(item => {
     return (item.uri === uri);
   });
   if (! exists) {
@@ -27,7 +27,7 @@ function addResource(uri, result, associationContext) {
 
 function add(name, uri, result, associations, callback) {
   if (associations.hasOwnProperty(name)) {
-    associations[name].children.forEach(function (childUri) {
+    associations[name].children.forEach(childUri => {
       result.links.push({parentUri: uri, childUri: childUri});
       addResource(childUri, result, {name: name, parentUri: uri});
       callback(childUri, result);
@@ -36,8 +36,8 @@ function add(name, uri, result, associations, callback) {
 }
 
 function addChildren(uri, result) {
-  var associations = data.getAssociations(uri);
-  for (var name in associations) {
+  let associations = getAssociations(uri);
+  for (let name in associations) {
     if (associations.hasOwnProperty(name)) {
       add(name, uri, result, associations, addChildren);
     }
@@ -45,8 +45,8 @@ function addChildren(uri, result) {
 }
 
 function addParents(uri, result) {
-  var associations = data.getAssociations(uri);
-  for (var name in associations) {
+  let associations = getAssociations(uri);
+  for (let name in associations) {
     if (associations.hasOwnProperty(name)) {
       add(name, uri, result, associations, addParents);
     }
@@ -54,18 +54,18 @@ function addParents(uri, result) {
 }
 
 function reduce(result) {
-  for (var name in result.categories) {
+  for (let name in result.categories) {
     if (result.categories.hasOwnProperty(name)) {
-      var items = result.categories[name];
+      let items = result.categories[name];
       if (items.length > REDUCE_LIMIT) {
 
-        var reducedItems = [];
+        let reducedItems = [];
         // group by parentUri
-        var reducedItemsMap = {}; // parentUri: data
+        let reducedItemsMap = {}; // parentUri: data
 
-        for (var i = 0; i < items.length; i++) {
-          var item = items[i];
-          var reducedItem;
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          let reducedItem;
 
           if (item.associationContext.parentUri) {
             reducedItem = reducedItemsMap[item.associationContext.parentUri];
@@ -91,7 +91,7 @@ function reduce(result) {
             reducedItem.status[item.status] += 1;
 
             // adjust links
-            for (var j = 0; j < result.links.length; j++) {
+            for (let j = 0; j < result.links.length; j++) {
               var link = result.links[j];
               if (link.parentUri === item.uri) {
                 link.parentUri = reducedItem.uri;
@@ -111,15 +111,11 @@ function reduce(result) {
   }
 }
 
-var GrommetMap = {
-  build: function (uri) {
-    var result = { links: [], categories: {}, rootUri: uri };
-    addResource(uri, result);
-    addParents(uri, result);
-    addChildren(uri, result);
-    reduce(result);
-    return result;
-  }
-};
-
-module.exports = GrommetMap;
+export function buildMap (uri) {
+  let result = { links: [], categories: {}, rootUri: uri };
+  addResource(uri, result);
+  addParents(uri, result);
+  addChildren(uri, result);
+  reduce(result);
+  return result;
+}

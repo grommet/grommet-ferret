@@ -2,7 +2,7 @@
 
 var gulp = require('gulp');
 var rsync = require('gulp-rsync');
-var nodemon = require('gulp-nodemon');
+// var nodemon = require('gulp-nodemon');
 
 gulp.task('sync', function() {
   gulp.src('.')
@@ -20,13 +20,4 @@ gulp.task('sync', function() {
       emptyDirectories: true,
       exclude: ['.DS_Store', 'node_modules']
     }));
-});
-
-gulp.task('dev', function() {
-  nodemon({
-    script: 'server.js',
-    execMap: {
-      js: "babel-node"
-    }
-  });
 });

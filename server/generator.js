@@ -1,20 +1,23 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
 
-var data = require('./data');
+import {
+  addAssociation, addCategory, addResource, getItems, setSettings, setStatus
+} from './data';
 
-// derived from http://stackoverflow.com/questions/521295/javascript-random-seeds
-var seed = 1234;
+// derived from
+// http://stackoverflow.com/questions/521295/javascript-random-seeds
+let seed = 1234;
 function random (scale) {
-  var x = Math.sin(seed++) * 10000;
+  const x = Math.sin(seed++) * 10000;
   return Math.round((x - Math.floor(x)) * scale);
 }
 
-var INITIALIZE_STEP_INTERVAL = 5000;
-var RESOURCE_COUNT = 20;
-var START_DATE = new Date();
-var USERS = ['Administrator', 'Vince', 'Ursula'];
+const INITIALIZE_STEP_INTERVAL = 5000;
+const RESOURCE_COUNT = 20;
+const START_DATE = new Date();
+const USERS = ['Administrator', 'Vince', 'Ursula'];
 
-var SCHEMA = [
+const SCHEMA = [
   {
     name: "virtual-machines",
     count: RESOURCE_COUNT,
@@ -134,7 +137,9 @@ var SCHEMA = [
       "Temperature threshold exceeded by 10 degrees.",
       "Unable to establish management contact with the service processor.",
       "Inconsistent configuration detected.",
-      "Utilization data has not been successfully collected for 50 minutes and 5 attempts. Communication with iLO management processor 172.18.6.3 failed. The iLO experienced an internal error."
+      "Utilization data has not been successfully collected for 50 minutes " +
+      "and 5 attempts. Communication with iLO management processor " +
+      "172.18.6.3 failed. The iLO experienced an internal error."
     ]
   },
   {
@@ -144,8 +149,8 @@ var SCHEMA = [
 ];
 
 function historicalData(min, max, count) {
-  var result = [];
-  var date = new Date(START_DATE.getTime());
+  let result = [];
+  let date = new Date(START_DATE.getTime());
   for (var i=1; i<=count; i+=1) {
     result.push([date.toISOString(), random(max - min)]);
     date.setTime(date.getTime() - (i * 5000));
@@ -154,7 +159,7 @@ function historicalData(min, max, count) {
 }
 
 function distribute (values) {
-  var result;
+  let result;
   for (var i = 0; i < values.length; i++) {
     if (Array.isArray(values[i])) {
       if (random(values[i][1]) === 0) {
@@ -170,20 +175,16 @@ function distribute (values) {
 }
 
 function createCategories () {
-  SCHEMA.forEach(function (category) {
-    data.addCategory(category.name);
-  });
+  SCHEMA.forEach(category => addCategory(category.name));
 }
 
 function alertForResource (resource, index) {
-  var alerts = SCHEMA.filter(function (category) {
-    return 'alerts' === category.name;
-  })[0];
-  var alert = {
+  const alerts = SCHEMA.filter(category => 'alerts' === category.name)[0];
+  const alert = {
     name: alerts.names[index % alerts.names.length],
     state: 'Active',
     status: resource.status,
-    uri: '/rest/alerts/r' + index + '-' + resource.category,
+    uri: `/rest/alerts/r${index}-${resource.category}`,
     category: 'alerts',
     created: resource.created,
     modified: resource.modified,
@@ -194,23 +195,23 @@ function alertForResource (resource, index) {
     }
   };
 
-  data.addResource('alerts', alert);
+  addResource('alerts', alert);
 }
 
 function buildItem (options) { //categoryName, index, name, date) {
-  var category = options.category;
+  const category = options.category;
 
-  var resource = {
+  const resource = {
     name: options.name,
     state: 'Online',
-    uri: '/rest/' + category.name + '/' + options.index,
+    uri: `/rest/${category.name}/${options.index}`,
     category: category.name,
     created: options.date.toISOString(),
     modified: options.date.toISOString()
   };
 
   if (!category.noStatus) {
-    var statusDistribution = ('alerts' === category.name ?
+    const statusDistribution = ('alerts' === category.name ?
       [['Critical', 7], 'Warning'] :
       [['Disabled', 3], ['Warning', 5], ['Critical', 7], 'OK']);
     resource.status = distribute(statusDistribution);
@@ -236,17 +237,17 @@ function buildItem (options) { //categoryName, index, name, date) {
 }
 
 function buildItems (category) {
-  var date = new Date();
-  var count = category.count || RESOURCE_COUNT;
+  let date = new Date();
+  let count = category.count || RESOURCE_COUNT;
 
   for (var i = 1; i <= count; i++) {
-    var name;
-    var attributes;
+    let name;
+    let attributes;
     if (category.prefix) {
       if (Array.isArray(category.prefix)) {
-        name = category.prefix[i % category.prefix.length] + ' ' + i;
+        name = `${category.prefix[i % category.prefix.length]} ${i}`;
       } else {
-        name = category.prefix + ' ' + i;
+        name = `${category.prefix} ${i}`;
       }
     } else if (category.names) {
       name = category.names[i % category.names.length];
@@ -258,16 +259,16 @@ function buildItems (category) {
         name = attributes.name;
       }
     }
-    var options = {
+    const options = {
       category: category,
       index: i,
       name: name,
       date: date,
       attributes: attributes
     };
-    var resource = buildItem(options);
+    const resource = buildItem(options);
 
-    data.addResource(category.name, resource);
+    addResource(category.name, resource);
 
     // randomly reduce timestamp for the next item
     date.setDate(date.getDate() - random(5) + 1);
@@ -275,26 +276,24 @@ function buildItems (category) {
 }
 
 function createResources () {
-  SCHEMA.forEach(function (category) {
-    buildItems(category);
-  });
+  SCHEMA.forEach(category => buildItems(category));
 }
 
 function createActivity () {
   // associate alerts and tasks with resources
-  var resources = [];
-  SCHEMA.filter(function (category) {
-    return ('alerts' !== category.name && 'tasks' !== category.name &&
-      'appliances' !== category.name);
-  }).forEach(function (category) {
-    resources = resources.concat(data.getItems(category.name));
+  let resources = [];
+  SCHEMA.filter(category => (
+    'alerts' !== category.name && 'tasks' !== category.name &&
+    'appliances' !== category.name
+  )).forEach(category => {
+    resources = resources.concat(getItems(category.name));
   });
-  var date = new Date();
+  let date = new Date();
 
-  var index = 0;
-  data.getItems('alerts', true).forEach(function(alert) {
+  let index = 0;
+  getItems('alerts', true).forEach(alert => {
     if ('Active' !== alert.state) {
-      var resource = resources[index];
+      const resource = resources[index];
       index += 1;
       alert.attributes = {
         associatedResourceCategory: resource.category,
@@ -313,8 +312,8 @@ function createActivity () {
 
   index = 0;
   date = new Date();
-  data.getItems('tasks', true).forEach(function(task) {
-    var resource = resources[index];
+  getItems('tasks', true).forEach(task => {
+    const resource = resources[index];
     index += 1;
     task.attributes = {
       associatedResourceCategory: resource.category,
@@ -323,25 +322,25 @@ function createActivity () {
       parentTaskUri: null,
       owner: USERS[index % USERS.length]
     };
-    task.state = distribute([['Running', 5], ['Critical', 6], ['Warning', 3], 'Completed']);
-    var taskStateMap = {
+    task.state = distribute([['Running', 5], ['Critical', 6], ['Warning', 3],
+      'Completed']);
+    const taskStateMap = {
       'Completed': 'OK',
       'Warning': 'Warning',
       'Critical': 'Critical'
     };
 
-    var createdDate;
     if ('Running' === task.state) {
       task.status = 'Unknown';
-      var modifiedDate = new Date();
-      createdDate = new Date(modifiedDate.getTime());
+      const modifiedDate = new Date();
+      let createdDate = new Date(modifiedDate.getTime());
       createdDate.setMinutes(createdDate.getMinutes() - random(20) + 1);
       task.created = createdDate.toISOString();
       task.modified = modifiedDate.toISOString();
       task.percentComplete = random(90);
     } else {
       task.status = taskStateMap[task.state];
-      createdDate = new Date(date.getTime());
+      let createdDate = new Date(date.getTime());
       createdDate.setMinutes(createdDate.getMinutes() - random(20) + 1);
       task.created = createdDate.toISOString();
       task.modified = date.toISOString();
@@ -354,22 +353,22 @@ function createActivity () {
 }
 
 function createAssociations () {
-  SCHEMA.forEach(function (category) {
+  SCHEMA.forEach(category => {
     if (category.hasOwnProperty('associations')) {
 
-      for (var name in category.associations) {
+      for (let name in category.associations) {
         if (category.associations.hasOwnProperty(name)) {
 
-          var schema = category.associations[name];
-          var parents = data.getItems(category.name);
-          var children = data.getItems(schema.category);
-          var childIndex = 0;
+          const schema = category.associations[name];
+          const parents = getItems(category.name);
+          const children = getItems(schema.category);
+          let childIndex = 0;
 
-          parents.forEach(function(parent) {
+          parents.forEach(parent => {
             for (var i = 0; i < schema.count; i++) {
               if (childIndex < children.length) {
-                var child = children[childIndex];
-                data.addAssociation(name, parent.uri, child.uri);
+                const child = children[childIndex];
+                addAssociation(name, parent.uri, child.uri);
                 if (schema.childUriAttribute) {
                   child[schema.childUriAttribute] = parent.uri;
                 }
@@ -388,13 +387,11 @@ function createAssociations () {
 
 function customize () {
   // add random VM utilization
-  data.getItems('virtual-machines', true).forEach(function (item) {
-    addUtilization(item);
-  });
+  getItems('virtual-machines', true).forEach(item => addUtilization(item));
 }
 
 function initializeSettings () {
-  var settings = {
+  const settings = {
     description: 'These are the configuration settings for an Ingot.',
     state: 'initial', // initial | updating | ready
     name: 'cluster PA 4',
@@ -452,10 +449,10 @@ function initializeSettings () {
     eula: 'http://ferret.grommet.io/eula',
     writtenOffer: 'http://ferret.grommet.io/written-offer'
   };
-  data.setSettings(settings);
+  setSettings(settings);
 }
 
-var steps = [
+const steps = [
   createCategories,
   createResources,
   createActivity,
@@ -464,29 +461,30 @@ var steps = [
   initializeSettings
 ];
 
-function initialize () {
-  data.setStatus({state: 'initializing', percent: 0});
-  var index = 0;
-  var timer = setInterval(function () {
+export function generate () {
+  setStatus({state: 'initializing', percent: 0});
+  let index = 0;
+  const timer = setInterval(() => {
     steps[index]();
     index += 1;
     if (index >= steps.length) {
-      data.setStatus({state: 'initialized'});
+      setStatus({state: 'initialized'});
       clearInterval(timer);
     } else {
-      data.setStatus({state: 'initializing',
+      setStatus({state: 'initializing',
         percent: Math.floor((index / steps.length) * 100)});
     }
   }, INITIALIZE_STEP_INTERVAL);
 }
 
-function addUtilization (item) {
-  // If the item came from the generator, copy attributes so each item has its own
-  var attributes = item.attributes || {};
+export function addUtilization (item) {
+  // If the item came from the generator, copy attributes so each item has
+  // its own
+  let attributes = item.attributes || {};
   if (item._indexAttributes) {
     attributes = JSON.parse(JSON.stringify(item._indexAttributes));
   }
-  var size = item.size || attributes.size;
+  const size = item.size || attributes.size;
   if ('Online' === item.state) {
     attributes.cpuUtilization = random(100 - 0);
     attributes.cpuUsed = Math.round(size.vCpus *
@@ -495,10 +493,14 @@ function addUtilization (item) {
     attributes.memoryUsed = Math.round(size.memory *
       (attributes.memoryUtilization / 10.0)) / 10.0;
     if (! attributes.diskReads) {
-      attributes.diskReads = historicalData(0, 100, 20); // kb per second over time
-      attributes.diskWrites = historicalData(0, 100, 20); // kb per second over time
-      attributes.networkPackets = historicalData(0, 100, 20); // packets over time
-      attributes.networkThroughput = historicalData(0, 500, 20); // kb per second over time
+      // kb per second over time
+      attributes.diskReads = historicalData(0, 100, 20);
+      // kb per second over time
+      attributes.diskWrites = historicalData(0, 100, 20);
+      // packets over time
+      attributes.networkPackets = historicalData(0, 100, 20);
+      // kb per second over time
+      attributes.networkThroughput = historicalData(0, 500, 20);
     }
   } else {
     attributes.cpuUtilization = 0;
@@ -514,10 +516,3 @@ function addUtilization (item) {
     item._resourceAttributes = attributes;
   }
 }
-
-var Generator = {
-  generate: initialize,
-  addUtilization: addUtilization
-};
-
-module.exports = Generator;
