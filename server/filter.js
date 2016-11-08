@@ -1,8 +1,7 @@
 // (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP
-var _ = require('lodash');
 
-var TRACE_PARSING = false;
-var TRACE_MATCHING = false;
+const TRACE_PARSING = false;
+const TRACE_MATCHING = false;
 
 // don't convert timestamps, MAC addresses, or WWNs to attribute:value
 // This pattern matches the name: ^[^\d:'"\s]{2}[^:'"\s]+
@@ -10,17 +9,17 @@ var TRACE_MATCHING = false;
 // pattern three times, once for single quoted value, once for double quoted
 // value, and lastly with no quotes.
 // We don't build this programmatically for better performance.
-var ATTRIBUTE_REGEXP =
+const ATTRIBUTE_REGEXP =
   /^[^\d:'"\s]{1}[^:'"\s]*:'[^']+'|^[^\d:'"\s]{1}[^:'"\s]*:"[^"]+"|^[^\d:'"\s]{1}[^:'"\s]*:[^'"\s]+/;
 // allow for text to contain quotes
-var TEXT_REGEXP = /^[^'"\s]+|^'[^']+'|^"[^"]+"/;
+const TEXT_REGEXP = /^[^'"\s]+|^'[^']+'|^"[^"]+"/;
 
-var TIMESTAMP_REGEXP = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
+const TIMESTAMP_REGEXP = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
 
 // TODO: This won't work in deployment context, use locally for now
 //var StringConvert = require('../../src/js/utils/StringConvert');
-var StringConvert = {
-  unquoteIfNecessary: function (text) {
+const StringConvert = {
+  unquoteIfNecessary: (text) => {
     // remove surrounding quotes
     if ((text[0] === '\'' && text[text.length - 1] === '\'') ||
       (text[0] === '"' && text[text.length - 1] === '"')) {
@@ -30,11 +29,11 @@ var StringConvert = {
   }
 };
 
-function filterUserQuery (items, userQuery) {
+export function filterUserQuery (items, userQuery) {
   // handle quoted strings, e.g. 'a b' c "d e"
-  var regexp = /'([^']+)'|"([^"]+)"|(\w+)/g;
-  var matches;
-  var terms = [];
+  const regexp = /'([^']+)'|"([^"]+)"|(\w+)/g;
+  let matches;
+  let terms = [];
   while ((matches = regexp.exec(userQuery)) !== null) {
     if (matches[1]) {
       terms.push(new RegExp(matches[1], 'i'));
@@ -45,14 +44,15 @@ function filterUserQuery (items, userQuery) {
     }
   }
 
-  var result = items.filter(function(item) {
-    var unmatchedTerms = terms.slice(0);
-    _.forOwn(item, function(value) {
-      unmatchedTerms = unmatchedTerms.filter(function(term) {
-        return !term.test(value);
+  const result = items.filter((item) => {
+    let unmatchedTerms = terms.slice(0);
+    Object.keys(item).forEach(key => {
+      const value = item[key];
+      unmatchedTerms = unmatchedTerms.filter((term) => {
+        return term.test(value);
       });
       if (unmatchedTerms.length === 0) {
-        return false;
+        return true;
       }
     });
     return (unmatchedTerms.length === 0);
@@ -64,43 +64,45 @@ function filterUserQuery (items, userQuery) {
 function AttributeTerm (text) {
   this._not = false;
 
-  var parts = text.toLowerCase().split(':');
+  const parts = text.toLowerCase().split(':');
   this._name = parts[0];
   this._value = StringConvert.unquoteIfNecessary(parts[1]);
 
-  this.not = function (not) {
+  this.not = (not) => {
     this._not = not;
   };
 
-  this.isRelatedTo = function (term) {
+  this.isRelatedTo = (term) => {
     return (this._name === term._name);
   };
 
-  this.matches = function (item) {
-    var result = ((this._not || 'null' === this._value) ? true : false);
-    _.forOwn(item, function (value, name) {
-      if ('attributes' === name) {
+  this.matches = (item) => {
+    let result = ((this._not || 'null' === this._value) ? true : false);
+    Object.keys(item).some(key => {
+      const value = item[key];
+      if ('attributes' === key) {
         result = this.matches(value);
         if (result || this._not) {
-          return false;
+          return true;
         }
       } else {
-        if (name.toLowerCase() === this._name &&
+        if (key.toLowerCase() === this._name &&
           ((value && value.toLowerCase() === this._value) ||
           (! value && 'null' === this._value))) {
           result = (this._not ? false : true);
-          return false;
+          return true;
         }
       }
-    }.bind(this));
+    });
     if (result && TRACE_MATCHING && item.uri) {
-      console.log('!!! ATTRIBUTE', result, item.uri, this._not ? 'NOT' : '', this._name, this._value);
+      console.log('!!! ATTRIBUTE', result, item.uri,
+        this._not ? 'NOT' : '', this._name, this._value);
     }
     return result;
   };
 
-  this.toString = function (prefix) {
-    return prefix + (this._not ? ' not ' : '') + this._name + ':' + this._value;
+  this.toString = (prefix) => {
+    return `${prefix}${this._not ? ' not ' : ''}${this._name}:${this._value}`;
   };
 }
 
@@ -110,47 +112,49 @@ function TextTerm (text) {
   this._text = text;
 
   // if the string is quoted, require matching at both ends
-  var unquoted = StringConvert.unquoteIfNecessary(text);
+  const unquoted = StringConvert.unquoteIfNecessary(text);
   if (text === unquoted) {
     this._regexp = new RegExp(text, 'i');
   } else {
-    this._regexp = new RegExp('^' + unquoted + '$', 'i');
+    this._regexp = new RegExp(`^${unquoted}$`, 'i');
   }
 
-  this.not = function (not) {
+  this.not = (not) => {
     this._not = not;
   };
 
-  this.isRelatedTo = function () {
+  this.isRelatedTo = () => {
     return false;
   };
 
-  this.matches = function (item) {
-    var result = (this._not ? true : false);
-    var matched;
-    _.forOwn(item, function(value, name) {
-      if ('attributes' === name) {
+  this.matches = (item) => {
+    let result = (this._not ? true : false);
+    let matched;
+    Object.keys(item).forEach(key => {
+      const value = item[key];
+      if ('attributes' === key) {
         result = this.matches(value);
         if (result || this._not) {
-          return false;
+          return true;
         }
       } else {
         // Don't match timestamps against short strings
         if (value && this._regexp.test(value) &&
           (text.length > 5 || ! TIMESTAMP_REGEXP.test(value))) {
           result = (this._not ? false : true);
-          matched = name + ':' + value;
-          return false;
+          matched = `${key}:${value}`;
+          return true;
         }
       }
-    }, this);
+    });
     if (result && TRACE_MATCHING) {
-      console.log('!!! REGEXP', result, item.uri, matched, this._not ? 'NOT' : '', this._regexp);
+      console.log('!!! REGEXP', result, item.uri, matched,
+        this._not ? 'NOT' : '', this._regexp);
     }
     return result;
   };
 
-  this.toString = function (prefix) {
+  this.toString = (prefix) => {
     return prefix + (this._not ? ' not ' : '') + this._regexp;
   };
 }
@@ -160,14 +164,14 @@ function TextTerm (text) {
 // They have a _left term, a _right term, and an _op (AND or OR).
 function Expression () {
 
-  this.op = function (op) {
+  this.op = (op) => {
     if (! this._op) {
       this._op = op;
     } else {
       // already have an op, nest
       // If the right is a simple term, convert it to an expression.
       if (! this._right._left) {
-        var expression = new Expression();
+        let expression = new Expression();
         expression.addTerm(this._right);
         expression.op(op);
         this._right = expression;
@@ -178,7 +182,7 @@ function Expression () {
     }
   };
 
-  this.addTerm = function (term) {
+  this.addTerm = (term) => {
     if (! this._left) {
       this._left = term;
     } else if (! this._right) {
@@ -194,7 +198,7 @@ function Expression () {
       // We already have a left and a right.
       // If the right is a simple term, convert it to an expression.
       if (! this._right._left) {
-        var expression = new Expression();
+        let expression = new Expression();
         expression.addTerm(this._right);
         this._right = expression;
       }
@@ -203,12 +207,12 @@ function Expression () {
     }
   };
 
-  this.isRelatedTo = function () {
+  this.isRelatedTo = () => {
     return false;
   };
 
-  this.matches = function (item) {
-    var result = false;
+  this.matches = (item) => {
+    let result = false;
     if (this._left) {
       result = this._left.matches(item);
     }
@@ -226,9 +230,9 @@ function Expression () {
     return result;
   };
 
-  this.toString = function (prefix) {
+  this.toString = (prefix) => {
     prefix = prefix || '';
-    var result = '';
+    let result = '';
     if (this._left) {
       result += this._left.toString(prefix + '  ') + "\n";
     }
@@ -255,12 +259,12 @@ function parseSpace (text) {
 }
 
 function parseParens (text, expression) {
-  var result = 0;
+  let result = 0;
   if ('(' === text[0]) {
     traceParsing('--begin-paren--');
     // NOTE: This doesn't handle nested parens yet.
-    var endIndex = text.indexOf(')');
-    var subExpression = parseQuery(text.slice(1, endIndex));
+    const endIndex = text.indexOf(')');
+    const subExpression = parseQuery(text.slice(1, endIndex));
     traceParsing('--end-paren--');
     expression.addTerm(subExpression);
     result = endIndex + 1;
@@ -269,7 +273,7 @@ function parseParens (text, expression) {
 }
 
 function parseAnd (text, expression) {
-  var result = 0;
+  let result = 0;
   if ('AND' === text.slice(0, 3)) {
     traceParsing('--and--');
     result = 3;
@@ -279,7 +283,7 @@ function parseAnd (text, expression) {
 }
 
 function parseOr (text, expression) {
-  var result = 0;
+  let result = 0;
   if ('OR' === text.slice(0, 2)) {
     traceParsing('--or--');
     result = 2;
@@ -289,7 +293,7 @@ function parseOr (text, expression) {
 }
 
 function parseNot (text, expression) {
-  var result = 0;
+  let result = 0;
   if ('NOT' === text.slice(0, 3)) {
     traceParsing('--not--');
     result = 3;
@@ -299,25 +303,25 @@ function parseNot (text, expression) {
 }
 
 function parseAttribute (text, expression) {
-  var result = 0;
-  var matches = text.match(ATTRIBUTE_REGEXP);
+  let result = 0;
+  const matches = text.match(ATTRIBUTE_REGEXP);
   if (matches) {
     traceParsing('--attribute--');
     // attribute:value
     result = matches[0].length;
-    var term = new AttributeTerm(matches[0]);
+    const term = new AttributeTerm(matches[0]);
     expression.addTerm(term);
   }
   return result;
 }
 
 function parseText (text, expression) {
-  var result = 0;
-  var matches = text.match(TEXT_REGEXP);
+  let result = 0;
+  const matches = text.match(TEXT_REGEXP);
   if (matches) {
     traceParsing('--text--');
     result = matches[0].length;
-    var term = new TextTerm(matches[0]);
+    const term = new TextTerm(matches[0]);
     expression.addTerm(term);
   }
   return result;
@@ -325,7 +329,7 @@ function parseText (text, expression) {
 
 function parseQuery (query) {
 
-  var parsers = [
+  const parsers = [
     parseSpace,
     parseParens,
     parseAnd,
@@ -334,17 +338,17 @@ function parseQuery (query) {
     parseAttribute,
     parseText
   ];
-  var remaining = query;
-  var expression = new Expression();
+  let remaining = query;
+  let expression = new Expression();
   traceParsing('--parse-- ' + query);
 
   while (remaining.length > 0) {
     for (var i = 0; i < parsers.length; i += 1) {
-      var parser = parsers[i];
-      var length = parser(remaining, expression);
+      const parser = parsers[i];
+      const length = parser(remaining, expression);
       if (length > 0) {
         remaining = remaining.slice(length);
-        traceParsing('  parsed ' + length + ' leaving ' + remaining);
+        traceParsing(`  parsed ${length} leaving ${remaining}`);
         break;
       }
     }
@@ -355,29 +359,29 @@ function parseQuery (query) {
   return expression;
 }
 
-function filterQuery (items, query) {
-  var expression = parseQuery(query);
-  var result = items.filter(function(item) {
+export function filterQuery (items, query) {
+  const expression = parseQuery(query);
+  const result = items.filter((item) => {
     return expression.matches(item);
   });
   return result;
 }
 
-function filterFilter (items, filterParam) {
+export function filterFilter (items, filterParam) {
   // convert filter to something more useful for comparison
-  var filter = {};
+  let filter = {};
   (typeof filterParam === 'string' ? [filterParam] : filterParam)
-    .forEach(function(term) {
-      var parts = term.split(':');
+    .forEach((term) => {
+      const parts = term.split(':');
       if (! filter[parts[0]]) {
         filter[parts[0]] = [];
       }
       filter[parts[0]].push(parts[1].toLowerCase());
     });
-  var result = items.filter(function(item) {
-    var match = false;
-    for (var name in filter) {
-      match = filter[name].some(function(value) {
+  const result = items.filter((item) => {
+    let match = false;
+    for (let name in filter) {
+      match = filter[name].some((value) => {
         return (item[name].toLowerCase() === value);
       });
       if (! match) {
@@ -436,31 +440,24 @@ function attributeValue (item, attribute) {
     item[attribute];
 }
 
-function sortItems (items, sort) {
-  var parts = sort.split(':');
-  var attribute = parts[0];
-  var ascending = ('asc' === parts[1]);
-  items.sort(function(m1, m2) {
-    var first = (ascending ? m1 : m2);
-    var second = (ascending ? m2 : m1);
-    var firstValue = attributeValue(first, attribute);
-    var secondValue = attributeValue(second, attribute);
+export function sortItems (items, sort) {
+  const parts = sort.split(':');
+  const attribute = parts[0];
+  const ascending = ('asc' === parts[1]);
+  items.sort((m1, m2) => {
+    const first = (ascending ? m1 : m2);
+    const second = (ascending ? m2 : m1);
+    const firstValue = attributeValue(first, attribute);
+    const secondValue = attributeValue(second, attribute);
     if (typeof firstValue === 'number' && typeof secondValue === 'number') {
       return firstValue - secondValue;
-    } else if (typeof firstValue === 'string' && typeof secondValue === 'string') {
+    } else if (typeof firstValue === 'string' &&
+      typeof secondValue === 'string') {
       return alphanum(firstValue.toLowerCase(), secondValue.toLowerCase());
     } else {
-      console.log('!!! Invalid sort types for', attribute, firstValue, secondValue);
+      console.log('!!! Invalid sort types for', attribute, firstValue,
+        secondValue);
       return 0;
     }
   });
 }
-
-var Filter = {
-  filterUserQuery: filterUserQuery, // (items, userQuery)
-  filterQuery: filterQuery, // (items, query)
-  filterFilter: filterFilter, // (items, filter)
-  sort: sortItems // (items, sort)
-};
-
-module.exports = Filter;

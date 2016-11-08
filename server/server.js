@@ -1,37 +1,34 @@
 // (C) Copyright 2014-2016 Hewlett Packard Enterprise Development LP
 
 import compression from 'compression';
-var Ddos = require('ddos');
+import Ddos from 'ddos';
 // increase ddos burst to avoid false positives with this app
-var ddos = new Ddos({ burst: 80 });
-var express = require('express');
-var http = require("http");
-var https = require("https");
-var morgan = require('morgan');
-var bodyParser = require('body-parser');
-var busboyBodyParser = require('busboy-body-parser');
-var cookieParser = require('cookie-parser');
-var path = require('path');
-var rest = require('./rest');
-var throng = require('throng');
+const ddos = new Ddos({ burst: 80 });
+import express from 'express';
+import http from "http";
+import https from "https";
+import morgan from 'morgan';
+import bodyParser from 'body-parser';
+import busboyBodyParser from 'busboy-body-parser';
+import cookieParser from 'cookie-parser';
+import path from 'path';
+import rest from './rest';
+import throng from 'throng';
 
-var ATLAS_SERVER = undefined;
+const ATLAS_SERVER = undefined;
 
-var PORT = process.env.PORT || 8101;
-var PREFIX = '/';
-if (process.env.PREFIX) {
-  PREFIX = '/' + process.env.PREFIX + '/';
-}
+const PORT = process.env.PORT || 8101;
+const PREFIX = process.env.PREFIX ? `/${process.env.PREFIX}/` : '/';
 
 // This allows for a self signed certificate from Atlas
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-var WORKERS = process.env.WEB_CONCURRENCY || 1;
+const WORKERS = process.env.WEB_CONCURRENCY || 1;
 
 throng(WORKERS, start);
 
 function start () {
-  var app = express();
+  const app = express();
 
   app.use(ddos.express);
 
@@ -55,61 +52,61 @@ function start () {
 
     // Proxy /rest requests to another server
 
-    app.get('/rest/*', function (req, res) {
-      var options = {
+    app.get('/rest/*', (req, res) => {
+      const options = {
         host:   ATLAS_SERVER,
         path:   req.url,
         method: 'GET',
         headers: req.headers
       };
-      var data = '';
+      let data = '';
 
-      var creq = https.request(options, function(cres) {
+      var creq = https.request(options, (cres) => {
         cres.setEncoding('utf8');
-        cres.on('data', function(chunk) {
+        cres.on('data', (chunk) => {
           data += chunk;
         });
-        cres.on('close', function() {
+        cres.on('close', () => {
           res.status(cres.statusCode).send(data);
         });
-        cres.on('end', function() {
+        cres.on('end', () => {
           res.status(cres.statusCode).send(data);
         });
-      }).on('error', function(e) {
+      }).on('error', (e) => {
         console.log('!!! error', e.message);
         res.status(500).send(e.message);
       });
       creq.end();
     });
 
-    app.post('/rest/*', function (req, res) {
-      var options = {
+    app.post('/rest/*', (req, res) => {
+      const options = {
         host:   ATLAS_SERVER,
         path:   req.url,
         method: 'POST',
         headers: req.headers
       };
-      var data = '';
+      let data = '';
 
-      var creq = https.request(options, function(cres) {
+      const creq = https.request(options, (cres) => {
         // set encoding
         cres.setEncoding('utf8');
         res.append('Content-Type', 'application/json');
         // wait for data
-        cres.on('data', function(chunk) {
+        cres.on('data', (chunk) => {
           data += chunk;
         });
-        cres.on('close', function() {
+        cres.on('close', () => {
           res.status(cres.statusCode).send(data);
         });
-        cres.on('end', function() {
+        cres.on('end', () => {
           res.status(cres.statusCode).send(data);
         });
-      }).on('error', function(e) {
+      }).on('error', (e) => {
         console.log('!!! error', e.message);
         res.status(500).send(e.message);
       });
-      creq.write(JSON.stringify(req.body), function (err) {
+      creq.write(JSON.stringify(req.body), (err) => {
         creq.end();
       });
     });
@@ -117,16 +114,12 @@ function start () {
 
   // UI serving
 
-  // app.use('/phoenix', express.static(path.join(__dirname, '/../dist')));
-  // app.get('/phoenix/*', function (req, res) {
-  //   res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
-  // });
   app.use('/', express.static(path.join(__dirname, '/../dist')));
-  app.get('/*', function (req, res) {
+  app.get('/*', (req, res) => {
     res.sendFile(path.resolve(path.join(__dirname, '/../dist/index.html')));
   });
 
-  var server = http.createServer(app);
+  const server = http.createServer(app);
 
   rest.setup(server, PREFIX);
 
