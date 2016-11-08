@@ -55,6 +55,6 @@
   },
   "scripts": {
     "build": "gulp dist",
-    "start": "node server/server.js"
+    "start": "babel-node server/server.js"
   }
 }
