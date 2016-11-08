@@ -333,7 +333,7 @@ function createActivity () {
     var createdDate;
     if ('Running' === task.state) {
       task.status = 'Unknown';
-      modifiedDate = new Date();
+      var modifiedDate = new Date();
       createdDate = new Date(modifiedDate.getTime());
       createdDate.setMinutes(createdDate.getMinutes() - random(20) + 1);
       task.created = createdDate.toISOString();
