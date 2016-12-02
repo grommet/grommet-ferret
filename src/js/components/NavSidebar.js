@@ -3,6 +3,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { navActivate } from '../actions/actions';
+import Box from 'grommet/components/Box';
 import Sidebar from 'grommet/components/Sidebar';
 import Header from 'grommet/components/Header';
 import Footer from 'grommet/components/Footer';
@@ -43,7 +44,7 @@ class NavSidebar extends Component {
           <Button icon={<CloseIcon />} onClick={this._onClose} plain={true}
             a11yTitle="Close Menu" />
         </Header>
-        <Menu primary={true}>
+        <Menu fill={true} primary={true}>
           {links}
         </Menu>
         <Footer pad={{horizontal: 'medium', vertical: 'small'}}>

@@ -46,7 +46,7 @@
   "devDependencies": {
     "del": "^2.0.2",
     "exports-loader": "^0.6.3",
-    "grommet-toolbox": "^0.4.5",
+    "grommet-toolbox": "^1.0.0",
     "gulp": "^3.9.0",
     "gulp-git": "^1.2.3",
     "gulp-nodemon": "^2.0.3",
