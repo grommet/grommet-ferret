@@ -8,3 +8,6 @@ node_modules
 *tmp*
 **sublime-project**
 **sublime-workspace**
+
+# temporary while yarn does not fix problems with bad hash
+yarn.lock
