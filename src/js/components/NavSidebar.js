@@ -43,7 +43,7 @@ class NavSidebar extends Component {
           <Button icon={<CloseIcon />} onClick={this._onClose} plain={true}
             a11yTitle="Close Menu" />
         </Header>
-        <Menu primary={true}>
+        <Menu fill={true} primary={true}>
           {links}
         </Menu>
         <Footer pad={{horizontal: 'medium', vertical: 'small'}}>
