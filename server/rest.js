@@ -562,14 +562,18 @@ router.post('/settings', (req, res) => {
   });
 });
 
-router.get('/update', (req, res) => {
-  var update = getUpdate();
-  if (update) {
-    res.json(update);
-  } else {
-    res.status(404).send();
-  }
-});
+function getOneFrom (path, func) {
+  router.get(path, (req, res) => {
+    var object = func();
+    if (object) {
+      res.json(object);
+    } else {
+      res.status(404).send();
+    }
+  });
+}
+
+getOneFrom('/update', getUpdate);
 
 router.post('/update/upload', (req, res) => {
   const resource = getResource('/rest/appliances/1');
@@ -757,14 +761,7 @@ router.post('/backup', (req, res) => {
   });
 });
 
-router.get('/backup', (req, res) => {
-  const backup = getBackup();
-  if (backup) {
-    res.json(backup);
-  } else {
-    res.status(404).send();
-  }
-});
+getOneFrom('/backup', getBackup);
 
 router.delete('/backup', (req, res) => {
   setBackup({});
@@ -789,14 +786,7 @@ router.post('/support', (req, res) => {
   });
 });
 
-router.get('/support', (req, res) => {
-  const support = getSupport();
-  if (support) {
-    res.json(support);
-  } else {
-    res.status(404).send();
-  }
-});
+getOneFrom('/support', getSupport);
 
 router.delete('/support', (req, res) => {
   setSupport({});
