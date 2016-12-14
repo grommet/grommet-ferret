@@ -80,13 +80,13 @@ class ActivityItem extends Component {
         duration = Duration(item.created, item.modified);
       }
       result = (
-        <span>
+        <Box direction='row' pad={{ between: 'small' }}>
           <Meter size="small"
             value={item.percentComplete || 0}
             a11yTitle="Progress bar" />
           <Value size="small" value={item.percentComplete || 0} units="%" />
           <span className="secondary">{duration}</span>
-        </span>
+        </Box>
       );
     }
     return result;
