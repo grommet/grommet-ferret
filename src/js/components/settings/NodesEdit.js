@@ -11,6 +11,17 @@ import Paragraph from 'grommet/components/Paragraph';
 import CheckBox from 'grommet/components/CheckBox';
 import ErrorList from './ErrorList';
 
+const Field = (props) => {
+  const { errors, index, label, onChange, property, type, value } = props;
+  return (
+    <FormField htmlFor={`${property}-${index}`}
+      label={label} error={errors[property]}>
+      <input id={`${property}-${index}`} name={`${property}-${index}`}
+        type={type || 'text'} value={value} onChange={onChange} />
+    </FormField>
+  );
+};
+
 class NodesEdit extends Component {
 
   constructor (props) {
@@ -18,10 +29,7 @@ class NodesEdit extends Component {
 
     this._onSubmit = this._onSubmit.bind(this);
     this._onChange = this._onChange.bind(this);
-    this._onToggleManage = this._onToggleManage.bind(this);
-    this._onToggleCommonCredentials = (
-      this._onToggleCommonCredentials.bind(this)
-    );
+    this._onToggle = this._onToggle.bind(this);
 
     this.state = {
       nodes: props.nodes.map(node => ({ ...node, manage: true })),
@@ -109,15 +117,9 @@ class NodesEdit extends Component {
     }
   }
 
-  _onToggleCommonCredentials (index) {
+  _onToggle (index, property) {
     let nodes = this.state.nodes;
-    nodes[index].useCommonCredentials = ! nodes[index].useCommonCredentials;
-    this.setState({ nodes: nodes });
-  }
-
-  _onToggleManage (index) {
-    let nodes = this.state.nodes;
-    nodes[index].manage = ! nodes[index].manage;
+    nodes[index][property] = ! nodes[index][property];
     this.setState({ nodes: nodes });
   }
 
@@ -126,16 +128,12 @@ class NodesEdit extends Component {
     return (
       <fieldset>
         <Heading tag="h3">Common credentials</Heading>
-        <FormField key="commonUserName" htmlFor="commonUserName"
-          label="iLO user name" error={errors.commonUserName}>
-          <input id="commonUserName" name="commonUserName" type="text"
-            value={this.state.commonUserName} onChange={this._onChange} />
-        </FormField>
-        <FormField key="commonPassword" htmlFor="commonPassword"
-          label="iLO password" error={errors.commonPassword}>
-          <input id="commonPassword" name="commonPassword" type="password"
-            value={this.state.commonPassword} onChange={this._onChange} />
-        </FormField>
+        <Field label="iLO user name" property="commonUserName"
+          value={this.state.commonUserName} errors={errors}
+          onChange={this._onChange} />
+        <Field label="iLO password" property="commonPassword"
+          value={this.state.commonPassword} errors={errors}
+          onChange={this._onChange} />
       </fieldset>
     );
   }
@@ -164,25 +162,20 @@ class NodesEdit extends Component {
             <CheckBox id={`common-${index}`} name={`common-${index}`}
               label="Use common credentials"
               checked={false !== node.useCommonCredentials}
-              onChange={this._onToggleCommonCredentials.bind(this, index)} />
+              onChange={this._onToggle.bind(this,
+                index, 'useCommonCredentials')} />
           </FormField>
         );
       }
 
       if (nodes.length === 1 || false === node.useCommonCredentials) {
         credentials = [
-          <FormField key="userName" htmlFor={`userName-${index}`}
-            label="iLO user name" error={errors.userName}>
-            <input id={`userName-${index}`} name={`userName-${index}`}
-              type="text"
-              value={node.userName} onChange={this._onChange} />
-          </FormField>,
-          <FormField key="password" htmlFor={`password-${index}`}
-            label="iLO password" error={errors.password}>
-            <input id={`password-${index}`} name={`password-${index}`}
-              type="password"
-              value={node.password} onChange={this._onChange} />
-          </FormField>
+          <Field key='name' label="iLO user name" property="userName"
+            value={node.userName} errors={errors}
+            onChange={this._onChange} />,
+          <Field key='password' label="iLO password" property="password"
+            value={node.password} errors={errors}
+            onChange={this._onChange} />
         ];
       }
     }
@@ -195,7 +188,7 @@ class NodesEdit extends Component {
           <CheckBox id={`manage-${index}`} name={`manage-${index}`}
             label="Manage"
             checked={false !== node.manage}
-            onChange={this._onToggleManage.bind(this, index)} />
+            onChange={this._onToggle.bind(this, index, 'manage')} />
         </FormField>
         {addressField}
         {credentialsControl}
