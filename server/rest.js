@@ -1115,59 +1115,29 @@ router.post('/:categoryName', (req, res) => {
   });
 });
 
-router.post('/:categoryName/*/on', (req, res) => {
-  const categoryName = req.params.categoryName;
-  let resource = getResource('/rest' +
-    req.url.slice(0, req.url.length - 3), true);
-  resource.modified = (new Date()).toISOString();
-  let task = createTask(categoryName, 'Power on', resource, req);
+function restTask (endpoint, taskName, endStatus, endState) {
+  router.post(`/:categoryName/*/${endpoint}`, (req, res) => {
+    const categoryName = req.params.categoryName;
+    let resource = getResource('/rest' +
+      req.url.slice(0, req.url.length - (endpoint.length + 1)), true);
+    resource.modified = (new Date()).toISOString();
+    let task = createTask(categoryName, taskName, resource, req);
 
-  res.json({
-    taskUri: task.uri
+    res.json({
+      taskUri: task.uri
+    });
+
+    runTask(task, resource, () => {
+      resource.status = endStatus;
+      resource.state =  endState;
+      addUtilization(resource);
+    });
   });
+}
 
-  runTask(task, resource, () => {
-    resource.status = "OK";
-    resource.state =  "Online";
-    addUtilization(resource);
-  });
-});
-
-router.post('/:categoryName/*/off', (req, res) => {
-  const categoryName = req.params.categoryName;
-  let resource = getResource('/rest' +
-    req.url.slice(0, req.url.length - 4), true);
-  resource.modified = (new Date()).toISOString();
-  let task = createTask(categoryName, 'Power off', resource, req);
-
-  res.json({
-    taskUri: task.uri
-  });
-
-  runTask(task, resource, () => {
-    resource.status = "Disabled";
-    resource.state = "Offline";
-    addUtilization(resource);
-  });
-});
-
-router.post('/:categoryName/*/restart', (req, res) => {
-  const categoryName = req.params.categoryName;
-  let resource = getResource('/rest' +
-    req.url.slice(0, req.url.length - 8), true);
-  resource.modified = (new Date()).toISOString();
-  let task = createTask(categoryName, 'Restart', resource, req);
-
-  res.json({
-    taskUri: task.uri
-  });
-
-  runTask(task, resource, () => {
-    resource.status = "OK";
-    resource.state =  "Online";
-    addUtilization(resource);
-  });
-});
+restTask('on', 'Power on', 'OK', 'Online');
+restTask('off', 'Power off', 'Disabled', 'Offline');
+restTask('restart', 'Restart', 'OK', 'Online');
 
 router.put('/:categoryName/*', (req, res) => {
   const categoryName = req.params.categoryName;
