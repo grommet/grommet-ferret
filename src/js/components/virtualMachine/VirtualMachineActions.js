@@ -92,7 +92,7 @@ class VirtualMachineShow extends Component {
     let name;
     let closeControl;
     if (onClose) {
-      name = <Heading tag="h3">{virtualMachine.name}</Heading>;
+      name = <Heading tag="h3" margin='none'>{virtualMachine.name}</Heading>;
       closeControl = (
         <Button icon={<CloseIcon />} onClick={onClose}
           a11yTitle={`Close ${virtualMachine.name}`} />
