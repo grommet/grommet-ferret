@@ -19,7 +19,12 @@ let localStorage = window.localStorage;
 
 export function sessionInitialize (path) {
   return function (dispatch) {
-    const { role, token, userName } = localStorage;
+    let { role, token, userName, logoutAt } = localStorage;
+    if (! logoutAt) {
+      // This user has never logged out, generate a temporary token for them
+      userName = 'Guest';
+      token = 'simulated-token';
+    }
     updateHeaders({ Auth: token });
     dispatch({
       type: SESSION_INIT, userName: userName, token: token, role: role
@@ -47,6 +52,7 @@ export function sessionLogin (host, userName, password) {
         localStorage.userName = session.userName;
         localStorage.token = token;
         localStorage.role = session.roles[0];
+        localStorage.removeItem('logoutAt');
       } catch (e) {
         alert(
           "Unable to preserve session, probably due to being in private" +
@@ -109,6 +115,7 @@ export function sessionLogout () {
       localStorage.removeItem('userName');
       localStorage.removeItem('token');
       localStorage.removeItem('role');
+      localStorage.logoutAt = (new Date()).toISOString();
     } catch (e) {
       // ignore
     }

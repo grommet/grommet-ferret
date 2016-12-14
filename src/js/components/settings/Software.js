@@ -9,7 +9,10 @@ import Header from 'grommet/components/Header';
 import Heading from 'grommet/components/Heading';
 import Section from 'grommet/components/Section';
 import Box from 'grommet/components/Box';
+import Footer from 'grommet/components/Footer';
 import LinkPreviousIcon from 'grommet/components/icons/base/LinkPrevious';
+import GithubIcon from 'grommet/components/icons/base/SocialGithub';
+import GrommetIcon from 'grommet/components/icons/Grommet';
 import Timestamp from 'grommet/components/Timestamp';
 
 class Software extends Component {
@@ -63,6 +66,22 @@ class Software extends Component {
             </Anchor>
           </Box>
         </Section>
+        <Footer direction='column' align='start'>
+          <Box direction='row'
+            pad={{ horizontal: 'medium', vertical: 'small' }}>
+            <Anchor icon={<GithubIcon />} label="GitHub"
+              href='https://github.com/grommet/grommet-ferret' />
+          </Box>
+          <Box direction='row'
+            pad={{ horizontal: 'medium', vertical: 'small' }}>
+            <Anchor href='https://grommet.io'>
+              <Box pad={{ between: 'small' }} direction='row' align='center'>
+                <GrommetIcon size='small'/>
+                <span>Grommet</span>
+              </Box>
+            </Anchor>
+          </Box>
+        </Footer>
       </Article>
     );
   }
