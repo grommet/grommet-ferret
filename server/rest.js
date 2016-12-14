@@ -731,10 +731,14 @@ router.post('/update', (req, res) => {
   }, 10);
 });
 
-router.delete('/update', (req, res) => {
-  setUpdate({});
-  res.status(200).send();
-});
+function deleteOneWith (path, func) {
+  router.delete(path, (req, res) => {
+    func({});
+    res.status(200).send();
+  });
+}
+
+deleteOneWith('/update', setUpdate);
 
 router.post('/restart', (req, res) => {
   // In a real product, this would create a task and preserve data.
@@ -763,10 +767,7 @@ router.post('/backup', (req, res) => {
 
 getOneFrom('/backup', getBackup);
 
-router.delete('/backup', (req, res) => {
-  setBackup({});
-  res.status(200).send();
-});
+deleteOneWith('/backup', setBackup);
 
 // How support dumps should work:
 
@@ -788,10 +789,7 @@ router.post('/support', (req, res) => {
 
 getOneFrom('/support', getSupport);
 
-router.delete('/support', (req, res) => {
-  setSupport({});
-  res.status(200).send();
-});
+deleteOneWith('/support', setSupport);
 
 // How Atlas server does suppprt dumps:
 
