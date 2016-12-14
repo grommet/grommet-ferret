@@ -2,7 +2,6 @@
 
 import { createStore, combineReducers, compose, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
-import { devTools } from 'redux-devtools';
 
 // TODO: fix webpack loader to allow import * from './reducers'
 import session from './reducers/session';
@@ -26,8 +25,7 @@ import activity from './reducers/activity';
 import notifications from './reducers/notifications';
 
 export default compose(
-  applyMiddleware(thunk),
-  devTools()
+  applyMiddleware(thunk)
 )(createStore)(combineReducers({session, route, nav, status,
   settings, software, backup, support, hypervisor, directory,
   search, index, item, image, vm, dashboard, utilization,

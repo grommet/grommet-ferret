@@ -36,6 +36,9 @@ class ActivityFilter extends Component {
         nextFilter[name] = event.value.map(value => (
           typeof value === 'object' ? value.value : value)
         );
+        if (nextFilter[name].length === 0) {
+          delete nextFilter[name];
+        }
       }
       this.props.dispatch(filterIndex(index, nextFilter));
     };
