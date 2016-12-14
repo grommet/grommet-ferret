@@ -377,7 +377,7 @@ router.post('/reset-password', (req, res) => {
   res.json(null);
 });
 
-router.get('/sessions', (req, res) => {
+function returnSession (req, res) {
   const token = req.headers.auth;
   const session = getSession(token);
   if (session) {
@@ -385,17 +385,11 @@ router.get('/sessions', (req, res) => {
   } else {
     res.status(404).send();
   }
-});
+}
 
-router.get('/authz/role', (req, res) => {
-  const token = req.headers.auth;
-  const session = getSession(token);
-  if (session) {
-    res.json(session);
-  } else {
-    res.status(404).send();
-  }
-});
+router.get('/sessions', returnSession);
+
+router.get('/authz/role', returnSession);
 
 router.get('/preferences/index', (req, res) => {
   const preferences = getPreferences(req.headers.auth, req.query.category);
