@@ -44,6 +44,7 @@
     "ws": "^1.1.1"
   },
   "devDependencies": {
+    "cross-env": "^5.1.0",
     "del": "^2.0.2",
     "exports-loader": "^0.6.3",
     "grommet-toolbox": "^1.0.0",
@@ -56,6 +57,6 @@
   "scripts": {
     "build": "gulp dist",
     "start": "node server/run.js",
-    "start:dev": "NODE_ENV=development nodemon --ignore src/ server/run.js"
+    "start:dev": "cross-env NODE_ENV=development nodemon --ignore src/ server/run.js"
   }
 }
