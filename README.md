@@ -12,7 +12,7 @@
 `Password` - enter any string (it is not used or stored anywhere)
 
 ## How To
-This app demonstrates an application using [Grommet](http://grommet.io/docs/develop/get-started).
+This app demonstrates an application using [Grommet](http://grommet.io/docs/get-started).
 We demonstrate UI routing and some important patterns like Login, Resource Management (including WebSocket connections), and Search. 
 
 This application **must** have back-end data to perform login operations and manage resources.
