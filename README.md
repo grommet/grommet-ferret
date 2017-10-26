@@ -3,7 +3,7 @@
 [![Build Status](https://api.travis-ci.org/grommet/grommet-ferret.svg)](https://travis-ci.org/grommet/grommet-ferret) [![Code Climate](https://codeclimate.com/github/grommet/grommet-ferret/badges/gpa.svg)](https://codeclimate.com/github/grommet/grommet-ferret)  [![Dependency Status](https://david-dm.org/grommet/grommet-ferret.svg)](https://david-dm.org/grommet/grommet-ferret)  [![devDependency Status](https://david-dm.org/grommet/grommet-ferret/dev-status.svg)](https://david-dm.org/grommet/grommet-ferret#info=devDependencies)
 
 ## Demo
-[Live demo](http://ferret.grommet.io/) of an example application using grommet and grommet-index.
+[Live demo](http://ferret.grommet.io/) of an example application using grommet and grommet-addons.
 
 **Login credentials:**
 
