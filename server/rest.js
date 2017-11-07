@@ -987,7 +987,7 @@ router.get(/^\/index\/trees(.+)$/, (req, res) => {
 });
 
 router.get('/:categoryName/*', (req, res) => {
-  var resource = getResource(`/rest${req.url}`);
+  var resource = getResource(`/rest${req.url.split('?')[0]}`);
   if (resource) {
     res.json(resource);
   } else {

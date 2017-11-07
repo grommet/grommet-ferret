@@ -39,8 +39,10 @@ export function updateHeaders (headers) {
 
 // Internal help/generic functions
 
-function _get (uri, params) {
+function _get (uri, params = {}) {
   const options = { method: 'GET', headers: _headers };
+  // prevent IE11 to cache resources by adding a timestamp to query params
+  params[new Date().getTime()] = '';
   const query = buildQuery(params);
   return fetch(`${_host}${urlPrefix}${uri}${query}`, options)
     .then(processStatus)

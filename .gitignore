@@ -11,3 +11,6 @@ node_modules
 
 # temporary while yarn does not fix problems with bad hash
 yarn.lock
+
+coverage/**
+.eslintcache
