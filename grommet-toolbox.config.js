@@ -25,6 +25,9 @@ export default {
       })
     ]
   },
+  devServer: {
+    disableHostCheck: true
+  },
   devServerPort: 8001,
   devServerProxy: {
     "/rest/*": 'http://localhost:8101'
