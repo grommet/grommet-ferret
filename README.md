@@ -3,7 +3,7 @@
 [![Build Status](https://api.travis-ci.org/grommet/grommet-ferret.svg)](https://travis-ci.org/grommet/grommet-ferret) [![Code Climate](https://codeclimate.com/github/grommet/grommet-ferret/badges/gpa.svg)](https://codeclimate.com/github/grommet/grommet-ferret)  [![Dependency Status](https://david-dm.org/grommet/grommet-ferret.svg)](https://david-dm.org/grommet/grommet-ferret)  [![devDependency Status](https://david-dm.org/grommet/grommet-ferret/dev-status.svg)](https://david-dm.org/grommet/grommet-ferret#info=devDependencies)
 
 ## Warning
-Grommet is now using grommet-v2. This is a grommet-v1 project, hence it is no longer supported by the grommet team.
+grommet-ferret uses grommet version 1. The grommet team is no longer actively supporting version 1 of grommet. We recommend using version 2 instead.
 
 ## Demo
 [Live demo](http://ferret.grommet.io/) of an example application using grommet and grommet-addons.
